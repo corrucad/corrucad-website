@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CorruCAD v0.5</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React and ReactDOM CDN imports for development -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel standalone for JSX transformation in browser -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- jsPDF library for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+        /* Ensure canvas is responsive within its container */
+        canvas {
+            display: block;
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+        }
+        /* Tailwind CSS overrides for rounded corners for consistency */
+        .rounded-md, .rounded-lg {
+            border-radius: 0.375rem; /* default rounded-md */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <div id="root"></div>
+
+    <!-- Changed type to text/babel to enable JSX transformation -->
+    <script type="text/babel">
+        // React and ReactDOM are available globally from CDN imports
+        const { useState, useEffect, useRef, useCallback } = React;
+        // Fix: Access createRoot directly from ReactDOM global object
+        const createRoot = ReactDOM.createRoot; 
+
+        // Utility for unit conversion
+        const convertUnits = (value, fromUnit, toUnit) => {
+            if (fromUnit === toUnit) {
+                return value;
+            }
+            const conversionFactor = 25.4; // 1 inch = 25.4 mm
+            if (fromUnit === 'mm' && toUnit === 'inch') {
+                return value / conversionFactor;
+            }
+            if (fromUnit === 'inch' && toUnit === 'mm') {
+                return value * conversionFactor;
+            }
+            return value; // Should not happen
+        };
+
+        // Helper function to round a value to the nearest specified fraction (in inches)
+        const roundToNearestFraction = (valueInInches, fraction) => {
+            return Math.ceil(valueInInches / fraction) * fraction;
+        };
+
+        // Function to convert square units (sq_in to m² or ft²)
+        const convertAreaUnits = (valueInSqIn, toUnit) => {
+            if (toUnit === 'ft²') {
+                return valueInSqIn / 144; // 1 sq ft = 144 sq in
+            }
+            if (toUnit === 'm²') {
+                return valueInSqIn * (0.0254 * 0.0254); // 1 inch = 0.0254 meters
+            }
+            return valueInSqIn; // Should not happen
+        };
+
+        // Define common board profiles and their approximate thicknesses (in inches)
+        const boardProfiles = {
+            '32 ECT B': 1/8, // 0.125 inches
+            '32 ECT C': 3/16, // 0.1875 inches
+            '44 ECT B': 1/8, // 0.125 inches
+            '44 ECT C': 3/16, // 0.1875 inches
+            '48 ECT BC': 5/16, // 0.3125 inches
+            '55 ECT BC': 5/16, // 0.3125 inches
+        };
+
+        // Simplified FEFCO data and blank calculation logic
+        const fefcoStyles = {
+            '0201': { // RSC - Regular Slotted Container (Page 18 of FEFCO PDF)
+                name: 'Regular Slotted Container (RSC)',
+                description: 'Commonly used slotted box with all flaps of the same length.',
+                calculateBlank: (L_input, W_input, H_input, thickness) => {
+                    const glueFlap = 1.375; // Standard glue flap in inches
+                    const slotWidth_full_in = 3/8; // Common slot width for full slots
+                    const slotWidth_half_in = 3/16; // Common slot width for half slots (Panel 4)
+                    const oneSixteenth_in = 1/16; // 1/16 inch
+                    const angle15DegRad = 15 * Math.PI / 180; // 15 degrees in radians
+
+                    // Panel widths for blank layout (scoring allowances)
+                    const panel1_width = L_input + thickness - oneSixteenth_in;
+                    const panel2_width = W_input + thickness;
+                    const panel3_width = L_input + thickness;
+                    const panel4_width = W_input + thickness - oneSixteenth_in;
+
+                    // Define X coordinates related to glue tab and panel ends - DEFINED FIRST
+                    const x_inner_glue_tab = panel1_width + panel2_width + panel3_width + panel4_width;
+                    const x_outer_glue_tab = x_inner_glue_tab + glueFlap;
+                    const x_panel4_end_before_glue_tab = panel1_width + panel2_width + panel3_width + panel4_width;
+
+                    // Internal H for blank layout (D + 2 CAL)
+                    const internalH_for_blank = H_input + (2 * thickness);
+
+                    // Flap length for top/bottom flaps: 1/2 W + 1/2 CAL (rounded up to nearest 1/16)
+                    const halfW = W_input / 2;
+                    const halfCal = thickness / 2;
+                    const minorFlapLength_inches = roundToNearestFraction(halfW, 1/16) + roundToNearestFraction(halfCal, 1/16);
+
+                    // Blank Width: Sum of panel widths + glue flap
+                    const blankWidth = x_outer_glue_tab; // Explicitly set blankWidth
+                    // Blank Height: internalH_for_blank (body) + minorFlapLength_inches (top flap) + minorFlapLength_inches (bottom flap)
+                    const blankHeight = internalH_for_blank + (2 * minorFlapLength_inches);
+
+                    const angleOffset = Math.tan(angle15DegRad) * glueFlap;
+
+                    // Define the Y-coordinates of the main body's top and bottom score lines (where flaps meet body)
+                    const y_top_body_crease = minorFlapLength_inches;
+                    const y_bottom_body_crease = internalH_for_blank + minorFlapLength_inches;
+
+                    // Glue tab points for internal model and score line intersection check (top-left origin)
+                    // These points define the visual polygon for the glue tab on the canvas.
+                    const glueTabPoints = [
+                        { x: x_inner_glue_tab, y: y_top_body_crease }, // Inner top
+                        { x: x_outer_glue_tab, y: y_top_body_crease + angleOffset }, // Outer top angled
+                        { x: x_outer_glue_tab, y: y_bottom_body_crease - angleOffset }, // Outer bottom angled
+                        { x: x_inner_glue_tab, y: y_bottom_body_crease } // Inner bottom
+                    ];
+
+                    // Glue tab points for DXF cut lines (ordered for clockwise trace from bottom-right of panel 4)
+                    // These points define the outer contour of the glue tab portion of the blank for DXF.
+                    const dxfGlueTabPerimeterPoints = [
+                        // Point 1: Start of bottom angled cut (inner point, on the blank's main body edge)
+                        // This is the point on the right edge of panel 4 where the bottom angled cut begins.
+                        { x: x_panel4_end_before_glue_tab, y: y_bottom_body_crease },
+                        // Point 2: End of bottom angled cut (outer point, on the outer glue tab edge)
+                        { x: x_outer_glue_tab, y: y_bottom_body_crease - angleOffset },
+                        // Point 3: Start of top angled cut (outer point, on the outer glue tab edge)
+                        { x: x_outer_glue_tab, y: y_top_body_crease + angleOffset },
+                        // Point 4: End of top angled cut (inner point, on the blank's main body edge)
+                        // This is the point on the right edge of panel 4 where the top angled cut ends.
+                        { x: x_panel4_end_before_glue_tab, y: y_top_body_crease }
+                    ];
+
+                    // Glue tab score line (vertical, broken at angles)
+                    const glueTabScoreLine = {
+                        x1: x_inner_glue_tab,
+                        y1: y_top_body_crease, // FIX: Extend to top endpoint
+                        x2: x_inner_glue_tab,
+                        y2: y_bottom_body_crease // FIX: Extend to bottom endpoint
+                    };
+
+                    // Outside Dimensions (OD)
+                    const outsideDimensions = {
+                        length: L_input + (2 * thickness),
+                        width: W_input + (2 * thickness),
+                        height: H_input + (3 * thickness) // D + 3 CAL for RSC OD
+                    };
+
+                    const slots = [
+                        // Slots on top minor flaps (Panel 2 and Panel 4)
+                        // Panel 2's top flap: centered on the vertical crease between P1 & P2
+                        { x: panel1_width - (slotWidth_full_in / 2), y: 0, w: slotWidth_full_in, h: minorFlapLength_inches, type: 'full', flapEdgeY: 0 },
+                        // Panel 2's top flap: centered on the vertical crease between P2 & P3
+                        { x: (panel1_width + panel2_width) - (slotWidth_full_in / 2), y: 0, w: slotWidth_full_in, h: minorFlapLength_inches, type: 'full', flapEdgeY: 0 },
+
+                        // Panel 4's top flap: centered on the vertical crease between P3 & P4
+                        { x: (panel1_width + panel2_width + panel3_width) - (slotWidth_full_in / 2), y: 0, w: slotWidth_full_in, h: minorFlapLength_inches, type: 'full', flapEdgeY: 0 },
+                        // Panel 4's top flap: "half slot" at the glue tab edge (open to the right/glue tab side)
+                        // Its horizontal lines extend to x_inner_glue_tab. The right vertical line is omitted.
+                        { x: x_inner_glue_tab - slotWidth_half_in, y: 0, w: slotWidth_half_in, h: minorFlapLength_inches, type: 'half_right_open', flapEdgeY: 0 },
+
+                        // Slots on bottom minor flaps (Panel 2 and Panel 4)
+                        // Panel 2's bottom flap: centered on the vertical crease between P1 & P2
+                        { x: panel1_width - (slotWidth_full_in / 2), y: internalH_for_blank + minorFlapLength_inches, w: slotWidth_full_in, h: minorFlapLength_inches, type: 'full', flapEdgeY: internalH_for_blank + (2 * minorFlapLength_inches) },
+                        // Panel 2's bottom flap: centered on the vertical crease between P2 & P3
+                        { x: (panel1_width + panel2_width) - (slotWidth_full_in / 2), y: internalH_for_blank + minorFlapLength_inches, w: slotWidth_full_in, h: minorFlapLength_inches, type: 'full', flapEdgeY: internalH_for_blank + (2 * minorFlapLength_inches) },
+
+                        // Panel 4's bottom flap: centered on the vertical crease between P3 & P4
+                        { x: (panel1_width + panel2_width + panel3_width) - (slotWidth_full_in / 2), y: internalH_for_blank + minorFlapLength_inches, w: slotWidth_full_in, h: minorFlapLength_inches, type: 'full', flapEdgeY: internalH_for_blank + (2 * minorFlapLength_inches) },
+                        // Panel 4's bottom flap: "half slot" at the glue tab edge (open to the right/glue tab side)
+                        // Its horizontal lines extend to x_inner_glue_tab. The right vertical line is omitted.
+                        { x: x_inner_glue_tab - slotWidth_half_in, y: internalH_for_blank + minorFlapLength_inches, w: slotWidth_half_in, h: minorFlapLength_inches, type: 'half_right_open', flapEdgeY: internalH_for_blank + (2 * minorFlapLength_inches) },
+                    ];
+
+                    return {
+                        blankWidth,
+                        blankHeight,
+                        outsideDimensions,
+                        layout: [
+                            // Main body panels (L, W, L, W)
+                            { x: 0, y: minorFlapLength_inches, w: panel1_width, h: internalH_for_blank, type: 'panel' },
+                            { x: panel1_width, y: minorFlapLength_inches, w: panel2_width, h: internalH_for_blank, type: 'panel' },
+                            { x: panel1_width + panel2_width, y: minorFlapLength_inches, w: panel3_width, h: internalH_for_blank, type: 'panel' },
+                            { x: panel1_width + panel2_width + panel3_width, y: minorFlapLength_inches, w: panel4_width, h: internalH_for_blank, type: 'panel' },
+                            // Angled Glue tab as a polygon (for visual only)
+                            { points: glueTabPoints, type: 'polygon_cut' }, // Use glueTabPoints for visual
+                            // Top flaps
+                            { x: 0, y: 0, w: panel1_width, h: minorFlapLength_inches, type: 'flap' },
+                            { x: panel1_width, y: 0, w: panel2_width, h: minorFlapLength_inches, type: 'flap' },
+                            { x: panel1_width + panel2_width, y: 0, w: panel3_width, h: minorFlapLength_inches, type: 'flap' },
+                            { x: panel1_width + panel2_width + panel3_width, y: 0, w: panel4_width, h: minorFlapLength_inches, type: 'flap' },
+                            // Bottom flaps
+                            { x: 0, y: internalH_for_blank + minorFlapLength_inches, w: panel1_width, h: minorFlapLength_inches, type: 'flap' },
+                            { x: panel1_width, y: internalH_for_blank + minorFlapLength_inches, w: panel2_width, h: minorFlapLength_inches, type: 'flap' },
+                            { x: panel1_width + panel2_width, y: internalH_for_blank + minorFlapLength_inches, w: panel3_width, h: minorFlapLength_inches, type: 'flap' },
+                            { x: panel1_width + panel2_width + panel3_width, y: internalH_for_blank + minorFlapLength_inches, w: panel4_width, h: minorFlapLength_inches, type: 'flap' },
+                        ],
+                        scoreLines: [
+                            // Vertical scores (full height, will be broken in DXF generation)
+                            { x1: panel1_width, y1: 0, x2: panel1_width, y2: blankHeight, type: 'vertical' },
+                            { x1: panel1_width + panel2_width, y1: 0, x2: panel1_width + panel2_width, y2: blankHeight, type: 'vertical' },
+                            { x1: panel1_width + panel2_width + panel3_width, y1: 0, x2: panel1_width + panel2_width + panel3_width, y2: blankHeight, type: 'vertical' },
+                            // Glue tab specific score line (using the calculated score line points)
+                            { x1: glueTabScoreLine.x1, y1: glueTabScoreLine.y1, x2: glueTabScoreLine.x2, y2: glueTabScoreLine.y2, type: 'vertical_glue_tab' },
+                            // Horizontal scores
+                            { x1: 0, y1: minorFlapLength_inches, x2: blankWidth, y2: minorFlapLength_inches, type: 'horizontal' },
+                            { x1: 0, y1: internalH_for_blank + minorFlapLength_inches, x2: blankWidth, y2: internalH_for_blank + minorFlapLength_inches, type: 'horizontal' },
+                        ],
+                        dxfGlueTabPerimeterPoints: dxfGlueTabPerimeterPoints, // New for DXF
+                        slots: slots || [],
+                        yTopFlapScore: y_top_body_crease, // Add this for canvas drawing
+                        yBottomFlapScore: y_bottom_body_crease // Add this for canvas drawing
+                    };
+                }
+            },
+            '0203': { // Full Overlap Slotted Box (Page 19 of FEFCO PDF)
+                name: 'Full Overlap Container (FOL)', // Corrected name
+                description: 'Slotted box where outer flaps fully overlap.',
+                calculateBlank: (L_input, W_input, H_input, thickness) => {
+                    const glueFlap = 1.375; // Standard glue flap in inches
+                    const slotWidth_full_in = 3/8; // Common slot width for full slots
+                    const slotWidth_half_in = 3/16; // Common slot width for half slots (Panel 4)
+                    const oneSixteenth_in = 1/16; // 1/16 inch
+                    const angle15DegRad = 15 * Math.PI / 180; // 15 degrees in radians
+
+                    // Panel widths for blank layout (scoring allowances)
+                    const panel1_width = L_input + thickness - oneSixteenth_in;
+                    const panel2_width = W_input + thickness;
+                    const panel3_width = L_input + thickness;
+                    const panel4_width = W_input + thickness - oneSixteenth_in;
+
+                    // Define X coordinates related to glue tab and panel ends - DEFINED FIRST
+                    const x_inner_glue_tab = panel1_width + panel2_width + panel3_width + panel4_width;
+                    const x_outer_glue_tab = x_inner_glue_tab + glueFlap;
+                    const x_panel4_end_before_glue_tab = panel1_width + panel2_width + panel3_width + panel4_width;
+
+                    // Internal H for blank layout (D + 3 CAL)
+                    const internalH_for_blank = H_input + (3 * thickness);
+
+                    // Flap length for FOL: equal to W_input (no additional allowance)
+                    const majorFlapLength_inches = W_input;
+                    
+                    // Blank Width: Sum of panel widths + glue flap
+                    const blankWidth = x_outer_glue_tab; // Explicitly set blankWidth
+                    // Blank Height: majorFlapLength_inches (top flap) + internalH_for_blank (body) + majorFlapLength_inches (bottom flap)
+                    const blankHeight = internalH_for_blank + (2 * majorFlapLength_inches);
+
+                    const angleOffset = Math.tan(angle15DegRad) * glueFlap;
+
+                    // Define the Y-coordinates of the main body's top and bottom score lines (where flaps meet body)
+                    const y_top_body_crease = majorFlapLength_inches;
+                    const y_bottom_body_crease = internalH_for_blank + majorFlapLength_inches;
+
+                    // Glue tab points for internal model and score line intersection check (top-left origin)
+                    const glueTabPoints = [
+                        { x: x_inner_glue_tab, y: y_top_body_crease }, // Inner top
+                        { x: x_outer_glue_tab, y: y_top_body_crease + angleOffset }, // Outer top angled
+                        { x: x_outer_glue_tab, y: y_bottom_body_crease - angleOffset }, // Outer bottom angled
+                        { x: x_inner_glue_tab, y: y_bottom_body_crease } // Inner bottom
+                    ];
+
+                    // Glue tab points for DXF cut lines (ordered for clockwise trace from bottom-right of panel 4)
+                    const dxfGlueTabPerimeterPoints = [
+                        { x: x_panel4_end_before_glue_tab, y: y_bottom_body_crease },
+                        { x: x_outer_glue_tab, y: y_bottom_body_crease - angleOffset },
+                        { x: x_outer_glue_tab, y: y_top_body_crease + angleOffset },
+                        { x: x_panel4_end_before_glue_tab, y: y_top_body_crease }
+                    ];
+
+                    // Glue tab score line (vertical, broken at angles)
+                    const glueTabScoreLine = {
+                        x1: x_inner_glue_tab,
+                        y1: y_top_body_crease, // FIX: Extend to top endpoint
+                        x2: x_inner_glue_tab,
+                        y2: y_bottom_body_crease // FIX: Extend to bottom endpoint
+                    };
+
+                    // Outside Dimensions (OD)
+                    const outsideDimensions = {
+                        length: L_input + (2 * thickness),
+                        width: W_input + (2 * thickness),
+                        height: H_input + (4 * thickness) // D + 4 CAL for FOL OD
+                    };
+
+                    const slots = [
+                        // Slots on top minor flaps (Panel 2 (W) and Panel 4 (W))
+                        // Slot on Panel 2's top flap: centered on the vertical crease at L
+                        { x: panel1_width - (slotWidth_full_in / 2), y: 0, w: slotWidth_full_in, h: majorFlapLength_inches, type: 'full', flapEdgeY: 0 },
+                        // Slot on Panel 2's top flap: centered on the vertical crease at L+W
+                        { x: (panel1_width + panel2_width) - (slotWidth_full_in / 2), y: 0, w: slotWidth_full_in, h: majorFlapLength_inches, type: 'full', flapEdgeY: 0 },
+
+                        // Slot on Panel 4's top flap: centered on the vertical crease at L+W+L
+                        { x: (panel1_width + panel2_width + panel3_width) - (slotWidth_full_in / 2), y: 0, w: slotWidth_full_in, h: majorFlapLength_inches, type: 'full', flapEdgeY: 0 },
+                        // Panel 4's top flap: "half slot" at the glue tab edge (open to the right/glue tab side)
+                        { x: x_inner_glue_tab - slotWidth_half_in, y: 0, w: slotWidth_half_in, h: majorFlapLength_inches, type: 'half_right_open', flapEdgeY: 0 },
+
+                        // Slots on bottom minor flaps (Panel 2 (W) and Panel 4 (W))
+                        // Slot on Panel 2's bottom flap: centered on the vertical crease at L
+                        { x: panel1_width - (slotWidth_full_in / 2), y: internalH_for_blank + majorFlapLength_inches, w: slotWidth_full_in, h: majorFlapLength_inches, type: 'full', flapEdgeY: internalH_for_blank + (2 * majorFlapLength_inches) },
+                        // Slot on Panel 2's bottom flap: centered on the vertical crease at L+W
+                        { x: (panel1_width + panel2_width) - (slotWidth_full_in / 2), y: internalH_for_blank + majorFlapLength_inches, w: slotWidth_full_in, h: majorFlapLength_inches, type: 'full', flapEdgeY: internalH_for_blank + (2 * majorFlapLength_inches) },
+
+                        // Slot on Panel 4's bottom flap: centered on the vertical crease at L+W+L
+                        { x: (panel1_width + panel2_width + panel3_width) - (slotWidth_full_in / 2), y: internalH_for_blank + majorFlapLength_inches, w: slotWidth_full_in, h: majorFlapLength_inches, type: 'full', flapEdgeY: internalH_for_blank + (2 * majorFlapLength_inches) },
+                        // Panel 4's bottom flap: "half slot" at the glue tab edge (open to the right/glue tab side)
+                        { x: x_inner_glue_tab - slotWidth_half_in, y: internalH_for_blank + majorFlapLength_inches, w: slotWidth_half_in, h: majorFlapLength_inches, type: 'half_right_open', flapEdgeY: internalH_for_blank + (2 * majorFlapLength_inches) },
+                    ];
+
+                    return {
+                        blankWidth,
+                        blankHeight,
+                        outsideDimensions,
+                        layout: [
+                            // Main body panels (L, W, L, W) - positioned after top flap
+                            { x: 0, y: majorFlapLength_inches, w: panel1_width, h: internalH_for_blank, type: 'panel' },
+                            { x: panel1_width, y: majorFlapLength_inches, w: panel2_width, h: internalH_for_blank, type: 'panel' },
+                            { x: panel1_width + panel2_width, y: majorFlapLength_inches, w: panel3_width, h: internalH_for_blank, type: 'panel' },
+                            { x: panel1_width + panel2_width + panel3_width, y: majorFlapLength_inches, w: panel4_width, h: internalH_for_blank, type: 'panel' },
+                            // Angled Glue tab as a polygon
+                            { points: glueTabPoints, type: 'polygon_cut' },
+                            // Top flaps
+                            { x: 0, y: 0, w: panel1_width, h: majorFlapLength_inches, type: 'flap' }, // Top flap of P1 (L)
+                            { x: panel1_width, y: 0, w: panel2_width, h: majorFlapLength_inches, type: 'flap' }, // Top flap of P2 (W) - minor flap
+                            { x: panel1_width + panel2_width, y: 0, w: panel3_width, h: majorFlapLength_inches, type: 'flap' }, // Top flap of P3 (L)
+                            { x: panel1_width + panel2_width + panel3_width, y: 0, w: panel4_width, h: majorFlapLength_inches, type: 'flap' }, // Top flap of P4 (W) - minor flap
+                            // Bottom flaps
+                            { x: 0, y: internalH_for_blank + majorFlapLength_inches, w: panel1_width, h: majorFlapLength_inches, type: 'flap' }, // Bottom flap of P1 (L)
+                            { x: panel1_width, y: internalH_for_blank + majorFlapLength_inches, w: panel2_width, h: majorFlapLength_inches, type: 'flap' }, // Bottom flap of P2 (W) - minor flap
+                            { x: panel1_width + panel2_width, y: internalH_for_blank + majorFlapLength_inches, w: panel3_width, h: majorFlapLength_inches, type: 'flap' }, // Bottom flap of P3 (L)
+                            { x: panel1_width + panel2_width + panel3_width, y: internalH_for_blank + majorFlapLength_inches, w: panel4_width, h: majorFlapLength_inches, type: 'flap' }, // Bottom flap of P4 (W) - minor flap
+                        ],
+                        scoreLines: [
+                            // Vertical scores (full height, will be broken in DXF generation)
+                            { x1: panel1_width, y1: 0, x2: panel1_width, y2: blankHeight, type: 'vertical' },
+                            { x1: panel1_width + panel2_width, y1: 0, x2: panel1_width + panel2_width, y2: blankHeight, type: 'vertical' },
+                            { x1: panel1_width + panel2_width + panel3_width, y1: 0, x2: panel1_width + panel2_width + panel3_width, y2: blankHeight, type: 'vertical' },
+                            // Glue tab specific score line
+                            { x1: glueTabScoreLine.x1, y1: glueTabScoreLine.y1, x2: glueTabScoreLine.x2, y2: glueTabScoreLine.y2, type: 'vertical_glue_tab' },
+                            // Horizontal scores
+                            { x1: 0, y1: majorFlapLength_inches, x2: blankWidth, y2: majorFlapLength_inches, type: 'horizontal' },
+                            { x1: 0, y1: internalH_for_blank + majorFlapLength_inches, x2: blankWidth, y2: internalH_for_blank + majorFlapLength_inches, type: 'horizontal' },
+                        ],
+                        dxfGlueTabPerimeterPoints: dxfGlueTabPerimeterPoints, // New for DXF
+                        slots: slots || [],
+                        yTopFlapScore: y_top_body_crease, // Add this for canvas drawing
+                        yBottomFlapScore: y_bottom_body_crease // Add this for canvas drawing
+                    };
+                }
+            },
+            'CUSTOM_4_PANEL_TUBE': {
+                name: 'Custom 4-Panel Tube',
+                description: 'A custom 4-panel tube as per lesson, not in FEFCO library.',
+                calculateBlank: (L_input, W_input, H_input, thickness) => {
+                    const oneSixteenth_in = 1/16; // 1/16 inch in inches
+                    const glueFlap_in = 1.375; // 1.375 inch in inches
+                    const angle15DegRad = 15 * Math.PI / 180; // 15 degrees in radians
+
+                    // Panel widths for blank layout (scoring allowances)
+                    const panel1_width = L_input + thickness - oneSixteenth_in;
+                    const panel2_width = W_input + thickness;
+                    const panel3_width = L_input + thickness;
+                    const panel4_width = W_input + thickness - oneSixteenth_in;
+
+                    // Define X coordinates related to glue tab and panel ends - DEFINED FIRST
+                    const x_inner_glue_tab = panel1_width + panel2_width + panel3_width + panel4_width;
+                    const x_outer_glue_tab = x_inner_glue_tab + glueFlap_in;
+                    const x_panel4_end_before_glue_tab = panel1_width + panel2_width + panel3_width + panel4_width;
+
+                    // Internal H for blank layout (D, no allowance added)
+                    const internalH_for_blank = H_input;
+
+                    const blankWidth = x_outer_glue_tab; // Explicitly set blankWidth
+                    const blankHeight = internalH_for_blank; // For a tube, D (H) is the blank height (corrugation direction)
+
+                    const angleOffset = Math.tan(angle15DegRad) * glueFlap_in;
+
+                    // Define the Y-coordinates of the main body's top and bottom score lines (for tube, it's the full height)
+                    const y_top_body_crease = 0;
+                    const y_bottom_body_crease = internalH_for_blank;
+
+                    // Glue tab points for internal model and score line intersection check (top-left origin)
+                    const glueTabPoints = [
+                        { x: x_inner_glue_tab, y: y_top_body_crease }, // Inner top
+                        { x: x_outer_glue_tab, y: y_top_body_crease + angleOffset }, // Outer top angled
+                        { x: x_outer_glue_tab, y: y_bottom_body_crease - angleOffset }, // Outer bottom angled
+                        { x: x_inner_glue_tab, y: y_bottom_body_crease } // Inner bottom
+                    ];
+
+                    // Glue tab points for DXF cut lines (ordered for clockwise trace from bottom-right of panel 4)
+                    const dxfGlueTabPerimeterPoints = [
+                        { x: x_panel4_end_before_glue_tab, y: y_bottom_body_crease },
+                        { x: x_outer_glue_tab, y: y_bottom_body_crease - angleOffset },
+                        { x: x_outer_glue_tab, y: y_top_body_crease + angleOffset },
+                        { x: x_panel4_end_before_glue_tab, y: y_top_body_crease }
+                    ];
+
+                    // Glue tab score line (vertical, broken at angles)
+                    const glueTabScoreLine = {
+                        x1: x_inner_glue_tab,
+                        y1: y_top_body_crease,
+                        x2: x_inner_glue_tab,
+                        y2: y_bottom_body_crease
+                    };
+
+                    // Outside dimensions for a tube (OD)
+                    const outsideDimensions = {
+                        length: L_input + (2 * thickness), // L + 2 CAL
+                        width: W_input + (2 * thickness),  // W + 2 CAL
+                        height: H_input // D + 0 CAL
+                    };
+
+                    return {
+                        blankWidth,
+                        blankHeight,
+                        outsideDimensions,
+                        layout: [
+                            // Panels (assuming they lay out side-by-side along the blank width)
+                            { x: 0, y: 0, w: panel1_width, h: blankHeight, type: 'panel' },
+                            { x: panel1_width, y: 0, w: panel2_width, h: blankHeight, type: 'panel' },
+                            { x: panel1_width + panel2_width, y: 0, w: panel3_width, h: blankHeight, type: 'panel' },
+                            { x: panel1_width + panel2_width + panel3_width, y: 0, w: panel4_width, h: blankHeight, type: 'panel' },
+                            // Angled Glue tab as a polygon
+                            { points: glueTabPoints, type: 'polygon_cut' },
+                        ],
+                        scoreLines: [
+                            // Vertical scores between panels
+                            { x1: panel1_width, y1: 0, x2: panel1_width, y2: blankHeight, type: 'vertical' },
+                            { x1: panel1_width + panel2_width, y1: 0, x2: panel1_width + panel2_width, y2: blankHeight, type: 'vertical' },
+                            { x1: panel1_width + panel2_width + panel3_width, y1: 0, x2: panel1_width + panel2_width + panel3_width, y2: blankHeight, type: 'vertical' },
+                            // Glue tab specific score line
+                            { x1: glueTabScoreLine.x1, y1: glueTabScoreLine.y1, x2: glueTabScoreLine.x2, y2: glueTabScoreLine.y2, type: 'vertical_glue_tab' },
+                        ],
+                        slots: [], // No slots for a simple tube
+                        dxfGlueTabPerimeterPoints: dxfGlueTabPerimeterPoints, // New for DXF
+                        yTopFlapScore: y_top_body_crease, // Add this for canvas drawing
+                        yBottomFlapScore: y_bottom_body_crease // Add this for canvas drawing
+                    };
+                }
+            },
+            '0200_HSC': { // Renamed from CUSTOM_HSC
+                name: 'Half-Slotted Container (HSC)', // Corrected name
+                description: 'A half-slotted container with bottom flaps, based on 0200 series construction.',
+                calculateBlank: (L_input, W_input, H_input, thickness) => {
+                    const glueFlap_in = 1.375; // 1.375 inch in inches
+                    const slotWidth_full_in = 3/8; // Common slot width for full slots
+                    const slotWidth_half_in = 3/16; // Common slot width for half slots (Panel 4)
+                    const oneSixteenth_in = 1/16; // 1/16 inch
+                    const angle15DegRad = 15 * Math.PI / 180; // 15 degrees in radians
+
+                    // Panel widths for blank layout (scoring allowances)
+                    const panel1_width = L_input + thickness - oneSixteenth_in;
+                    const panel2_width = W_input + thickness;
+                    const panel3_width = L_input + thickness;
+                    const panel4_width = W_input + thickness - oneSixteenth_in;
+
+                    // Define X coordinates related to glue tab and panel ends - DEFINED FIRST
+                    const x_inner_glue_tab = panel1_width + panel2_width + panel3_width + panel4_width;
+                    const x_outer_glue_tab = x_inner_glue_tab + glueFlap_in;
+                    const x_panel4_end_before_glue_tab = panel1_width + panel2_width + panel3_width + panel4_width;
+
+                    // Internal H for blank layout (D + 1 CAL)
+                    const internalH_for_blank = H_input + (1 * thickness);
+
+                    // Flap length for bottom flaps: 1/2 W + 1/2 CAL (rounded up to nearest 1/16)
+                    const halfW = W_input / 2;
+                    const halfCal = thickness / 2;
+                    const flapLength_inches = roundToNearestFraction(halfW, 1/16) + roundToNearestFraction(halfCal, 1/16);
+
+                    const blankWidth = x_outer_glue_tab; // Explicitly set blankWidth
+                    const blankHeight = internalH_for_blank + flapLength_inches; // internalH_for_blank (body) + bottom flap
+
+                    const angleOffset = Math.tan(angle15DegRad) * glueFlap_in;
+
+                    // Define the Y-coordinates of the main body's top and bottom score lines
+                    const y_top_body_crease = 0; // HSC body starts at the top of the blank
+                    const y_bottom_body_crease = internalH_for_blank; // HSC body ends here
+
+                    // Glue tab points for internal model and score line intersection check (top-left origin)
+                    const glueTabPoints = [
+                        { x: x_inner_glue_tab, y: y_top_body_crease }, // Inner top
+                        { x: x_outer_glue_tab, y: y_top_body_crease + angleOffset }, // Outer top angled
+                        { x: x_outer_glue_tab, y: y_bottom_body_crease - angleOffset }, // Outer bottom angled
+                        { x: x_inner_glue_tab, y: y_bottom_body_crease } // Inner bottom
+                    ];
+
+                    // Glue tab points for DXF cut lines (ordered for clockwise trace from bottom-right of panel 4)
+                    const dxfGlueTabPerimeterPoints = [
+                        { x: x_panel4_end_before_glue_tab, y: y_bottom_body_crease },
+                        { x: x_outer_glue_tab, y: y_bottom_body_crease - angleOffset },
+                        { x: x_outer_glue_tab, y: y_top_body_crease + angleOffset },
+                        { x: x_panel4_end_before_glue_tab, y: y_top_body_crease }
+                    ];
+
+                    // Glue tab score line (vertical, broken at angles)
+                    const glueTabScoreLine = {
+                        x1: x_inner_glue_tab,
+                        y1: y_top_body_crease, // FIX: Extend to top endpoint
+                        x2: x_inner_glue_tab,
+                        y2: y_bottom_body_crease // FIX: Extend to bottom endpoint
+                    };
+
+                    // Outside dimensions for HSC (OD)
+                    const outsideDimensions = {
+                        length: L_input + (2 * thickness),
+                        width: W_input + (2 * thickness),
+                        height: H_input + (2 * thickness) // D + 2 CAL
+                    };
+
+                    const slots = [
+                        // Slots on Panel 2's flap (minor flap) - centered on its crease lines
+                        // Slot 1: Centered on the crease between Panel 1 and Panel 2
+                        { x: panel1_width - (slotWidth_full_in / 2), y: internalH_for_blank, w: slotWidth_full_in, h: flapLength_inches, type: 'full', flapEdgeY: internalH_for_blank + flapLength_inches },
+                        // Slot 2: Centered on the crease between Panel 2 and Panel 3
+                        { x: (panel1_width + panel2_width) - (slotWidth_full_in / 2), y: internalH_for_blank, w: slotWidth_full_in, h: flapLength_inches, type: 'full', flapEdgeY: internalH_for_blank + flapLength_inches },
+                        // Slot 3: Centered on the crease between Panel 3 and Panel 4
+                        { x: (panel1_width + panel2_width + panel3_width) - (slotWidth_full_in / 2), y: internalH_for_blank, w: slotWidth_full_in, h: flapLength_inches, type: 'full', flapEdgeY: internalH_for_blank + flapLength_inches },
+                        // Panel 4's bottom flap: "half slot" at the glue tab edge (open to the right/glue tab side)
+                        { x: x_inner_glue_tab - slotWidth_half_in, y: internalH_for_blank, w: slotWidth_half_in, h: flapLength_inches, type: 'half_right_open', flapEdgeY: internalH_for_blank + flapLength_inches },
+                    ];
+
+                    return {
+                        blankWidth,
+                        blankHeight,
+                        outsideDimensions,
+                        layout: [
+                            // Main body panels (L, W, L, W)
+                            { x: 0, y: 0, w: panel1_width, h: internalH_for_blank, type: 'panel' },
+                            { x: panel1_width, y: 0, w: panel2_width, h: internalH_for_blank, type: 'panel' },
+                            { x: panel1_width + panel2_width, y: 0, w: panel3_width, h: internalH_for_blank, type: 'panel' },
+                            { x: panel1_width + panel2_width + panel3_width, y: 0, w: panel4_width, h: internalH_for_blank, type: 'panel' },
+                            // Angled Glue tab as a polygon
+                            { points: glueTabPoints, type: 'polygon_cut' },
+                            // Bottom flaps
+                            { x: 0, y: internalH_for_blank, w: panel1_width, h: flapLength_inches, type: 'flap' },
+                            { x: panel1_width, y: internalH_for_blank, w: panel2_width, h: flapLength_inches, type: 'flap' },
+                            { x: panel1_width + panel2_width, y: internalH_for_blank, w: panel3_width, h: flapLength_inches, type: 'flap' },
+                            { x: panel1_width + panel2_width + panel3_width, y: internalH_for_blank, w: panel4_width, h: flapLength_inches, type: 'flap' },
+                        ],
+                        scoreLines: [
+                            // Vertical scores (full height, will be broken in DXF generation)
+                            { x1: panel1_width, y1: 0, x2: panel1_width, y2: blankHeight, type: 'vertical' },
+                            { x1: panel1_width + panel2_width, y1: 0, x2: panel1_width + panel2_width, y2: blankHeight, type: 'vertical' },
+                            { x1: panel1_width + panel2_width + panel3_width, y1: 0, x2: panel1_width + panel2_width + panel3_width, y2: blankHeight, type: 'vertical' },
+                            // Glue tab specific score line
+                            { x1: glueTabScoreLine.x1, y1: glueTabScoreLine.y1, x2: glueTabScoreLine.x2, y2: glueTabScoreLine.y2, type: 'vertical_glue_tab' },
+                            // Horizontal score for flaps
+                            { x1: 0, y1: internalH_for_blank, x2: blankWidth, y2: internalH_for_blank, type: 'horizontal' },
+                        ],
+                        slots: slots || [],
+                        dxfGlueTabPerimeterPoints: dxfGlueTabPerimeterPoints, // New for DXF
+                        yTopFlapScore: y_top_body_crease, // Add this for canvas drawing
+                        yBottomFlapScore: y_bottom_body_crease // Add this for canvas drawing
+                    };
+                }
+            },
+            '0301_TRAY': {
+                name: '0301 Design Style Tray (Base)',
+                description: 'A die-cut tray base for a two-piece telescope box.',
+                calculateBlank: (L_input, W_input, H_input, thickness) => {
+                    const D = H_input;
+                    const CAL = thickness;
+                    const frac = 1/16;
+
+                    const flap_H = roundToNearestFraction(D + 0.5 * CAL, frac);
+                    const flap_W = roundToNearestFraction(D + 0.5 * CAL, frac);
+
+                    const center_L = roundToNearestFraction(L_input + 2 * CAL, frac);
+                    const center_W = roundToNearestFraction(W_input + 1 * CAL, frac);
+                    
+                    const blankWidth = flap_W + center_L + flap_W;
+                    const blankHeight = flap_H + center_W + flap_H;
+
+                    const outsideDimensions = {
+                        length: center_L,
+                        width: center_W,
+                        height: flap_H
+                    };
+                    
+                    const slot_width = 3/8;
+
+                    return {
+                        blankWidth,
+                        blankHeight,
+                        outsideDimensions,
+                        layout: [
+                            // A single panel representing the whole blank
+                            { x: 0, y: 0, w: blankWidth, h: blankHeight, type: 'panel' },
+                        ],
+                        scoreLines: [
+                            { x1: flap_W, y1: 0, x2: flap_W, y2: blankHeight, type: 'vertical' },
+                            { x1: flap_W + center_L, y1: 0, x2: flap_W + center_L, y2: blankHeight, type: 'vertical' },
+                            { x1: 0, y1: flap_H, x2: blankWidth, y2: flap_H, type: 'horizontal' },
+                            { x1: 0, y1: flap_H + center_W, x2: blankWidth, y2: flap_H + center_W, type: 'horizontal' },
+                        ],
+                        slots: [
+                            // Top-left slot
+                            { x: flap_W - (slot_width / 2), y: 0, w: slot_width, h: flap_H, type: 'full', flapEdgeY: 0 },
+                            // Top-right slot
+                            { x: flap_W + center_L - (slot_width / 2), y: 0, w: slot_width, h: flap_H, type: 'full', flapEdgeY: 0 },
+                            // Bottom-left slot
+                            { x: flap_W - (slot_width / 2), y: flap_H + center_W, w: slot_width, h: flap_H, type: 'full', flapEdgeY: blankHeight },
+                            // Bottom-right slot
+                            { x: flap_W + center_L - (slot_width / 2), y: flap_H + center_W, w: slot_width, h: flap_H, type: 'full', flapEdgeY: blankHeight },
+                        ],
+                        dxfGlueTabPerimeterPoints: [], // No glue tab
+                    };
+                }
+            },
+            '0301_LID': {
+                name: '0301 Design Style Lid',
+                description: 'A die-cut tray lid for a two-piece telescope box, with cross-corrugation.',
+                calculateBlank: (L_input, W_input, H_input, thickness) => {
+                    const D = H_input;
+                    const CAL = thickness;
+                    const frac = 1/16;
+
+                    // Note the swap of L and W for cross-corrugation
+                    const flap_H = roundToNearestFraction(D + 1.5 * CAL, frac);
+                    const flap_W = roundToNearestFraction(D + 1.5 * CAL, frac);
+
+                    const center_L = roundToNearestFraction(W_input + 7 * CAL, frac); // Based on W
+                    const center_W = roundToNearestFraction(L_input + 5 * CAL, frac); // Based on L
+                    
+                    const blankWidth = flap_W + center_L + flap_W;
+                    const blankHeight = flap_H + center_W + flap_H;
+
+                    const outsideDimensions = {
+                        length: center_L,
+                        width: center_W,
+                        height: flap_H
+                    };
+                    
+                    const slot_width = 3/8;
+
+                    return {
+                        blankWidth,
+                        blankHeight,
+                        outsideDimensions,
+                        layout: [
+                            // A single panel representing the whole blank
+                            { x: 0, y: 0, w: blankWidth, h: blankHeight, type: 'panel' },
+                        ],
+                        scoreLines: [
+                            { x1: flap_W, y1: 0, x2: flap_W, y2: blankHeight, type: 'vertical' },
+                            { x1: flap_W + center_L, y1: 0, x2: flap_W + center_L, y2: blankHeight, type: 'vertical' },
+                            { x1: 0, y1: flap_H, x2: blankWidth, y2: flap_H, type: 'horizontal' },
+                            { x1: 0, y1: flap_H + center_W, x2: blankWidth, y2: flap_H + center_W, type: 'horizontal' },
+                        ],
+                        slots: [
+                            // Top-left slot
+                            { x: flap_W - (slot_width / 2), y: 0, w: slot_width, h: flap_H, type: 'full', flapEdgeY: 0 },
+                            // Top-right slot
+                            { x: flap_W + center_L - (slot_width / 2), y: 0, w: slot_width, h: flap_H, type: 'full', flapEdgeY: 0 },
+                            // Bottom-left slot
+                            { x: flap_W - (slot_width / 2), y: flap_H + center_W, w: slot_width, h: flap_H, type: 'full', flapEdgeY: blankHeight },
+                            // Bottom-right slot
+                            { x: flap_W + center_L - (slot_width / 2), y: flap_H + center_W, w: slot_width, h: flap_H, type: 'full', flapEdgeY: blankHeight },
+                        ],
+                        dxfGlueTabPerimeterPoints: [], // No glue tab
+                    };
+                }
+            },
+        };
+
+        /**
+         * Reusable utility to get the final, clipped line segments for scores.
+         * This ensures that both DXF and PDF outputs are identical.
+         * @param {object} line - The original score line object {x1, y1, x2, y2, type}.
+         * @param {array} cutRects - Array of slot objects {x, y, w, h}.
+         * @param {array} glueTabInternalPoints - Array of points for the glue tab polygon.
+         * @returns {array} An array of final line segments, e.g., [{x1, y1, x2, y2}].
+         */
+        const getCleanedLineSegments = (line, cutRects, glueTabInternalPoints) => {
+            const xTolerance = 1e-6;
+            const isVertical = line.type.startsWith('vertical');
+            const isGlueTabScoreLine = line.type === 'vertical_glue_tab';
+
+            let segments = [{
+                start: isVertical ? line.y1 : line.x1,
+                end: isVertical ? line.y2 : line.x2,
+            }];
+
+            const clipSegments = (currentSegments, clipArea) => {
+                let nextSegments = [];
+                currentSegments.forEach(seg => {
+                    const overlapStart = Math.max(seg.start, clipArea.start);
+                    const overlapEnd = Math.min(seg.end, clipArea.end);
+
+                    if (overlapStart < overlapEnd - xTolerance) {
+                        if (seg.start < overlapStart - xTolerance) {
+                            nextSegments.push({ start: seg.start, end: overlapStart });
+                        }
+                        if (seg.end > overlapEnd + xTolerance) {
+                            nextSegments.push({ start: overlapEnd, end: seg.end });
+                        }
+                    } else {
+                        nextSegments.push(seg);
+                    }
+                });
+                return nextSegments;
+            };
+            
+            // Clip against slots
+            cutRects.forEach(rect => {
+                let clipArea;
+                if (isVertical && line.x1 >= rect.x - xTolerance && line.x1 <= rect.x + rect.w + xTolerance) {
+                    clipArea = { start: rect.y, end: rect.y + rect.h };
+                    segments = clipSegments(segments, clipArea);
+                } else if (!isVertical && line.y1 >= rect.y - xTolerance && line.y1 <= rect.y + rect.h + xTolerance) {
+                    clipArea = { start: rect.x, end: rect.x + rect.w };
+                    segments = clipSegments(segments, clipArea);
+                }
+            });
+            
+            // Clip against glue tab (if applicable)
+            if (!isGlueTabScoreLine && glueTabInternalPoints.length === 4) {
+                const polyP1 = glueTabInternalPoints[0]; // Inner top
+                const polyP2 = glueTabInternalPoints[1]; // Outer top angled
+                const polyP3 = glueTabInternalPoints[2]; // Outer bottom angled
+                const polyP4 = glueTabInternalPoints[3]; // Inner bottom
+                
+                if (isVertical) {
+                    if (line.x1 > polyP1.x - xTolerance) {
+                        const slopeTop = (polyP2.y - polyP1.y) / (polyP2.x - polyP1.x);
+                        const yGlueTabTop = polyP1.y + slopeTop * (line.x1 - polyP1.x);
+                        const slopeBottom = (polyP3.y - polyP4.y) / (polyP3.x - polyP4.x);
+                        const yGlueTabBottom = polyP4.y + slopeBottom * (line.x1 - polyP4.x);
+                        const clipArea = { start: Math.min(yGlueTabTop, yGlueTabBottom), end: Math.max(yGlueTabTop, yGlueTabBottom) };
+                        segments = clipSegments(segments, clipArea);
+                    }
+                } else { // Horizontal line
+                    const clipArea = { start: polyP1.x, end: line.x2 }; // Clip from glue tab start to end of line
+                    segments = clipSegments(segments, clipArea);
+                }
+            }
+
+            // Convert back to line objects
+            return segments.map(seg => {
+                if (isVertical) {
+                    return { x1: line.x1, y1: seg.start, x2: line.x1, y2: seg.end };
+                } else {
+                    return { x1: seg.start, y1: line.y1, x2: seg.end, y2: line.y1 };
+                }
+            }).filter(l => (Math.abs(l.x1 - l.x2) > xTolerance || Math.abs(l.y1 - l.y2) > xTolerance));
+        };
+
+        // Function to generate DXF content (moved outside component)
+        const generateDxfContent = (blankData, fefcoStyle, L_in, W_in, H_in) => {
+            let dxf = `0
+SECTION
+2
+HEADER
+9
+$ACADVER
+1
+AC1009
+0
+ENDSEC
+0
+SECTION
+2
+ENTITIES
+`;
+
+            const xTolerance = 1e-6; // Tolerance for floating point comparisons
+
+            // Helper function to add a LINE to DXF output (Y is converted from top-left origin to DXF bottom-left origin)
+            const addLine = (color, x1, y1, x2, y2) => {
+                // Only add lines if they have a non-zero length (within tolerance)
+                if (Math.abs(x1 - x2) > xTolerance || Math.abs(y1 - y2) > xTolerance) {
+                    let entityDxf = `0\nLINE\n8\n0\n62\n${color}\n`; // Layer 0, but with direct color
+                    entityDxf += `10\n${x1.toFixed(6)}\n20\n${(blankData.blankHeight - y1).toFixed(6)}\n30\n0\n11\n${x2.toFixed(6)}\n21\n${(blankData.blankHeight - y2).toFixed(6)}\n31\n0\n`;
+                    dxf += entityDxf;
+                }
+            };
+            
+            const addText = (color, x, y, height, text) => {
+                dxf += `0\nTEXT\n8\n0\n62\n${color}\n10\n${x.toFixed(6)}\n20\n${y.toFixed(6)}\n30\n0.0\n40\n${height}\n1\n${text}\n`;
+            };
+
+            addText(0, 0.5, (blankData.blankHeight + 1.5), 0.5, `FEFCO ${fefcoStyle} - L${L_in.toFixed(3)} W${W_in.toFixed(3)} H${H_in.toFixed(3)}`);
+            addText(0, 0.5, (blankData.blankHeight + 1.0), 0.3, `Blank: ${blankData.blankWidth.toFixed(3)}x${blankData.blankHeight.toFixed(3)} inches`);
+            addText(0, 0.5, (blankData.blankHeight + 0.5), 0.3, `OD: L${blankData.outsideDimensions.length.toFixed(3)} W${blankData.outsideDimensions.width.toFixed(3)} H${blankData.outsideDimensions.height.toFixed(3)} inches`);
+
+            // --- CUT Layer Geometry (Explicit LINE entities) ---
+            const y_top_edge = 0;
+            const y_bottom_edge = blankData.blankHeight;
+            const x_left_edge = 0;
+            const x_right_edge = blankData.blankWidth;
+            const x_inner_glue_tab = blankData.dxfGlueTabPerimeterPoints.length > 0 ? blankData.dxfGlueTabPerimeterPoints[0].x : blankData.blankWidth;
+            const dxfGlueTabPerimeterPoints = blankData.dxfGlueTabPerimeterPoints || [];
+
+            // Styles that have a glue tab and whose rightmost perimeter is defined by it
+            const glueTabStyles = ['0201', '0203', '0200_HSC', 'CUSTOM_4_PANEL_TUBE'];
+            const isGlueTabStyle = glueTabStyles.includes(fefcoStyle);
+
+            // 1. Glue Tab Perimeter (only for styles with glue tabs)
+            if (isGlueTabStyle && dxfGlueTabPerimeterPoints.length === 4) {
+                const p1 = dxfGlueTabPerimeterPoints[0];
+                const p2 = dxfGlueTabPerimeterPoints[1];
+                const p3 = dxfGlueTabPerimeterPoints[2];
+                const p4 = dxfGlueTabPerimeterPoints[3];
+                addLine(1, p1.x, p1.y, p2.x, p2.y);
+                addLine(1, p2.x, p2.y, p3.x, p3.y);
+                addLine(1, p3.x, p3.y, p4.x, p4.y);
+            }
+
+            // 2. Perimeter Segments (Top, Bottom, Left)
+            // Top perimeter segments
+            const topSlots = blankData.slots.filter(s => Math.abs(s.y - y_top_edge) < xTolerance).sort((a, b) => a.x - b.x);
+            let lastX_top = 0;
+            topSlots.forEach(slot => {
+                if (slot.x > lastX_top + xTolerance) addLine(1, lastX_top, y_top_edge, slot.x, y_top_edge);
+                lastX_top = slot.x + slot.w;
+            });
+            // For top edge, if it's a glue tab style, stop at the inner glue tab x coordinate, otherwise go to full blank width
+            const topXLimit = isGlueTabStyle ? x_inner_glue_tab : x_right_edge;
+            if (lastX_top < topXLimit - xTolerance) addLine(1, lastX_top, y_top_edge, topXLimit, y_top_edge);
+
+            // Bottom perimeter segments
+            const bottomSlots = blankData.slots.filter(s => Math.abs(s.y + s.h - y_bottom_edge) < xTolerance).sort((a, b) => a.x - b.x);
+            let lastX_bottom = 0;
+            bottomSlots.forEach(slot => {
+                if (slot.x > lastX_bottom + xTolerance) addLine(1, lastX_bottom, y_bottom_edge, slot.x, y_bottom_edge);
+                lastX_bottom = slot.x + slot.w;
+            });
+            // For bottom edge, if it's a glue tab style, stop at the inner glue tab x coordinate, otherwise go to full blank width
+            const bottomXLimit = isGlueTabStyle ? x_inner_glue_tab : x_right_edge;
+            if (lastX_bottom < bottomXLimit - xTolerance) addLine(1, lastX_bottom, y_bottom_edge, bottomXLimit, y_bottom_edge);
+
+            // Left perimeter segments
+            const leftSlots = blankData.slots.filter(s => Math.abs(s.x - x_left_edge) < xTolerance).sort((a, b) => a.y - b.y);
+            let lastY_left = 0;
+            leftSlots.forEach(slot => {
+                if (slot.y > lastY_left + xTolerance) addLine(1, x_left_edge, lastY_left, x_left_edge, slot.y);
+                lastY_left = slot.y + slot.h;
+            });
+            if (lastY_left < y_bottom_edge - xTolerance) addLine(1, x_left_edge, lastY_left, x_left_edge, y_bottom_edge);
+            
+            // Right perimeter segments (ONLY for styles WITHOUT a glue tab)
+            if (!isGlueTabStyle) {
+                const rightSlots = blankData.slots.filter(s => Math.abs(s.x + s.w - x_right_edge) < xTolerance).sort((a, b) => a.y - b.y);
+                let lastY_right = 0;
+                rightSlots.forEach(slot => {
+                    if (slot.y > lastY_right + xTolerance) addLine(1, x_right_edge, lastY_right, x_right_edge, slot.y);
+                    lastY_right = slot.y + slot.h;
+                });
+                if (lastY_right < y_bottom_edge - xTolerance) addLine(1, x_right_edge, lastY_right, x_right_edge, y_bottom_edge);
+            }
+            
+            // 3. Slot Cut Lines
+            blankData.slots.forEach(slot => {
+                // No beginPath/stroke here, addLine handles it
+                if (slot.type === 'full') {
+                    addLine(1, slot.x, slot.y, slot.x, slot.y + slot.h); // Left vertical
+                    addLine(1, slot.x + slot.w, slot.y, slot.x + slot.w, slot.y + slot.h); // Right vertical
+                    const hLineY = Math.abs(slot.y - y_top_edge) < xTolerance ? slot.y + slot.h : slot.y;
+                    addLine(1, slot.x, hLineY, slot.x + slot.w, hLineY); // Inner horizontal
+                } else if (slot.type === 'half_right_open') {
+                    addLine(1, slot.x, slot.y, slot.x, slot.y + slot.h);
+                    const hLineY = Math.abs(slot.y - y_top_edge) < xTolerance ? slot.y + slot.h : slot.y;
+                    addLine(1, slot.x, hLineY, x_inner_glue_tab, hLineY);
+                } else if (slot.type === 'h_slot_left_open') {
+                    addLine(1, slot.x, slot.y, slot.x + slot.w, slot.y); // Top horizontal
+                    addLine(1, slot.x, slot.y + slot.h, slot.x + slot.w, slot.y + slot.h); // Bottom horizontal
+                    addLine(1, slot.x + slot.w, slot.y, slot.x + slot.w, slot.y + slot.h); // Inner vertical
+                } else if (slot.type === 'h_slot_right_open') {
+                    addLine(1, slot.x, slot.y, slot.x + slot.w, slot.y);
+                    addLine(1, slot.x, slot.y + slot.h, slot.x + slot.w, slot.y + slot.h);
+                    addLine(1, slot.x, slot.y, slot.x, slot.y + slot.h);
+                }
+            });
+
+            // --- SCORE Layer Geometry ---
+            const cutRects = blankData.slots.map(s => s.type !== 'line_cut' ? { x: s.x, y: s.y, w: s.w, h: s.h } : null).filter(Boolean);
+            const glueTabInternalPoints = blankData.layout.find(p => p.type === 'polygon_cut')?.points || [];
+            
+            blankData.scoreLines.forEach(line => {
+                const cleanedSegments = getCleanedLineSegments(line, cutRects, glueTabInternalPoints);
+                cleanedSegments.forEach(seg => {
+                    addLine(3, seg.x1, seg.y1, seg.x2, seg.y2); // Color 3 for Green
+                });
+            });
+
+            dxf += `0\nENDSEC\n0\nEOF`;
+            return dxf;
+        };
+
+        // Function to generate and download a PDF (moved outside component)
+        const generatePdf = (blankData, fefcoStyle, L_in, W_in, H_in, unit, setMessage) => {
+            const { jsPDF } = window.jspdf;
+            const pdfUnit = unit === 'mm' ? 'mm' : 'in';
+            const margin = pdfUnit === 'mm' ? 10 : 0.5;
+            
+            const pdfPageWidth = convertUnits(blankData.blankWidth, 'inch', pdfUnit) + (2 * margin);
+            const pdfPageHeight = convertUnits(blankData.blankHeight, 'inch', pdfUnit) + (2 * margin);
+
+            const doc = new jsPDF({
+                orientation: pdfPageWidth > pdfPageHeight ? 'landscape' : 'portrait',
+                unit: pdfUnit,
+                format: [pdfPageWidth, pdfPageHeight]
+            });
+
+            const xTolerance = 1e-6;
+
+            const addLineToPdf = (x1, y1, x2, y2) => {
+                const x1_pdf = convertUnits(x1, 'inch', pdfUnit) + margin;
+                const y1_pdf = convertUnits(y1, 'inch', pdfUnit) + margin;
+                const x2_pdf = convertUnits(x2, 'inch', pdfUnit) + margin;
+                const y2_pdf = convertUnits(y2, 'inch', pdfUnit) + margin;
+                doc.line(x1_pdf, y1_pdf, x2_pdf, y2_pdf);
+            };
+
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(10);
+            const textYStart = margin / 2;
+            const textLineHeight = pdfUnit === 'mm' ? 4 : 0.2;
+            doc.text(`FEFCO ${fefcoStyle} - L:${L_in.toFixed(3)} W:${W_in.toFixed(3)} H:${H_in.toFixed(3)} (${unit})`, margin, textYStart);
+            doc.text(`Blank: ${convertUnits(blankData.blankWidth, 'inch', unit).toFixed(3)} x ${convertUnits(blankData.blankHeight, 'inch', unit).toFixed(3)} ${unit}`, margin, textYStart + textLineHeight);
+            
+            const targetPoints = 2;
+            const lineWidthInUserUnits = (targetPoints / 72) * (pdfUnit === 'in' ? 1 : 25.4);
+
+            doc.setDrawColor(255, 0, 0);
+            doc.setLineDashPattern([], 0);
+            doc.setLineWidth(lineWidthInUserUnits);
+
+            const y_top_edge = 0;
+            const y_bottom_edge = blankData.blankHeight;
+            const x_left_edge = 0;
+            const x_right_edge = blankData.blankWidth;
+            const x_inner_glue_tab = blankData.dxfGlueTabPerimeterPoints.length > 0 ? blankData.dxfGlueTabPerimeterPoints[0].x : blankData.blankWidth;
+            const dxfGlueTabPerimeterPoints = blankData.dxfGlueTabPerimeterPoints || [];
+
+            // Styles that have a glue tab and whose rightmost perimeter is defined by it
+            const glueTabStyles = ['0201', '0203', '0200_HSC', 'CUSTOM_4_PANEL_TUBE'];
+            const isGlueTabStyle = glueTabStyles.includes(fefcoStyle);
+
+            // Glue Tab Perimeter
+            if (isGlueTabStyle && dxfGlueTabPerimeterPoints.length === 4) {
+                const p1 = dxfGlueTabPerimeterPoints[0];
+                const p2 = dxfGlueTabPerimeterPoints[1];
+                const p3 = dxfGlueTabPerimeterPoints[2];
+                const p4 = dxfGlueTabPerimeterPoints[3];
+                addLineToPdf(p1.x, p1.y, p2.x, p2.y);
+                addLineToPdf(p2.x, p2.y, p3.x, p3.y);
+                addLineToPdf(p3.x, p3.y, p4.x, p4.y);
+            }
+
+            // Perimeter Segments (Top, Bottom, Left)
+            const topSlots = blankData.slots.filter(s => Math.abs(s.y - y_top_edge) < xTolerance).sort((a, b) => a.x - b.x);
+            let lastX_top = 0;
+            topSlots.forEach(slot => {
+                if (slot.x > lastX_top + xTolerance) addLineToPdf(lastX_top, y_top_edge, slot.x, y_top_edge);
+                lastX_top = slot.x + slot.w;
+            });
+            // For top edge, if it's a glue tab style, stop at the inner glue tab x coordinate, otherwise go to full blank width
+            const topXLimit = isGlueTabStyle ? x_inner_glue_tab : x_right_edge;
+            if (lastX_top < topXLimit - xTolerance) addLineToPdf(lastX_top, y_top_edge, topXLimit, y_top_edge);
+
+            // Bottom perimeter segments
+            const bottomSlots = blankData.slots.filter(s => Math.abs(s.y + s.h - y_bottom_edge) < xTolerance).sort((a, b) => a.x - b.x);
+            let lastX_bottom = 0;
+            bottomSlots.forEach(slot => {
+                if (slot.x > lastX_bottom + xTolerance) addLineToPdf(lastX_bottom, y_bottom_edge, slot.x, y_bottom_edge);
+                lastX_bottom = slot.x + slot.w;
+            });
+            // For bottom edge, if it's a glue tab style, stop at the inner glue tab x coordinate, otherwise go to full blank width
+            const bottomXLimit = isGlueTabStyle ? x_inner_glue_tab : x_right_edge;
+            if (lastX_bottom < bottomXLimit - xTolerance) addLineToPdf(lastX_bottom, y_bottom_edge, bottomXLimit, y_bottom_edge);
+
+            // Left perimeter segments
+            const leftSlots = blankData.slots.filter(s => Math.abs(s.x - x_left_edge) < xTolerance).sort((a, b) => a.y - b.y);
+            let lastY_left = 0;
+            leftSlots.forEach(slot => {
+                if (slot.y > lastY_left + xTolerance) addLineToPdf(x_left_edge, lastY_left, x_left_edge, slot.y);
+                lastY_left = slot.y + slot.h;
+            });
+            if (lastY_left < y_bottom_edge - xTolerance) addLineToPdf(x_left_edge, lastY_left, x_left_edge, y_bottom_edge);
+            
+            // Right perimeter segments (ONLY for styles WITHOUT a glue tab)
+            if (!isGlueTabStyle) {
+                const rightSlots = blankData.slots.filter(s => Math.abs(s.x + s.w - x_right_edge) < xTolerance).sort((a, b) => a.y - b.y);
+                let lastY_right = 0;
+                rightSlots.forEach(slot => {
+                    if (slot.y > lastY_right + xTolerance) addLineToPdf(x_right_edge, lastY_right, x_right_edge, slot.y);
+                    lastY_right = slot.y + slot.h;
+                });
+                if (lastY_right < y_bottom_edge - xTolerance) addLineToPdf(x_right_edge, lastY_right, x_right_edge, y_bottom_edge);
+            }
+            
+            // Slot Cut Lines
+            blankData.slots.forEach(slot => {
+                if (slot.type === 'full') {
+                    addLineToPdf(slot.x, slot.y, slot.x, slot.y + slot.h);
+                    addLineToPdf(slot.x + slot.w, slot.y, slot.x + slot.w, slot.y + slot.h);
+                    const hLineY = Math.abs(slot.y - y_top_edge) < xTolerance ? slot.y + slot.h : slot.y;
+                    addLineToPdf(slot.x, hLineY, slot.x + slot.w, hLineY);
+                } else if (slot.type === 'half_right_open') {
+                    addLineToPdf(slot.x, slot.y, slot.x, slot.y + slot.h);
+                    const hLineY = Math.abs(slot.y - y_top_edge) < xTolerance ? slot.y + slot.h : slot.y;
+                    addLineToPdf(slot.x, hLineY, x_inner_glue_tab, hLineY);
+                } else if (slot.type === 'h_slot_left_open') {
+                    addLineToPdf(slot.x, slot.y, slot.x + slot.w, slot.y);
+                    addLineToPdf(slot.x, slot.y + slot.h, slot.x + slot.w, slot.y + slot.h);
+                    addLineToPdf(slot.x + slot.w, slot.y, slot.x + slot.w, slot.y + slot.h);
+                } else if (slot.type === 'h_slot_right_open') {
+                    addLineToPdf(slot.x, slot.y, slot.x + slot.w, slot.y);
+                    addLineToPdf(slot.x, slot.y + slot.h, slot.x + slot.w, slot.y + slot.h);
+                    addLineToPdf(slot.x, slot.y, slot.x, slot.y + slot.h);
+                }
+            });
+
+            doc.setDrawColor(0, 177, 64);
+            const dashLength = pdfUnit === 'mm' ? 2 : 0.08;
+            const gapLength = pdfUnit === 'mm' ? 1 : 0.04;
+            doc.setLineDashPattern([dashLength, gapLength], 0);
+            doc.setLineWidth(lineWidthInUserUnits);
+
+            const cutRects = blankData.slots.map(s => s.type !== 'line_cut' ? { x: s.x, y: s.y, w: s.w, h: s.h } : null).filter(Boolean);
+            const glueTabInternalPoints = blankData.layout.find(p => p.type === 'polygon_cut')?.points || [];
+            
+            blankData.scoreLines.forEach(line => {
+                const cleanedSegments = getCleanedLineSegments(line, cutRects, glueTabInternalPoints);
+                cleanedSegments.forEach(seg => {
+                    addLineToPdf(seg.x1, seg.y1, seg.x2, seg.y2);
+                });
+            });
+
+            const filename = `FEFCO_${fefcoStyle}_${L_in.toFixed(2)}x${W_in.toFixed(2)}x${H_in.toFixed(2)}.pdf`;
+            doc.save(filename);
+            setMessage('PDF file downloaded successfully!');
+        };
+
+
+        const FEFCOCADApp = () => {
+            const [length, setLength] = useState(10); // L in inches
+            const [width, setWidth] = useState(8);    // W in inches
+            const [height, setHeight] = useState(4); // H in inches
+            const [boardProfile, setBoardProfile] = useState('32 ECT B'); // Default to 32 ECT B
+            const [fefcoStyle, setFefcoStyle] = useState('0200_HSC'); // Default to the custom HSC
+            const [unit, setUnit] = useState('inch'); // Default to inches
+
+            const [blankDimensions, setBlankDimensions] = useState(null);
+            const [outsideDimensions, setOutsideDimensions] = useState(null);
+            const [squareFootage, setSquareFootage] = useState(null);
+            const [wastePercentage, setWastePercentage] = useState(null);
+            const [message, setMessage] = useState('');
+            const [hasGeneratedOnce, setHasGeneratedOnce] = useState(false);
+            // jsPDF is now loaded via CDN in HTML, so this state is not strictly needed for loading,
+            // but can be used for conditional button disabling if preferred.
+            const [isJsPdfLoaded, setIsJsPdfLoaded] = useState(true); 
+
+            const canvasRef = useRef(null);
+            
+            // Removed useEffect for jsPDF as it's now loaded via CDN in HTML head.
+            // If you need to ensure it's fully ready before interaction, you might add a check
+            // like `window.jspdf` in a useEffect, but typically it's available by the time React renders.
+
+            const handleGenerate = useCallback(() => {
+                let L_in = parseFloat(length);
+                let W_in = parseFloat(width);
+                let H_in = parseFloat(height);
+
+                if (unit === 'mm') {
+                    L_in = convertUnits(L_in, 'mm', 'inch');
+                    W_in = convertUnits(W_in, 'mm', 'inch');
+                    H_in = convertUnits(H_in, 'mm', 'inch');
+                }
+
+                if (isNaN(L_in) || isNaN(W_in) || isNaN(H_in) || L_in <= 0 || W_in <= 0 || H_in <= 0) {
+                    setMessage('Please enter valid positive numbers for Length, Width, and Height.');
+                    setBlankDimensions(null);
+                    return;
+                }
+
+                const stylesWithFlapMeeting = ['0201', '0203', '0200_HSC'];
+                if (stylesWithFlapMeeting.includes(fefcoStyle) && L_in < W_in) {
+                    setMessage('Error: For this box style, Length (L) must be greater than or equal to Width (W) to ensure flaps meet correctly.');
+                    setBlankDimensions(null);
+                    return;
+                }
+
+                const selectedStyle = fefcoStyles[fefcoStyle];
+                const thickness_in = boardProfiles[boardProfile];
+
+                if (!selectedStyle || thickness_in === undefined) {
+                    setMessage('Invalid style or board profile selected.');
+                    setBlankDimensions(null);
+                    return;
+                }
+
+                try {
+                    const blank = selectedStyle.calculateBlank(L_in, W_in, H_in, thickness_in);
+                    
+                    setBlankDimensions({
+                        width: convertUnits(blank.blankWidth, 'inch', unit),
+                        height: convertUnits(blank.blankHeight, 'inch', unit),
+                        layout: blank.layout,
+                        scoreLines: blank.scoreLines,
+                        slots: blank.slots || []
+                    });
+
+                    setOutsideDimensions({
+                        length: convertUnits(blank.outsideDimensions.length, 'inch', unit),
+                        width: convertUnits(blank.outsideDimensions.width, 'inch', unit),
+                        height: convertUnits(blank.outsideDimensions.height, 'inch', unit)
+                    });
+
+                    if (hasGeneratedOnce) {
+                        setMessage(`Auto-updated for FEFCO ${fefcoStyle}.`);
+                    } else {
+                        setMessage(`Generated blank for FEFCO ${fefcoStyle}: ${selectedStyle.name}`);
+                    }
+
+                    const areaSqIn = blank.blankWidth * blank.blankHeight; 
+                    setSquareFootage(convertAreaUnits(areaSqIn, unit === 'mm' ? 'm²' : 'ft²'));
+
+                    let waste = 0;
+                    if (areaSqIn === 0) { // Safety check for division by zero
+                        waste = 0;
+                    } else if (fefcoStyle.startsWith('0301')) {
+                        // For 0301 styles, calculate waste from slots only
+                        let totalSlotArea_sq_in = 0;
+                        // For 0301, the slots are fixed based on flap_H and slot_width
+                        const D = H_in; // Use H_in as D for 0301 styles
+                        const CAL = thickness_in; // Use thickness_in as CAL for 0301 styles
+                        const frac = 1/16;
+                        const flap_H = roundToNearestFraction(D + 0.5 * CAL, frac);
+                        const slot_width = 3/8; // Fixed slot width for 0301
+                        totalSlotArea_sq_in = 4 * flap_H * slot_width; // 4 slots
+                        
+                        waste = (totalSlotArea_sq_in / areaSqIn) * 100;
+                    } else if (fefcoStyle !== 'CUSTOM_4_PANEL_TUBE') { // Existing logic for other styles with glue flaps
+                        const glueFlap_in = 1.375;
+                        let flapLength_for_waste = 0;
+
+                        if (['0201', '0200_HSC'].includes(fefcoStyle)) {
+                            flapLength_for_waste = roundToNearestFraction(W_in / 2, 1/16) + roundToNearestFraction(thickness_in / 2, 1/16);
+                        } else if (fefcoStyle === '0203') {
+                            flapLength_for_waste = W_in;
+                        }
+                        
+                        const trimmedArea_sq_in = glueFlap_in * flapLength_for_waste * 2;
+                        waste = (trimmedArea_sq_in / areaSqIn) * 100;
+
+                        let totalSlotArea_sq_in_other_styles = 0;
+                        blank.slots.forEach(slot => {
+                            totalSlotArea_sq_in_other_styles += slot.w * slot.h;
+                        });
+                        waste += (totalSlotArea_sq_in_other_styles / areaSqIn) * 100;
+                    }
+                    // For CUSTOM_4_PANEL_TUBE, waste remains 0 as it has no slots or glue flaps for waste calculation.
+
+                    setWastePercentage(waste);
+                    drawBlank(blank);
+
+                } catch (error) {
+                    setMessage(`Error generating CAD: ${error.message}`);
+                    setBlankDimensions(null);
+                    console.error('Error in handleGenerate:', error);
+                }
+            }, [length, width, height, boardProfile, fefcoStyle, unit, hasGeneratedOnce]);
+
+            const initialGenerateClick = () => {
+                setHasGeneratedOnce(true);
+                handleGenerate();
+            };
+
+            useEffect(() => {
+                if (hasGeneratedOnce) {
+                    handleGenerate();
+                }
+            }, [hasGeneratedOnce, handleGenerate]);
+
+            const drawBlank = (blank) => {
+                const canvas = canvasRef.current;
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                const fixedCanvasWidth = 800;
+                const fixedCanvasHeight = 600;
+                canvas.width = fixedCanvasWidth;
+                canvas.height = fixedCanvasHeight;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                const padding = 20;
+                const scale = Math.min(
+                    (fixedCanvasWidth - 2 * padding) / blank.blankWidth,
+                    (fixedCanvasHeight - 2 * padding) / blank.blankHeight
+                );
+                const offsetX = (fixedCanvasWidth - blank.blankWidth * scale) / 2;
+                const offsetY = (fixedCanvasHeight - blank.blankHeight * scale) / 2;
+
+                ctx.save();
+                ctx.translate(offsetX, offsetY);
+                ctx.scale(scale, scale);
+
+                blank.layout.forEach(part => {
+                    if (part.type === 'panel' || part.type === 'flap') {
+                        ctx.fillStyle = part.type === 'panel' ? '#D4EDDA' : '#C3E6CB';
+                        ctx.fillRect(part.x, part.y, part.w, part.h);
+                        ctx.strokeStyle = '#666';
+                        ctx.lineWidth = 1 / scale;
+                        ctx.strokeRect(part.x, part.y, part.w, part.h);
+                    } else if (part.type === 'polygon_cut') {
+                        ctx.fillStyle = '#B8DAFF';
+                        ctx.beginPath();
+                        ctx.moveTo(part.points[0].x, part.points[0].y);
+                        for (let i = 1; i < part.points.length; i++) {
+                            ctx.lineTo(part.points[i].x, part.points[i].y);
+                        }
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.strokeStyle = '#666';
+                        ctx.lineWidth = 1 / scale;
+                        ctx.stroke();
+                    }
+                });
+
+                ctx.strokeStyle = '#00FF00';
+                ctx.lineWidth = 1 / scale;
+                ctx.setLineDash([5 / scale, 5 / scale]);
+                blank.scoreLines.forEach(line => {
+                    const cutRects = blank.slots.map(s => s.type !== 'line_cut' ? { x: s.x, y: s.y, w: s.w, h: s.h } : null).filter(Boolean);
+                    const glueTabInternalPoints = blank.layout.find(p => p.type === 'polygon_cut')?.points || [];
+                    const cleanedSegments = getCleanedLineSegments(line, cutRects, glueTabInternalPoints);
+                    cleanedSegments.forEach(seg => {
+                        ctx.beginPath();
+                        ctx.moveTo(seg.x1, seg.y1);
+                        ctx.lineTo(seg.x2, seg.y2);
+                        ctx.stroke();
+                    });
+                });
+                ctx.setLineDash([]);
+
+                const x_inner_glue_tab_canvas = blank.dxfGlueTabPerimeterPoints.length > 0 ? blank.dxfGlueTabPerimeterPoints[0].x : 0;
+                ctx.strokeStyle = '#FF0000';
+                ctx.lineWidth = 1 / scale;
+                blank.slots.forEach(slot => {
+                    ctx.beginPath(); // Ensure new path for each slot line
+                    if (slot.type === 'full' || slot.type === 'half_right_open') {
+                        ctx.moveTo(slot.x, slot.y);
+                        ctx.lineTo(slot.x, slot.y + slot.h);
+                        if (slot.type !== 'half_right_open') {
+                            ctx.moveTo(slot.x + slot.w, slot.y);
+                            ctx.lineTo(slot.x + slot.w, slot.y + slot.h);
+                        }
+                        const hLineY = Math.abs(slot.y - (slot.flapEdgeY || 0)) < 1e-6 ? slot.y + slot.h : slot.y;
+                        const hLineX2 = slot.type === 'half_right_open' ? x_inner_glue_tab_canvas : slot.x + slot.w;
+                        ctx.moveTo(slot.x, hLineY);
+                        ctx.lineTo(hLineX2, hLineY);
+                    }
+                    if (slot.type === 'h_slot_left_open' || slot.type === 'h_slot_right_open') {
+                        ctx.moveTo(slot.x, slot.y);
+                        ctx.lineTo(slot.x + slot.w, slot.y);
+                        ctx.moveTo(slot.x, slot.y + slot.h);
+                        ctx.lineTo(slot.x + slot.w, slot.y + slot.h);
+                        const vLineX = slot.type === 'h_slot_left_open' ? slot.x + slot.w : slot.x;
+                        ctx.moveTo(vLineX, slot.y);
+                        ctx.lineTo(vLineX, slot.y + slot.h);
+                    }
+                    ctx.stroke();
+                });
+
+                ctx.restore();
+            };
+
+            const handleDownload = (type) => {
+                if (!blankDimensions) {
+                    setMessage(`Please generate the CAD first before downloading the ${type.toUpperCase()}.`);
+                    return;
+                }
+                
+                const L_in = convertUnits(parseFloat(length), unit, 'inch');
+                const W_in = convertUnits(parseFloat(width), unit, 'inch');
+                const H_in = convertUnits(parseFloat(height), unit, 'inch');
+                const thickness_in = boardProfiles[boardProfile];
+                const blankData = fefcoStyles[fefcoStyle].calculateBlank(L_in, W_in, H_in, thickness_in);
+
+                if (type === 'dxf') {
+                    const dxfContent = generateDxfContent(blankData, fefcoStyle, L_in, W_in, H_in);
+                    const blob = new Blob([dxfContent], { type: 'application/dxf' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `FEFCO_${fefcoStyle}_${L_in.toFixed(2)}x${W_in.toFixed(2)}x${H_in.toFixed(2)}.dxf`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    a.remove();
+                    setMessage('DXF file downloaded successfully!');
+                } else if (type === 'pdf') {
+                    if (!isJsPdfLoaded) {
+                        setMessage('PDF library is still loading. Please wait a moment and try again.');
+                        return;
+                    }
+                    generatePdf(blankData, fefcoStyle, L_in, W_in, H_in, unit, setMessage);
+                }
+            };
+
+            return (
+                <div className="min-h-screen bg-gray-100 p-4 font-inter">
+                    <div className="max-w-6xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+                        {/* CorruCAD Logo Mark */}
+                        <div className="text-5xl font-extrabold text-slate-800 flex items-baseline justify-center mb-2">
+                            <span>corru</span>
+                            <span className="text-orange-500 text-6xl font-normal mx-1" style={{ transform: 'translateY(2px)' }}>~</span>
+                            <span className="font-black">CAD</span>
+                        </div>
+                        <p className="text-sm text-gray-600 text-center mb-6">version 0.5</p> {/* Updated version number */}
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            {/* Input Section */}
+                            <div className="space-y-4">
+                                <h2 className="text-xl font-semibold text-gray-700">Box Dimensions</h2>
+                                <div>
+                                    <label htmlFor="unit" className="block text-sm font-medium text-gray-700">Units:</label>
+                                    <select
+                                        id="unit"
+                                        value={unit}
+                                        onChange={(e) => setUnit(e.target.value)}
+                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                    >
+                                        <option value="mm">Millimeters (mm)</option>
+                                        <option value="inch">Inches (in)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label htmlFor="length" className="block text-sm font-medium text-gray-700">Internal Length (L) ({unit}):</label>
+                                    <input
+                                        type="number"
+                                        id="length"
+                                        value={length}
+                                        onChange={(e) => setLength(e.target.value)}
+                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                        placeholder={`e.g., ${unit === 'mm' ? '300' : '10'}`}
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="width" className="block text-sm font-medium text-gray-700">Internal Width (W) ({unit}):</label>
+                                    <input
+                                        type="number"
+                                        id="width"
+                                        value={width}
+                                        onChange={(e) => setWidth(e.target.value)}
+                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                        placeholder={`e.g., ${unit === 'mm' ? '200' : '8'}`}
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="height" className="block text-sm font-medium text-gray-700">Internal Height (H) ({unit}):</label>
+                                    <input
+                                        type="number"
+                                        id="height"
+                                        value={height}
+                                        onChange={(e) => setHeight(e.target.value)}
+                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                        placeholder={`e.g., ${unit === 'mm' ? '150' : '4'}`}
+                                    />
+                                </div>
+
+                                <h2 className="text-xl font-semibold text-gray-700">Material & Style</h2>
+                                <div>
+                                    <label htmlFor="boardProfile" className="block text-sm font-medium text-gray-700">Board Profile:</label>
+                                    <select
+                                        id="boardProfile"
+                                        value={boardProfile}
+                                        onChange={(e) => setBoardProfile(e.target.value)}
+                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                    >
+                                        {Object.keys(boardProfiles).map((profile) => (
+                                            <option key={profile} value={profile}>{profile}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label htmlFor="fefcoStyle" className="block text-sm font-medium text-gray-700">FEFCO Style Code:</label>
+                                    <select
+                                        id="fefcoStyle"
+                                        value={fefcoStyle}
+                                        onChange={(e) => setFefcoStyle(e.target.value)}
+                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                    >
+                                        {Object.keys(fefcoStyles).map((styleCode) => (
+                                            <option key={styleCode} value={styleCode}>
+                                                {styleCode} - {fefcoStyles[styleCode].name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <button
+                                    onClick={initialGenerateClick}
+                                    disabled={hasGeneratedOnce}
+                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md shadow-md transition duration-300 ease-in-out disabled:bg-gray-400 disabled:cursor-not-allowed"
+                                >
+                                    {hasGeneratedOnce ? 'Auto-Updating...' : 'Generate CAD'}
+                                </button>
+                            </div>
+
+                            {/* Output Section */}
+                            <div className="space-y-4">
+                                <h2 className="text-xl font-semibold text-gray-700">Output Information</h2>
+                                {message && (
+                                    <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative" role="alert">
+                                        <span className="block sm:inline">{message}</span>
+                                    </div>
+                                )}
+
+                                {blankDimensions && outsideDimensions && (
+                                    <div className="bg-gray-50 p-4 rounded-md shadow-sm">
+                                        <h3 className="text-lg font-medium text-gray-800 mb-2">Calculated Dimensions:</h3>
+                                        <p><strong>Internal Length (L):</strong> {length} {unit}</p>
+                                        <p><strong>Internal Width (W):</strong> {width} {unit}</p>
+                                        <p><strong>Internal Height (H):</strong> {height} {unit}</p>
+                                        <p className="mt-2"><strong>Outside Length:</strong> {outsideDimensions.length.toFixed(3)} {unit}</p>
+                                        <p><strong>Outside Width:</strong> {outsideDimensions.width.toFixed(3)} {unit}</p>
+                                        <p><strong>Outside Height:</strong> {outsideDimensions.height.toFixed(3)} {unit}</p>
+                                        <p className="mt-2"><strong>Overall Blank Width:</strong> {blankDimensions.width.toFixed(3)} {unit}</p>
+                                        <p><strong>Overall Blank Height:</strong> {blankDimensions.height.toFixed(3)} {unit}</p>
+                                        <p><strong>Square Footage:</strong> {squareFootage ? squareFootage.toFixed(4) : 'N/A'} {unit === 'mm' ? 'm²' : 'ft²'}</p>
+                                        <p><strong>Estimated Waste:</strong> {wastePercentage ? wastePercentage.toFixed(2) : 'N/A'}%</p>
+                                    </div>
+                                )}
+
+                                <h3 className="text-lg font-semibold text-gray-700 mt-6">
+                                    Simplified Blank Layout
+                                </h3>
+                                <div className="border border-gray-300 rounded-md overflow-auto bg-white p-2 flex justify-center items-center" style={{ minHeight: '300px' }}>
+                                    <canvas ref={canvasRef} width="800" height="600" className="max-w-full max-h-full"></canvas>
+                                </div>
+                                <p className="text-sm text-gray-600 mt-2">
+                                    *This is a simplified visual representation.
+                                </p>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                                    <button
+                                        onClick={() => handleDownload('dxf')}
+                                        disabled={!blankDimensions}
+                                        className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md shadow-md transition duration-300 ease-in-out disabled:bg-gray-400 disabled:cursor-not-allowed"
+                                    >
+                                        Download DXF
+                                    </button>
+                                    <button
+                                        onClick={() => handleDownload('pdf')}
+                                        disabled={!isJsPdfLoaded || !blankDimensions}
+                                        className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md shadow-md transition duration-300 ease-in-out disabled:bg-gray-400 disabled:cursor-not-allowed"
+                                    >
+                                        {isJsPdfLoaded ? 'Download PDF' : 'Loading PDF...'}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Main App component to render FEFCOCADApp
+        const App = () => {
+            return <FEFCOCADApp />;
+        };
+
+        // Mount the React application
+        const rootElement = document.getElementById('root');
+        if (rootElement) {
+            const root = createRoot(rootElement); // Use createRoot from ReactDOM
+            root.render(
+                <React.StrictMode>
+                    <App />
+                </React.StrictMode>
+            );
+        } else {
+            console.error("Root element with ID 'root' not found in the document.");
+        }
+    </script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CorruCAD v1.0</title>
+    <title>CorruCAD v1.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -31,6 +31,7 @@
             border: 1px solid #e0e0e0;
         }
     </style>
+    <script src="/_vercel/insights/script.js" defer></script>
 </head>
 
 <body class="bg-gray-100">
@@ -44,8 +45,8 @@
         const estimatingEngine = (() => {
             const calculateQuote = (inputs) => {
                 const defaults = {
-                    outerLiner: 0, innerLiner: 0, middleLiner: 0, medium1: 0, medium2: 0, 
-                    takeUpFactor1: 0, takeUpFactor2: 0, priceMsf: 0, blankAreaSqFt: 0, 
+                    outerLiner: 0, innerLiner: 0, middleLiner: 0, medium1: 0, medium2: 0,
+                    takeUpFactor1: 0, takeUpFactor2: 0, priceMsf: 0, blankAreaSqFt: 0,
                     quantity: 0, marginPercent: 0, printUpcharge: 0, setupFee: 0
                 };
                 const data = { ...defaults, ...inputs };
@@ -69,19 +70,33 @@
 
         // --- Comprehensive Board Data Object with Price ---
         const boardData = {
-            '32 ECT B': { type: 'singlewall', thickness: 1/8, flute: 'B', components: { outerLiner: 35, medium1: 23, innerLiner: 35 }, priceMsf: 48 },
-            '32 ECT C': { type: 'singlewall', thickness: 3/16, flute: 'C', components: { outerLiner: 35, medium1: 23, innerLiner: 35 }, priceMsf: 48 },
-            '44 ECT B': { type: 'singlewall', thickness: 1/8, flute: 'B', components: { outerLiner: 56, medium1: 23, innerLiner: 56 }, priceMsf: 62 },
-            '44 ECT C': { type: 'singlewall', thickness: 3/16, flute: 'C', components: { outerLiner: 56, medium1: 23, innerLiner: 56 }, priceMsf: 62 },
-            '48 ECT BC': { type: 'doublewall', thickness: 5/16, flutes: ['B', 'C'], components: { outerLiner: 35, medium1: 23, middleLiner: 23, medium2: 23, innerLiner: 35 }, priceMsf: 65 },
-            '51 ECT BC': { type: 'doublewall', thickness: 5/16, flutes: ['B', 'C'], components: { outerLiner: 35, medium1: 23, middleLiner: 35, medium2: 23, innerLiner: 35 }, priceMsf: 68 },
-            '61 ECT BC': { type: 'doublewall', thickness: 5/16, flutes: ['B', 'C'], components: { outerLiner: 56, medium1: 23, middleLiner: 35, medium2: 23, innerLiner: 56 }, priceMsf: 75 },
-            '71 ECT BC': { type: 'doublewall', thickness: 5/16, flutes: ['B', 'C'], components: { outerLiner: 56, medium1: 23, middleLiner: 56, medium2: 23, innerLiner: 56 }, priceMsf: 82 },
+            '32 ECT C': { type: 'singlewall', thickness: 3/16, flute: 'C', components: { outerLiner: 35, medium1: 23, innerLiner: 35 }, priceMsf: 58 },
+            '32 ECT B': { type: 'singlewall', thickness: 1/8, flute: 'B', components: { outerLiner: 35, medium1: 23, innerLiner: 35 }, priceMsf: 58 },
+            '44 ECT C': { type: 'singlewall', thickness: 3/16, flute: 'C', components: { outerLiner: 56, medium1: 23, innerLiner: 56 }, priceMsf: 79 },
+            '44 ECT B': { type: 'singlewall', thickness: 1/8, flute: 'B', components: { outerLiner: 56, medium1: 23, innerLiner: 56 }, priceMsf: 79 },
+            '48 ECT BC': { type: 'doublewall', thickness: 5/16, flutes: ['B', 'C'], components: { outerLiner: 35, medium1: 23, middleLiner: 23, medium2: 23, innerLiner: 35 }, priceMsf: 102 },
+            '51 ECT BC': { type: 'doublewall', thickness: 5/16, flutes: ['B', 'C'], components: { outerLiner: 35, medium1: 23, middleLiner: 35, medium2: 23, innerLiner: 35 }, priceMsf: 110 },
+            '61 ECT BC': { type: 'doublewall', thickness: 5/16, flutes: ['B', 'C'], components: { outerLiner: 56, medium1: 23, middleLiner: 35, medium2: 23, innerLiner: 56 }, priceMsf: 128 },
+            '71 ECT BC': { type: 'doublewall', thickness: 5/16, flutes: ['B', 'C'], components: { outerLiner: 56, medium1: 23, middleLiner: 56, medium2: 23, innerLiner: 56 }, priceMsf: 142 },
         };
+
+        // NEW: Top Ten SKUs from CSV
+        const topTenSkus = [
+            { name: "6 x 6 x 6 (S-4062)", l: 6, w: 6, h: 6 },
+            { name: "8 x 8 x 8 (S-4084)", l: 8, w: 8, h: 8 },
+            { name: "10 x 10 x 10 (S-4105)", l: 10, w: 10, h: 10 },
+            { name: "12 x 12 x 12 (S-4125)", l: 12, w: 12, h: 12 },
+            { name: "14 x 14 x 14 (S-4142)", l: 14, w: 14, h: 14 },
+            { name: "16 x 16 x 16 (S-4166)", l: 16, w: 16, h: 16 },
+            { name: "18 x 12 x 12 (S-4181)", l: 18, w: 12, h: 12 },
+            { name: "18 x 18 x 18 (S-4185)", l: 18, w: 18, h: 18 },
+            { name: "20 x 20 x 20 (S-4201)", l: 20, w: 20, h: 20 },
+            { name: "24 x 12 x 12 (S-4243)", l: 24, w: 12, h: 12 }
+        ];
 
         // --- Start of STABLE Geometry and Drawing Engine ---
         const roundToNearestFraction = (valueInInches, fraction) => Math.ceil(valueInInches / fraction) * fraction;
-        
+
         const fefcoStyles = {
             '0201': {
                 name: 'Regular Slotted Container (RSC)',
@@ -140,6 +155,24 @@
                     const outsideDimensions = { length: L_in + (2 * thickness), width: W_in + (2 * thickness), height: H_in + (2 * thickness) };
                     const slots = [ { x: panel1_width - (slotWidth_full_in / 2), y: internalH_for_blank, w: slotWidth_full_in, h: flapLength_inches, type: 'full' }, { x: (panel1_width + panel2_width) - (slotWidth_full_in / 2), y: internalH_for_blank, w: slotWidth_full_in, h: flapLength_inches, type: 'full' }, { x: (panel1_width + panel2_width + panel3_width) - (slotWidth_full_in / 2), y: internalH_for_blank, w: slotWidth_full_in, h: flapLength_inches, type: 'full' }, { x: x_inner_glue_tab - slotWidth_half_in, y: internalH_for_blank, w: slotWidth_half_in, h: flapLength_inches, type: 'half_right_open' } ];
                     return { blankWidth, blankHeight, outsideDimensions, layout: [ { x: 0, y: 0, w: panel1_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width, y: 0, w: panel2_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width + panel2_width, y: 0, w: panel3_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width + panel2_width + panel3_width, y: 0, w: panel4_width, h: internalH_for_blank, type: 'panel' }, { points: glueTabPoints, type: 'polygon_cut' }, { x: 0, y: internalH_for_blank, w: panel1_width, h: flapLength_inches, type: 'flap' }, { x: panel1_width, y: internalH_for_blank, w: panel2_width, h: flapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width, y: internalH_for_blank, w: panel3_width, h: flapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width + panel3_width, y: internalH_for_blank, w: panel4_width, h: flapLength_inches, type: 'flap' }, ], scoreLines: [ { x1: panel1_width, y1: 0, x2: panel1_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width, y1: 0, x2: panel1_width + panel2_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width + panel3_width, y1: 0, x2: panel1_width + panel2_width + panel3_width, y2: blankHeight, type: 'vertical' }, { x1: glueTabScoreLine.x1, y1: glueTabScoreLine.y1, x2: glueTabScoreLine.x2, y2: glueTabScoreLine.y2, type: 'vertical_glue_tab' }, { x1: 0, y1: internalH_for_blank, x2: blankWidth, y2: internalH_for_blank, type: 'horizontal' }, ], slots, dxfGlueTabPerimeterPoints };
+                }
+            },
+            // NEW: Rescued and Renamed Glued Tube
+            '0501': {
+                name: 'Glued Tube (FEFCO 0501)',
+                calculateBlank: (L_input, W_input, H_input, thickness) => {
+                    const oneSixteenth_in = 1/16; const glueFlap_in = 1.375; const angle15DegRad = 15 * Math.PI / 180;
+                    const panel1_width = L_input + thickness - oneSixteenth_in; const panel2_width = W_input + thickness; const panel3_width = L_input + thickness; const panel4_width = W_input + thickness - oneSixteenth_in;
+                    const x_inner_glue_tab = panel1_width + panel2_width + panel3_width + panel4_width; const x_outer_glue_tab = x_inner_glue_tab + glueFlap_in; const x_panel4_end_before_glue_tab = panel1_width + panel2_width + panel3_width + panel4_width;
+                    const internalH_for_blank = H_input;
+                    const blankWidth = x_outer_glue_tab; const blankHeight = internalH_for_blank;
+                    const angleOffset = Math.tan(angle15DegRad) * glueFlap_in;
+                    const y_top_body_crease = 0; const y_bottom_body_crease = internalH_for_blank;
+                    const glueTabPoints = [ { x: x_inner_glue_tab, y: y_top_body_crease }, { x: x_outer_glue_tab, y: y_top_body_crease + angleOffset }, { x: x_outer_glue_tab, y: y_bottom_body_crease - angleOffset }, { x: x_inner_glue_tab, y: y_bottom_body_crease } ];
+                    const dxfGlueTabPerimeterPoints = [ { x: x_panel4_end_before_glue_tab, y: y_bottom_body_crease }, { x: x_outer_glue_tab, y: y_bottom_body_crease - angleOffset }, { x: x_outer_glue_tab, y: y_top_body_crease + angleOffset }, { x: x_panel4_end_before_glue_tab, y: y_top_body_crease } ];
+                    const glueTabScoreLine = { x1: x_inner_glue_tab, y1: y_top_body_crease, x2: x_inner_glue_tab, y2: y_bottom_body_crease };
+                    const outsideDimensions = { length: L_input + (2 * thickness), width: W_input + (2 * thickness), height: H_input };
+                    return { blankWidth, blankHeight, outsideDimensions, layout: [ { x: 0, y: 0, w: panel1_width, h: blankHeight, type: 'panel' }, { x: panel1_width, y: 0, w: panel2_width, h: blankHeight, type: 'panel' }, { x: panel1_width + panel2_width, y: 0, w: panel3_width, h: blankHeight, type: 'panel' }, { x: panel1_width + panel2_width + panel3_width, y: 0, w: panel4_width, h: blankHeight, type: 'panel' }, { points: glueTabPoints, type: 'polygon_cut' } ], scoreLines: [ { x1: panel1_width, y1: 0, x2: panel1_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width, y1: 0, x2: panel1_width + panel2_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width + panel3_width, y1: 0, x2: panel1_width + panel2_width + panel3_width, y2: blankHeight, type: 'vertical' }, { x1: glueTabScoreLine.x1, y1: glueTabScoreLine.y1, x2: glueTabScoreLine.x2, y2: glueTabScoreLine.y2, type: 'vertical_glue_tab' } ], slots: [], dxfGlueTabPerimeterPoints };
                 }
             },
             '0301_TRAY': {
@@ -212,11 +245,11 @@
                 }
             }
             return segments.map(seg => {
-                if (isVertical) { return { x1: line.x1, y1: seg.start, x2: line.x1, y2: seg.end }; } 
+                if (isVertical) { return { x1: line.x1, y1: seg.start, x2: line.x1, y2: seg.end }; }
                 else { return { x1: seg.start, y1: line.y1, x2: seg.end, y2: line.y1 }; }
             }).filter(l => (Math.abs(l.x1 - l.x2) > xTolerance || Math.abs(l.y1 - l.y2) > xTolerance));
         };
-        
+
         const generateDxfContent = (blankData, fefcoStyle, L_in, W_in, H_in) => {
             let dxf = `0\nSECTION\n2\nHEADER\n9\n$ACADVER\n1\nAC1009\n0\nENDSEC\n0\nSECTION\n2\nENTITIES\n`;
             const xTolerance = 1e-6;
@@ -228,7 +261,7 @@
             const y_top_edge = 0; const y_bottom_edge = blankData.blankHeight; const x_left_edge = 0; const x_right_edge = blankData.blankWidth;
             const x_inner_glue_tab = blankData.dxfGlueTabPerimeterPoints.length > 0 ? blankData.dxfGlueTabPerimeterPoints[0].x : blankData.blankWidth;
             const dxfGlueTabPerimeterPoints = blankData.dxfGlueTabPerimeterPoints || [];
-            const glueTabStyles = ['0201', '0203', '0200_HSC'];
+            const glueTabStyles = ['0201', '0203', '0200_HSC', '0501'];
             const isGlueTabStyle = glueTabStyles.includes(fefcoStyle);
             if (isGlueTabStyle && dxfGlueTabPerimeterPoints.length === 4) {
                 const p1 = dxfGlueTabPerimeterPoints[0]; const p2 = dxfGlueTabPerimeterPoints[1]; const p3 = dxfGlueTabPerimeterPoints[2]; const p4 = dxfGlueTabPerimeterPoints[3];
@@ -255,7 +288,7 @@
                 if (lastY_right < y_bottom_edge - xTolerance) addLine(1, x_right_edge, lastY_right, x_right_edge, y_bottom_edge);
             }
             blankData.slots.forEach(slot => {
-                if (slot.type === 'full') { addLine(1, slot.x, slot.y, slot.x, slot.y + slot.h); addLine(1, slot.x + slot.w, slot.y, slot.x + slot.w, slot.y + slot.h); const hLineY = Math.abs(slot.y - y_top_edge) < xTolerance ? slot.y + slot.h : slot.y; addLine(1, slot.x, hLineY, slot.x + slot.w, hLineY); } 
+                if (slot.type === 'full') { addLine(1, slot.x, slot.y, slot.x, slot.y + slot.h); addLine(1, slot.x + slot.w, slot.y, slot.x + slot.w, slot.y + slot.h); const hLineY = Math.abs(slot.y - y_top_edge) < xTolerance ? slot.y + slot.h : slot.y; addLine(1, slot.x, hLineY, slot.x + slot.w, hLineY); }
                 else if (slot.type === 'half_right_open') { addLine(1, slot.x, slot.y, slot.x, slot.y + slot.h); const hLineY = Math.abs(slot.y - y_top_edge) < xTolerance ? slot.y + slot.h : slot.y; addLine(1, slot.x, hLineY, x_inner_glue_tab, hLineY); }
             });
             const cutRects = blankData.slots.map(s => s.type !== 'line_cut' ? { x: s.x, y: s.y, w: s.w, h: s.h } : null).filter(Boolean);
@@ -267,7 +300,7 @@
             dxf += `0\nENDSEC\n0\nEOF`;
             return dxf;
         };
-        
+
         const generatePdf = (blankData, fefcoStyle, L_in, W_in, H_in, unit, setMessage) => {
             const { jsPDF } = window.jspdf;
             const pdfUnit = 'in';
@@ -284,7 +317,7 @@
             const y_top_edge = 0; const y_bottom_edge = blankData.blankHeight; const x_left_edge = 0; const x_right_edge = blankData.blankWidth;
             const x_inner_glue_tab = blankData.dxfGlueTabPerimeterPoints.length > 0 ? blankData.dxfGlueTabPerimeterPoints[0].x : blankData.blankWidth;
             const dxfGlueTabPerimeterPoints = blankData.dxfGlueTabPerimeterPoints || [];
-            const glueTabStyles = ['0201', '0203', '0200_HSC'];
+            const glueTabStyles = ['0201', '0203', '0200_HSC', '0501'];
             const isGlueTabStyle = glueTabStyles.includes(fefcoStyle);
             if (isGlueTabStyle && dxfGlueTabPerimeterPoints.length === 4) {
                 const p1 = dxfGlueTabPerimeterPoints[0]; const p2 = dxfGlueTabPerimeterPoints[1]; const p3 = dxfGlueTabPerimeterPoints[2]; const p4 = dxfGlueTabPerimeterPoints[3];
@@ -311,7 +344,7 @@
                 if (lastY_right < y_bottom_edge - xTolerance) addLineToPdf(x_right_edge, lastY_right, x_right_edge, y_bottom_edge);
             }
             blankData.slots.forEach(slot => {
-                if (slot.type === 'full') { addLineToPdf(slot.x, slot.y, slot.x, slot.y + slot.h); addLineToPdf(slot.x + slot.w, slot.y, slot.x + slot.w, slot.y + slot.h); const hLineY = Math.abs(slot.y - y_top_edge) < xTolerance ? slot.y + slot.h : slot.y; addLineToPdf(slot.x, hLineY, slot.x + slot.w, hLineY); } 
+                if (slot.type === 'full') { addLineToPdf(slot.x, slot.y, slot.x, slot.y + slot.h); addLineToPdf(slot.x + slot.w, slot.y, slot.x + slot.w, slot.y + slot.h); const hLineY = Math.abs(slot.y - y_top_edge) < xTolerance ? slot.y + slot.h : slot.y; addLineToPdf(slot.x, hLineY, slot.x + slot.w, hLineY); }
                 else if (slot.type === 'half_right_open') { addLineToPdf(slot.x, slot.y, slot.x, slot.y + slot.h); const hLineY = Math.abs(slot.y - y_top_edge) < xTolerance ? slot.y + slot.h : slot.y; addLineToPdf(slot.x, hLineY, x_inner_glue_tab, hLineY); }
             });
             doc.setDrawColor(0, 177, 64); doc.setLineDashPattern([0.08, 0.04], 0); doc.setLineWidth(0.02);
@@ -324,7 +357,7 @@
             doc.save(`FEFCO_${fefcoStyle}_${L_in.toFixed(2)}x${W_in.toFixed(2)}x${H_in.toFixed(2)}.pdf`);
             setMessage('PDF file downloaded successfully!');
         };
-        
+
         const drawBlank = (blank, canvas, ctx) => {
             if (!ctx || !blank) return;
             const parentWidth = canvas.parentElement.clientWidth;
@@ -382,29 +415,48 @@
         // --- Main React Application Component (Re-architected for Stability) ---
         const FEFCOCADApp = () => {
             const [appState, setAppState] = useState({
-                length: 13.5, width: 9.75, height: 10.75,
-                boardProfile: '44 ECT C', fefcoStyle: '0201',
-                priceMsf: 62, outerLiner: 56, innerLiner: 56,
+                length: 12, width: 12, height: 12, // MODIFIED: Default to a common size
+                boardProfile: '32 ECT C', fefcoStyle: '0201', // MODIFIED: Default to most common board/style
+                priceMsf: 48, outerLiner: 35, innerLiner: 35,
                 medium1: 23, middleLiner: 0, medium2: 0,
                 flute1: '1.42', flute2: '1.32',
                 margin: 20, printUpcharge: 0.05, setupFee: 350, quantity: 5000,
+                // NEW
+                topTenSelection: '12 x 12 x 12 (S-4125)',
             });
 
             const [results, setResults] = useState({
                 blankDimensions: null, outsideDimensions: null,
-                squareFootage: null, wastePercentage: null,
-                quoteResults: null, message: 'Enter dimensions to begin.',
+                squareFootage: null, wastePercentage: null, inchesOfRule: null, // MODIFIED
+                quoteResults: null, message: 'Enter dimensions or select a preset to begin.',
             });
-            
+
             const canvasRef = useRef(null);
 
-            // useCallback for a stable state update function.
-            // This function ONLY updates the app state, including all derived values.
             const handleStateChange = useCallback((changes) => {
                 setAppState(prevState => {
                     let newState = { ...prevState, ...changes };
 
-                    // If the board profile changed, derive new component, flute, and price values
+                    // NEW: Handle Top Ten SKU selection
+                    if ('topTenSelection' in changes) {
+                        const selectedSkuName = changes.topTenSelection;
+                        if (selectedSkuName === "custom") {
+                           newState.topTenSelection = "custom";
+                        } else {
+                            const selectedSku = topTenSkus.find(s => s.name === selectedSkuName);
+                            if (selectedSku) {
+                                newState.length = selectedSku.l;
+                                newState.width = selectedSku.w;
+                                newState.height = selectedSku.h;
+                            }
+                        }
+                    }
+                    
+                    // If any dimension is changed manually, set the SKU dropdown to "custom"
+                    if (['length', 'width', 'height'].some(key => key in changes)) {
+                        newState.topTenSelection = "custom";
+                    }
+
                     if ('boardProfile' in changes) {
                         const newBoardProfile = changes.boardProfile;
                         const board = boardData[newBoardProfile];
@@ -418,9 +470,7 @@
                                 medium2: comps.medium2 || 0,
                                 priceMsf: board.priceMsf || 0,
                             };
-                            
                             const fluteTakeupFactors = { 'B': '1.32', 'C': '1.42' };
-
                             if (board.type === 'doublewall' && board.flutes && board.flutes.length === 2) {
                                 const factorA = fluteTakeupFactors[board.flutes[0]];
                                 const factorB = fluteTakeupFactors[board.flutes[1]];
@@ -443,8 +493,6 @@
                 });
             }, []);
 
-            // useEffect to perform calculations WHEN appState changes.
-            // This guarantees calculations run with the latest, committed state.
             useEffect(() => {
                 const {
                     length, width, height, boardProfile, fefcoStyle,
@@ -457,7 +505,7 @@
                 const H_in = parseFloat(height);
 
                 if (isNaN(L_in) || isNaN(W_in) || isNaN(H_in) || L_in <= 0 || W_in <= 0 || H_in <= 0) {
-                    setResults(r => ({ ...r, message: 'Please enter valid positive numbers for all CAD dimensions.', quoteResults: null, blankDimensions: null }));
+                    setResults(r => ({ ...r, message: 'Please enter valid positive numbers for all CAD dimensions.', quoteResults: null, blankDimensions: null, wastePercentage: null, inchesOfRule: null }));
                     return;
                 }
 
@@ -465,7 +513,7 @@
                 const selectedStyle = fefcoStyles[fefcoStyle];
 
                 if (!board || !selectedStyle) {
-                    setResults(r => ({ ...r, message: 'Please select a valid style and board profile.', quoteResults: null, blankDimensions: null }));
+                    setResults(r => ({ ...r, message: 'Please select a valid style and board profile.', quoteResults: null, blankDimensions: null, wastePercentage: null, inchesOfRule: null }));
                     return;
                 }
 
@@ -473,7 +521,81 @@
                 const blankData = selectedStyle.calculateBlank(L_in, W_in, H_in, thickness_in);
                 const blankAreaSqIn = blankData.blankWidth * blankData.blankHeight;
                 const blankAreaSqFt = blankAreaSqIn / 144;
-                let waste = 0; // Simplified waste calc for brevity
+
+                // MODIFIED: Restored waste calculation
+                let waste = 0;
+                if (blankAreaSqIn > 0) {
+                    let totalWasteAreaSqIn = 0;
+                    // Slot waste
+                    blankData.slots.forEach(slot => { totalWasteAreaSqIn += slot.w * slot.h; });
+                    // Glue flap corner trim waste
+                    const glueTabStyles = ['0201', '0203', '0200_HSC'];
+                    if(glueTabStyles.includes(fefcoStyle)) {
+                        const glueFlap_in = 1.375;
+                        let flapLength_for_waste = 0;
+                        if (fefcoStyle === '0201' || fefcoStyle === '0200_HSC') {
+                           flapLength_for_waste = roundToNearestFraction(W_in / 2, 1/16) + roundToNearestFraction(thickness_in / 2, 1/16);
+                        } else if (fefcoStyle === '0203') {
+                           flapLength_for_waste = W_in;
+                        }
+                        const angle15DegRad = 15 * Math.PI / 180;
+                        const angleOffset = Math.tan(angle15DegRad) * glueFlap_in;
+                        // Waste from the two angled corners is equivalent to a rectangle of size angleOffset * glueFlap_in
+                        totalWasteAreaSqIn += angleOffset * glueFlap_in;
+                    }
+                    waste = (totalWasteAreaSqIn / blankAreaSqIn) * 100;
+                }
+
+                // NEW: Inches of Rule Calculation
+                let totalRuleInches = 0;
+                const cutRects = blankData.slots.map(s => ({ x: s.x, y: s.y, w: s.w, h: s.h }));
+                const glueTabInternalPoints = blankData.layout.find(p => p.type === 'polygon_cut')?.points || [];
+                // 1. Score lines
+                blankData.scoreLines.forEach(line => {
+                    const cleanedSegments = getCleanedLineSegments(line, cutRects, glueTabInternalPoints);
+                    cleanedSegments.forEach(seg => {
+                        totalRuleInches += Math.sqrt(Math.pow(seg.x2 - seg.x1, 2) + Math.pow(seg.y2 - seg.y1, 2));
+                    });
+                });
+                // 2. Cut lines (Perimeter + Slots) from DXF logic
+                const xTolerance = 1e-6;
+                const y_top_edge = 0; const y_bottom_edge = blankData.blankHeight; const x_left_edge = 0; const x_right_edge = blankData.blankWidth;
+                const x_inner_glue_tab = blankData.dxfGlueTabPerimeterPoints.length > 0 ? blankData.dxfGlueTabPerimeterPoints[0].x : blankData.blankWidth;
+                const dxfGlueTabPerimeterPoints = blankData.dxfGlueTabPerimeterPoints || [];
+                const glueTabStyles = ['0201', '0203', '0200_HSC', '0501'];
+                const isGlueTabStyle = glueTabStyles.includes(fefcoStyle);
+                if (isGlueTabStyle && dxfGlueTabPerimeterPoints.length === 4) {
+                    for(let i = 0; i < 4; i++) {
+                        const p1 = dxfGlueTabPerimeterPoints[i];
+                        const p2 = dxfGlueTabPerimeterPoints[(i + 1) % 4];
+                        totalRuleInches += Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+                    }
+                }
+                const topSlots = blankData.slots.filter(s => Math.abs(s.y - y_top_edge) < xTolerance).sort((a, b) => a.x - b.x);
+                let lastX_top = 0;
+                topSlots.forEach(slot => { if (slot.x > lastX_top + xTolerance) totalRuleInches += (slot.x - lastX_top); lastX_top = slot.x + slot.w; });
+                const topXLimit = isGlueTabStyle ? x_inner_glue_tab : x_right_edge;
+                if (lastX_top < topXLimit - xTolerance) totalRuleInches += (topXLimit - lastX_top);
+                const bottomSlots = blankData.slots.filter(s => Math.abs(s.y + s.h - y_bottom_edge) < xTolerance).sort((a, b) => a.x - b.x);
+                let lastX_bottom = 0;
+                bottomSlots.forEach(slot => { if (slot.x > lastX_bottom + xTolerance) totalRuleInches += (slot.x - lastX_bottom); lastX_bottom = slot.x + slot.w; });
+                const bottomXLimit = isGlueTabStyle ? x_inner_glue_tab : x_right_edge;
+                if (lastX_bottom < bottomXLimit - xTolerance) totalRuleInches += (bottomXLimit - lastX_bottom);
+                const leftSlots = blankData.slots.filter(s => Math.abs(s.x - x_left_edge) < xTolerance).sort((a, b) => a.y - b.y);
+                let lastY_left = 0;
+                leftSlots.forEach(slot => { if (slot.y > lastY_left + xTolerance) totalRuleInches += (slot.y - lastY_left); lastY_left = slot.y + slot.h; });
+                if (lastY_left < y_bottom_edge - xTolerance) totalRuleInches += (y_bottom_edge - lastY_left);
+                if (!isGlueTabStyle) {
+                    const rightSlots = blankData.slots.filter(s => Math.abs(s.x + s.w - x_right_edge) < xTolerance).sort((a, b) => a.y - b.y);
+                    let lastY_right = 0;
+                    rightSlots.forEach(slot => { if (slot.y > lastY_right + xTolerance) totalRuleInches += (slot.y - lastY_right); lastY_right = slot.y + slot.h; });
+                    if (lastY_right < y_bottom_edge - xTolerance) totalRuleInches += (y_bottom_edge - lastY_right);
+                }
+                blankData.slots.forEach(slot => {
+                    totalRuleInches += slot.h; // Left vertical
+                    if (slot.type === 'full') { totalRuleInches += slot.h; } // Right vertical
+                    totalRuleInches += slot.w; // Inner horizontal
+                });
 
                 const pricingInputs = {
                     outerLiner: parseFloat(outerLiner) || 0, innerLiner: parseFloat(innerLiner) || 0,
@@ -484,18 +606,17 @@
                     quantity: parseInt(quantity) || 0, marginPercent: parseFloat(margin) || 0,
                     printUpcharge: parseFloat(printUpcharge) || 0, setupFee: parseFloat(setupFee) || 0,
                 };
-                
+
                 const quote = estimatingEngine.calculate(pricingInputs);
-                
+
                 setResults({
                     blankDimensions: blankData, outsideDimensions: blankData.outsideDimensions,
-                    squareFootage: blankAreaSqFt, wastePercentage: waste,
+                    squareFootage: blankAreaSqFt, wastePercentage: waste, inchesOfRule: totalRuleInches,
                     quoteResults: quote, message: `Generated blank for FEFCO ${fefcoStyle}: ${selectedStyle.name}`
                 });
 
-            }, [appState]); // Dependency array ensures this runs whenever appState changes.
+            }, [appState]);
 
-            // useEffect for drawing to the canvas. This is a side effect of results changing.
             useEffect(() => {
                 const canvas = canvasRef.current;
                 const ctx = canvas ? canvas.getContext('2d') : null;
@@ -506,7 +627,7 @@
                 }
             }, [results.blankDimensions]);
 
-            const handleDownload = (type) => { 
+            const handleDownload = (type) => {
                 const { blankDimensions } = results;
                 const { length, width, height, fefcoStyle } = appState;
                 const L_in = parseFloat(length);
@@ -534,20 +655,28 @@
                     generatePdf(blankDimensions, fefcoStyle, L_in, W_in, H_in, 'in', (msg) => setResults(prev => ({...prev, message: msg})));
                 }
             };
-            const { blankDimensions, outsideDimensions, squareFootage, wastePercentage, quoteResults, message } = results;
+            const { blankDimensions, outsideDimensions, squareFootage, wastePercentage, quoteResults, message, inchesOfRule } = results;
 
             return (
                 <div className="max-w-7xl mx-auto p-4 md:p-8">
                     <div className="text-center mb-8">
-                        <h1 className="text-4xl md:text-5xl font-extrabold text-slate-800 flex items-baseline justify-center">
+                         <h1 className="text-4xl md:text-5xl font-extrabold text-slate-800 flex items-baseline justify-center">
                             <span>corru</span><span className="text-orange-500 text-5xl md:text-6xl font-normal mx-1" style={{ transform: 'translateY(2px)' }}>~</span><span className="font-black">CAD</span>
                         </h1>
-                        <p className="text-md text-gray-600">v1.0 - Stable Calculation Engine</p>
+                        <p className="text-md text-gray-600">v1.1 - Precision Engine with Presets</p>
                     </div>
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-sm space-y-6">
                             <div>
                                 <h2 className="section-title">CAD Inputs</h2>
+                                {/* NEW: Top Ten SKU Selector */}
+                                <div className="mb-4">
+                                     <label className="block text-sm font-medium text-gray-700">Top 10 SKU Presets</label>
+                                     <select value={appState.topTenSelection} onChange={e => handleStateChange({ topTenSelection: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md bg-yellow-50">
+                                         <option value="custom">-- Custom Dimensions --</option>
+                                         {topTenSkus.map(sku => <option key={sku.name} value={sku.name}>{sku.name}</option>)}
+                                     </select>
+                                </div>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">Length (L) (in)</label>
@@ -564,7 +693,7 @@
                                     <div className="md:col-span-2">
                                         <label className="block text-sm font-medium text-gray-700">FEFCO Style</label>
                                         <select value={appState.fefcoStyle} onChange={e => handleStateChange({ fefcoStyle: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
-                                            {Object.keys(fefcoStyles).map(style => <option key={style} value={style}>{style} - {fefcoStyles[style].name}</option>)}
+                                            {Object.keys(fefcoStyles).sort().map(style => <option key={style} value={style}>{style} - {fefcoStyles[style].name}</option>)}
                                         </select>
                                     </div>
                                     <div>
@@ -670,6 +799,8 @@
                                         <div className="border-t my-2"></div>
                                         <div className="grid grid-cols-2 gap-x-4 text-base">
                                             <span className="font-bold">Sq. Footage:</span><span className="font-bold text-right">{squareFootage ? squareFootage.toFixed(4) : 'N/A'} ft²</span>
+                                            {/* MODIFIED: Display restored values */}
+                                            <span className="font-bold">Inches of Rule:</span><span className="font-bold text-right">{inchesOfRule ? inchesOfRule.toFixed(2) : 'N/A'} in</span>
                                             <span className="font-bold">Est. Waste:</span><span className="font-bold text-right">{wastePercentage ? wastePercentage.toFixed(2) : 'N/A'}%</span>
                                         </div>
                                     </div>
@@ -709,7 +840,7 @@
                 </div>
             );
         };
-        
+
         const App = () => <FEFCOCADApp />;
         const rootElement = document.getElementById('root');
         const root = createRoot(rootElement);
@@ -717,4 +848,3 @@
     </script>
 </body>
 </html>
-

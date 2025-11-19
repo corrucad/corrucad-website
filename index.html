@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CorruCAD v1.1</title>
+    <title>CorruCAD v1.5.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -11,27 +11,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
+        body { font-family: 'Inter', sans-serif; }
         .section-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: #374151;
-            border-bottom: 1px solid #e5e7eb;
-            padding-bottom: 0.5rem;
-            margin-bottom: 1rem;
+            font-size: 1.125rem; font-weight: 600; color: #374151;
+            border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1rem;
         }
-        .final-quote-value {
-            color: #4338ca;
-        }
+        .final-quote-value { color: #4338ca; }
         canvas {
-            display: block;
-            background-color: #ffffff;
-            border: 1px solid #e0e0e0;
+            display: block; background-color: #ffffff; border: 1px solid #e0e0e0;
         }
     </style>
-    <script src="/_vercel/insights/script.js" defer></script>
 </head>
 
 <body class="bg-gray-100">
@@ -41,7 +30,7 @@
         const { useState, useEffect, useRef, useCallback } = React;
         const createRoot = ReactDOM.createRoot;
 
-        // --- CorruCAD Precision Estimating Engine v1.1 ---
+        // --- CorruCAD Precision Estimating Engine v1.5 ---
         const estimatingEngine = (() => {
             const calculateQuote = (inputs) => {
                 const defaults = {
@@ -157,7 +146,6 @@
                     return { blankWidth, blankHeight, outsideDimensions, layout: [ { x: 0, y: 0, w: panel1_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width, y: 0, w: panel2_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width + panel2_width, y: 0, w: panel3_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width + panel2_width + panel3_width, y: 0, w: panel4_width, h: internalH_for_blank, type: 'panel' }, { points: glueTabPoints, type: 'polygon_cut' }, { x: 0, y: internalH_for_blank, w: panel1_width, h: flapLength_inches, type: 'flap' }, { x: panel1_width, y: internalH_for_blank, w: panel2_width, h: flapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width, y: internalH_for_blank, w: panel3_width, h: flapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width + panel3_width, y: internalH_for_blank, w: panel4_width, h: flapLength_inches, type: 'flap' }, ], scoreLines: [ { x1: panel1_width, y1: 0, x2: panel1_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width, y1: 0, x2: panel1_width + panel2_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width + panel3_width, y1: 0, x2: panel1_width + panel2_width + panel3_width, y2: blankHeight, type: 'vertical' }, { x1: glueTabScoreLine.x1, y1: glueTabScoreLine.y1, x2: glueTabScoreLine.x2, y2: glueTabScoreLine.y2, type: 'vertical_glue_tab' }, { x1: 0, y1: internalH_for_blank, x2: blankWidth, y2: internalH_for_blank, type: 'horizontal' }, ], slots, dxfGlueTabPerimeterPoints };
                 }
             },
-            // NEW: Rescued and Renamed Glued Tube
             '0501': {
                 name: 'Glued Tube (FEFCO 0501)',
                 calculateBlank: (L_input, W_input, H_input, thickness) => {
@@ -199,7 +187,104 @@
                     return { blankWidth, blankHeight, outsideDimensions, layout: [ { x: 0, y: 0, w: blankWidth, h: blankHeight, type: 'panel' } ], scoreLines: [ { x1: flap_W, y1: 0, x2: flap_W, y2: blankHeight, type: 'vertical' }, { x1: flap_W + center_L, y1: 0, x2: flap_W + center_L, y2: blankHeight, type: 'vertical' }, { x1: 0, y1: flap_H, x2: blankWidth, y2: flap_H, type: 'horizontal' }, { x1: 0, y1: flap_H + center_W, x2: blankWidth, y2: flap_H + center_W, type: 'horizontal' }, ], slots, dxfGlueTabPerimeterPoints: [] };
                 }
             },
-        };
+            '0401': {
+                name: 'One Piece Folder (0401)',
+                calculateBlank: (L_in, W_in, H_in, thickness) => {
+                    const CAL = thickness;
+                    const corner_offset = 0.5 * CAL; 
+
+                    // --- Horizontal (X) Dimensions ---
+                    // Layout: Tuck | Side Depth | Main Length | Side Depth | Tuck
+                    const Tuck = 2.0; 
+                    const x_tuck_w = Tuck;
+                    const x_depth_w = H_in + CAL; 
+                    const x_length_w = L_in + CAL; 
+
+                    const x0 = 0;
+                    const x1 = x0 + x_tuck_w;
+                    const x2 = x1 + x_depth_w;   // Start of Main Panel
+                    const x3 = x2 + x_length_w;  // End of Main Panel
+                    const x4 = x3 + x_depth_w;
+                    const x5 = x4 + x_tuck_w;
+                    const blankWidth = x5;
+
+                    // --- Vertical (Y) Dimensions ---
+                    // Layout: Top Lid | Top Depth | Main Width | Bottom Depth | Bottom Lid
+                    // Note: We restore the explicit Depth panels here.
+                    const y_lid_h = (W_in / 2);    // Meets in middle
+                    const y_depth_h = H_in + CAL;  // Depth panel height
+                    const y_main_h = W_in + (2 * CAL); 
+
+                    const y0 = 0;
+                    const y1 = y0 + y_lid_h;       // Score: Top Lid -> Top Depth
+                    const y2 = y1 + y_depth_h;     // Score: Top Depth -> Main (Top Edge of Main)
+                    const y3 = y2 + y_main_h;      // Score: Main -> Bottom Depth (Bottom Edge of Main)
+                    const y4 = y3 + y_depth_h;     // Score: Bottom Depth -> Bottom Lid
+                    const y5 = y4 + y_lid_h;       // End
+                    const blankHeight = y5;
+
+                    // --- Wing Geometry Fix ---
+                    // The Side Wings (attached to Main) must be shorter than the Main Panel height
+                    // by 0.5 CAL at top and bottom to allow folding inside the Top/Bottom Depth panels.
+                    const y_wing_top = y2 + corner_offset;
+                    const y_wing_bottom = y3 - corner_offset;
+                    const h_wing = y_wing_bottom - y_wing_top;
+
+                    const outsideDimensions = { 
+                        length: L_in + (2 * CAL), 
+                        width: W_in + (2 * CAL), 
+                        height: H_in + (2 * CAL) 
+                    };
+
+                    const layout = [
+                        // Central Main Panel
+                        { x: x2, y: y2, w: x_length_w, h: y_main_h, type: 'panel' },
+
+                        // Vertical Strip Panels (Top/Bottom)
+                        { x: x2, y: 0, w: x_length_w, h: y_lid_h, type: 'flap' },        // Top Lid
+                        { x: x2, y: y1, w: x_length_w, h: y_depth_h, type: 'panel' },    // Top Depth (Restored)
+                        { x: x2, y: y3, w: x_length_w, h: y_depth_h, type: 'panel' },    // Bottom Depth (Restored)
+                        { x: x2, y: y4, w: x_length_w, h: y_lid_h, type: 'flap' },       // Bottom Lid
+
+                        // Horizontal Strip Panels (Wings) - with offset height
+                        { x: x0, y: y_wing_top, w: x_tuck_w, h: h_wing, type: 'flap' },  // Left Tuck
+                        { x: x1, y: y_wing_top, w: x_depth_w, h: h_wing, type: 'panel' },// Left Depth
+                        { x: x3, y: y_wing_top, w: x_depth_w, h: h_wing, type: 'panel' },// Right Depth
+                        { x: x4, y: y_wing_top, w: x_tuck_w, h: h_wing, type: 'flap' }   // Right Tuck
+                    ];
+
+                    const scoreLines = [
+                        // Horizontal Scores (Top/Bottom Sequence)
+                        { x1: x2, y1: y1, x2: x3, y2: y1, type: 'horizontal' }, // Top Lid Fold
+                        { x1: x2, y1: y2, x2: x3, y2: y2, type: 'horizontal' }, // Top Depth Fold (Main Top)
+                        { x1: x2, y1: y3, x2: x3, y2: y3, type: 'horizontal' }, // Bottom Depth Fold (Main Bottom)
+                        { x1: x2, y1: y4, x2: x3, y2: y4, type: 'horizontal' }, // Bottom Lid Fold
+
+                        // Vertical Scores (Wing Sequence)
+                        { x1: x1, y1: y_wing_top, x2: x1, y2: y_wing_bottom, type: 'vertical' }, // Left Tuck Fold
+                        { x1: x2, y1: y_wing_top, x2: x2, y2: y_wing_bottom, type: 'vertical' }, // Left Wing Hinge
+                        { x1: x3, y1: y_wing_top, x2: x3, y2: y_wing_bottom, type: 'vertical' }, // Right Wing Hinge
+                        { x1: x4, y1: y_wing_top, x2: x4, y2: y_wing_bottom, type: 'vertical' }  // Right Tuck Fold
+                    ];
+
+                    const slots = [
+                        // Corner Cuts: Remove the rectangular areas between the vertical strip and horizontal wings
+                        // Top Left: Cuts everything left of x2, and above y_wing_top
+                        { x: 0, y: 0, w: x2, h: y_wing_top, type: 'corner_cut' },
+                        // Top Right: Cuts everything right of x3, and above y_wing_top
+                        { x: x3, y: 0, w: blankWidth - x3, h: y_wing_top, type: 'corner_cut' },
+                        // Bottom Left: Cuts everything left of x2, and below y_wing_bottom
+                        { x: 0, y: y_wing_bottom, w: x2, h: blankHeight - y_wing_bottom, type: 'corner_cut' },
+                        // Bottom Right: Cuts everything right of x3, and below y_wing_bottom
+                        { x: x3, y: y_wing_bottom, w: blankWidth - x3, h: blankHeight - y_wing_bottom, type: 'corner_cut' }
+                    ];
+
+                    const dxfGlueTabPerimeterPoints = [];
+
+                    return { blankWidth, blankHeight, outsideDimensions, layout, scoreLines, slots, dxfGlueTabPerimeterPoints };
+                }
+            }
+        }; 
 
         const getCleanedLineSegments = (line, cutRects, glueTabInternalPoints) => {
             const xTolerance = 1e-6;
@@ -267,30 +352,42 @@
                 const p1 = dxfGlueTabPerimeterPoints[0]; const p2 = dxfGlueTabPerimeterPoints[1]; const p3 = dxfGlueTabPerimeterPoints[2]; const p4 = dxfGlueTabPerimeterPoints[3];
                 addLine(1, p1.x, p1.y, p2.x, p2.y); addLine(1, p2.x, p2.y, p3.x, p3.y); addLine(1, p3.x, p3.y, p4.x, p4.y);
             }
+
             const topSlots = blankData.slots.filter(s => Math.abs(s.y - y_top_edge) < xTolerance).sort((a, b) => a.x - b.x);
             let lastX_top = 0;
             topSlots.forEach(slot => { if (slot.x > lastX_top + xTolerance) addLine(1, lastX_top, y_top_edge, slot.x, y_top_edge); lastX_top = slot.x + slot.w; });
             const topXLimit = isGlueTabStyle ? x_inner_glue_tab : x_right_edge;
             if (lastX_top < topXLimit - xTolerance) addLine(1, lastX_top, y_top_edge, topXLimit, y_top_edge);
+            
             const bottomSlots = blankData.slots.filter(s => Math.abs(s.y + s.h - y_bottom_edge) < xTolerance).sort((a, b) => a.x - b.x);
             let lastX_bottom = 0;
             bottomSlots.forEach(slot => { if (slot.x > lastX_bottom + xTolerance) addLine(1, lastX_bottom, y_bottom_edge, slot.x, y_bottom_edge); lastX_bottom = slot.x + slot.w; });
             const bottomXLimit = isGlueTabStyle ? x_inner_glue_tab : x_right_edge;
             if (lastX_bottom < bottomXLimit - xTolerance) addLine(1, lastX_bottom, y_bottom_edge, bottomXLimit, y_bottom_edge);
+            
             const leftSlots = blankData.slots.filter(s => Math.abs(s.x - x_left_edge) < xTolerance).sort((a, b) => a.y - b.y);
             let lastY_left = 0;
             leftSlots.forEach(slot => { if (slot.y > lastY_left + xTolerance) addLine(1, x_left_edge, lastY_left, x_left_edge, slot.y); lastY_left = slot.y + slot.h; });
             if (lastY_left < y_bottom_edge - xTolerance) addLine(1, x_left_edge, lastY_left, x_left_edge, y_bottom_edge);
+            
             if (!isGlueTabStyle) {
                 const rightSlots = blankData.slots.filter(s => Math.abs(s.x + s.w - x_right_edge) < xTolerance).sort((a, b) => a.y - b.y);
                 let lastY_right = 0;
                 rightSlots.forEach(slot => { if (slot.y > lastY_right + xTolerance) addLine(1, x_right_edge, lastY_right, x_right_edge, slot.y); lastY_right = slot.y + slot.h; });
                 if (lastY_right < y_bottom_edge - xTolerance) addLine(1, x_right_edge, lastY_right, x_right_edge, y_bottom_edge);
             }
+
             blankData.slots.forEach(slot => {
                 if (slot.type === 'full') { addLine(1, slot.x, slot.y, slot.x, slot.y + slot.h); addLine(1, slot.x + slot.w, slot.y, slot.x + slot.w, slot.y + slot.h); const hLineY = Math.abs(slot.y - y_top_edge) < xTolerance ? slot.y + slot.h : slot.y; addLine(1, slot.x, hLineY, slot.x + slot.w, hLineY); }
                 else if (slot.type === 'half_right_open') { addLine(1, slot.x, slot.y, slot.x, slot.y + slot.h); const hLineY = Math.abs(slot.y - y_top_edge) < xTolerance ? slot.y + slot.h : slot.y; addLine(1, slot.x, hLineY, x_inner_glue_tab, hLineY); }
+                else if (slot.type === 'corner_cut') {
+                    if (Math.abs(slot.x - x_left_edge) > xTolerance) addLine(1, slot.x, slot.y, slot.x, slot.y + slot.h);
+                    if (Math.abs(slot.x + slot.w - x_right_edge) > xTolerance) addLine(1, slot.x + slot.w, slot.y, slot.x + slot.w, slot.y + slot.h);
+                    if (Math.abs(slot.y - y_top_edge) > xTolerance) addLine(1, slot.x, slot.y, slot.x + slot.w, slot.y);
+                    if (Math.abs(slot.y + slot.h - y_bottom_edge) > xTolerance) addLine(1, slot.x, slot.y + slot.h, slot.x + slot.w, slot.y + slot.h);
+                }
             });
+
             const cutRects = blankData.slots.map(s => s.type !== 'line_cut' ? { x: s.x, y: s.y, w: s.w, h: s.h } : null).filter(Boolean);
             const glueTabInternalPoints = blankData.layout.find(p => p.type === 'polygon_cut')?.points || [];
             blankData.scoreLines.forEach(line => {
@@ -310,43 +407,67 @@
             const doc = new jsPDF({ orientation: pdfPageWidth > pdfPageHeight ? 'landscape' : 'portrait', unit: pdfUnit, format: [pdfPageWidth, pdfPageHeight] });
             const xTolerance = 1e-6;
             const addLineToPdf = (x1, y1, x2, y2) => { doc.line(x1 + margin, y1 + margin, x2 + margin, y2 + margin); };
+            
             doc.setTextColor(0, 0, 0); doc.setFontSize(10);
             doc.text(`FEFCO ${fefcoStyle} - L:${L_in.toFixed(3)} W:${W_in.toFixed(3)} H:${H_in.toFixed(3)} (${pdfUnit})`, margin, margin / 2);
             doc.text(`Blank: ${blankData.blankWidth.toFixed(3)} x ${blankData.blankHeight.toFixed(3)} ${pdfUnit}`, margin, margin/2 + 0.2);
             doc.setDrawColor(255, 0, 0); doc.setLineDashPattern([], 0); doc.setLineWidth(0.02);
+            
             const y_top_edge = 0; const y_bottom_edge = blankData.blankHeight; const x_left_edge = 0; const x_right_edge = blankData.blankWidth;
             const x_inner_glue_tab = blankData.dxfGlueTabPerimeterPoints.length > 0 ? blankData.dxfGlueTabPerimeterPoints[0].x : blankData.blankWidth;
             const dxfGlueTabPerimeterPoints = blankData.dxfGlueTabPerimeterPoints || [];
             const glueTabStyles = ['0201', '0203', '0200_HSC', '0501'];
             const isGlueTabStyle = glueTabStyles.includes(fefcoStyle);
+            
             if (isGlueTabStyle && dxfGlueTabPerimeterPoints.length === 4) {
                 const p1 = dxfGlueTabPerimeterPoints[0]; const p2 = dxfGlueTabPerimeterPoints[1]; const p3 = dxfGlueTabPerimeterPoints[2]; const p4 = dxfGlueTabPerimeterPoints[3];
                 addLineToPdf(p1.x, p1.y, p2.x, p2.y); addLineToPdf(p2.x, p2.y, p3.x, p3.y); addLineToPdf(p3.x, p3.y, p4.x, p4.y);
             }
+
             const topSlots = blankData.slots.filter(s => Math.abs(s.y - y_top_edge) < xTolerance).sort((a, b) => a.x - b.x);
             let lastX_top = 0;
             topSlots.forEach(slot => { if (slot.x > lastX_top + xTolerance) addLineToPdf(lastX_top, y_top_edge, slot.x, y_top_edge); lastX_top = slot.x + slot.w; });
             const topXLimit = isGlueTabStyle ? x_inner_glue_tab : x_right_edge;
             if (lastX_top < topXLimit - xTolerance) addLineToPdf(lastX_top, y_top_edge, topXLimit, y_top_edge);
+            
             const bottomSlots = blankData.slots.filter(s => Math.abs(s.y + s.h - y_bottom_edge) < xTolerance).sort((a, b) => a.x - b.x);
             let lastX_bottom = 0;
             bottomSlots.forEach(slot => { if (slot.x > lastX_bottom + xTolerance) addLineToPdf(lastX_bottom, y_bottom_edge, slot.x, y_bottom_edge); lastX_bottom = slot.x + slot.w; });
             const bottomXLimit = isGlueTabStyle ? x_inner_glue_tab : x_right_edge;
             if (lastX_bottom < bottomXLimit - xTolerance) addLineToPdf(lastX_bottom, y_bottom_edge, bottomXLimit, y_bottom_edge);
+            
             const leftSlots = blankData.slots.filter(s => Math.abs(s.x - x_left_edge) < xTolerance).sort((a, b) => a.y - b.y);
             let lastY_left = 0;
             leftSlots.forEach(slot => { if (slot.y > lastY_left + xTolerance) addLineToPdf(x_left_edge, lastY_left, x_left_edge, slot.y); lastY_left = slot.y + slot.h; });
             if (lastY_left < y_bottom_edge - xTolerance) addLineToPdf(x_left_edge, lastY_left, x_left_edge, y_bottom_edge);
+            
             if (!isGlueTabStyle) {
                 const rightSlots = blankData.slots.filter(s => Math.abs(s.x + s.w - x_right_edge) < xTolerance).sort((a, b) => a.y - b.y);
                 let lastY_right = 0;
                 rightSlots.forEach(slot => { if (slot.y > lastY_right + xTolerance) addLineToPdf(x_right_edge, lastY_right, x_right_edge, slot.y); lastY_right = slot.y + slot.h; });
                 if (lastY_right < y_bottom_edge - xTolerance) addLineToPdf(x_right_edge, lastY_right, x_right_edge, y_bottom_edge);
             }
+
             blankData.slots.forEach(slot => {
-                if (slot.type === 'full') { addLineToPdf(slot.x, slot.y, slot.x, slot.y + slot.h); addLineToPdf(slot.x + slot.w, slot.y, slot.x + slot.w, slot.y + slot.h); const hLineY = Math.abs(slot.y - y_top_edge) < xTolerance ? slot.y + slot.h : slot.y; addLineToPdf(slot.x, hLineY, slot.x + slot.w, hLineY); }
-                else if (slot.type === 'half_right_open') { addLineToPdf(slot.x, slot.y, slot.x, slot.y + slot.h); const hLineY = Math.abs(slot.y - y_top_edge) < xTolerance ? slot.y + slot.h : slot.y; addLineToPdf(slot.x, hLineY, x_inner_glue_tab, hLineY); }
+                if (slot.type === 'full') { 
+                    addLineToPdf(slot.x, slot.y, slot.x, slot.y + slot.h); 
+                    addLineToPdf(slot.x + slot.w, slot.y, slot.x + slot.w, slot.y + slot.h); 
+                    const hLineY = Math.abs(slot.y - y_top_edge) < xTolerance ? slot.y + slot.h : slot.y; 
+                    addLineToPdf(slot.x, hLineY, slot.x + slot.w, hLineY); 
+                }
+                else if (slot.type === 'half_right_open') { 
+                    addLineToPdf(slot.x, slot.y, slot.x, slot.y + slot.h); 
+                    const hLineY = Math.abs(slot.y - y_top_edge) < xTolerance ? slot.y + slot.h : slot.y; 
+                    addLineToPdf(slot.x, hLineY, x_inner_glue_tab, hLineY); 
+                }
+                else if (slot.type === 'corner_cut') {
+                    if (Math.abs(slot.x - x_left_edge) > xTolerance) addLineToPdf(slot.x, slot.y, slot.x, slot.y + slot.h);
+                    if (Math.abs(slot.x + slot.w - x_right_edge) > xTolerance) addLineToPdf(slot.x + slot.w, slot.y, slot.x + slot.w, slot.y + slot.h);
+                    if (Math.abs(slot.y - y_top_edge) > xTolerance) addLineToPdf(slot.x, slot.y, slot.x + slot.w, slot.y);
+                    if (Math.abs(slot.y + slot.h - y_bottom_edge) > xTolerance) addLineToPdf(slot.x, slot.y + slot.h, slot.x + slot.w, slot.y + slot.h);
+                }
             });
+
             doc.setDrawColor(0, 177, 64); doc.setLineDashPattern([0.08, 0.04], 0); doc.setLineWidth(0.02);
             const cutRects = blankData.slots.map(s => s.type !== 'line_cut' ? { x: s.x, y: s.y, w: s.w, h: s.h } : null).filter(Boolean);
             const glueTabInternalPoints = blankData.layout.find(p => p.type === 'polygon_cut')?.points || [];
@@ -357,7 +478,7 @@
             doc.save(`FEFCO_${fefcoStyle}_${L_in.toFixed(2)}x${W_in.toFixed(2)}x${H_in.toFixed(2)}.pdf`);
             setMessage('PDF file downloaded successfully!');
         };
-
+        
         const drawBlank = (blank, canvas, ctx) => {
             if (!ctx || !blank) return;
             const parentWidth = canvas.parentElement.clientWidth;
@@ -369,6 +490,13 @@
             const padding = 0.5 * scale;
             ctx.translate(padding, padding);
             ctx.scale(scale, scale);
+            
+            const x_left_edge = 0;
+            const x_right_edge = blank.blankWidth;
+            const y_top_edge = 0;
+            const y_bottom_edge = blank.blankHeight;
+            const xTolerance = 1e-6;
+
             blank.layout.forEach(part => {
                 if (part.type === 'panel' || part.type === 'flap') {
                     ctx.fillStyle = part.type === 'panel' ? '#D4EDDA' : '#C3E6CB';
@@ -406,6 +534,11 @@
                     const hLineY = Math.abs(slot.y) < 1e-6 ? slot.y + slot.h : slot.y;
                     const hLineX2 = slot.type === 'half_right_open' ? x_inner_glue_tab_canvas : slot.x + slot.w;
                     ctx.moveTo(slot.x, hLineY); ctx.lineTo(hLineX2, hLineY);
+                } else if (slot.type === 'corner_cut') {
+                     if (Math.abs(slot.x - x_left_edge) > xTolerance) { ctx.moveTo(slot.x, slot.y); ctx.lineTo(slot.x, slot.y + slot.h); }
+                     if (Math.abs(slot.x + slot.w - x_right_edge) > xTolerance) { ctx.moveTo(slot.x + slot.w, slot.y); ctx.lineTo(slot.x + slot.w, slot.y + slot.h); }
+                     if (Math.abs(slot.y - y_top_edge) > xTolerance) { ctx.moveTo(slot.x, slot.y); ctx.lineTo(slot.x + slot.w, slot.y); }
+                     if (Math.abs(slot.y + slot.h - y_bottom_edge) > xTolerance) { ctx.moveTo(slot.x, slot.y + slot.h); ctx.lineTo(slot.x + slot.w, slot.y + slot.h); }
                 }
                 ctx.stroke();
             });
@@ -527,7 +660,15 @@
                 if (blankAreaSqIn > 0) {
                     let totalWasteAreaSqIn = 0;
                     // Slot waste
-                    blankData.slots.forEach(slot => { totalWasteAreaSqIn += slot.w * slot.h; });
+                    blankData.slots.forEach(slot => { 
+                        if (slot.type !== 'corner_cut') {
+                            totalWasteAreaSqIn += slot.w * slot.h; 
+                        } else {
+                            // For 0401 corner cuts, these are large areas of waste
+                            totalWasteAreaSqIn += slot.w * slot.h;
+                        }
+                    });
+                    
                     // Glue flap corner trim waste
                     const glueTabStyles = ['0201', '0203', '0200_HSC'];
                     if(glueTabStyles.includes(fefcoStyle)) {
@@ -571,30 +712,35 @@
                         totalRuleInches += Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
                     }
                 }
-                const topSlots = blankData.slots.filter(s => Math.abs(s.y - y_top_edge) < xTolerance).sort((a, b) => a.x - b.x);
+                const topSlots = blankData.slots.filter(s => Math.abs(s.y - y_top_edge) < xTolerance && s.type !== 'corner_cut').sort((a, b) => a.x - b.x);
                 let lastX_top = 0;
                 topSlots.forEach(slot => { if (slot.x > lastX_top + xTolerance) totalRuleInches += (slot.x - lastX_top); lastX_top = slot.x + slot.w; });
                 const topXLimit = isGlueTabStyle ? x_inner_glue_tab : x_right_edge;
                 if (lastX_top < topXLimit - xTolerance) totalRuleInches += (topXLimit - lastX_top);
-                const bottomSlots = blankData.slots.filter(s => Math.abs(s.y + s.h - y_bottom_edge) < xTolerance).sort((a, b) => a.x - b.x);
+                const bottomSlots = blankData.slots.filter(s => Math.abs(s.y + s.h - y_bottom_edge) < xTolerance && s.type !== 'corner_cut').sort((a, b) => a.x - b.x);
                 let lastX_bottom = 0;
                 bottomSlots.forEach(slot => { if (slot.x > lastX_bottom + xTolerance) totalRuleInches += (slot.x - lastX_bottom); lastX_bottom = slot.x + slot.w; });
                 const bottomXLimit = isGlueTabStyle ? x_inner_glue_tab : x_right_edge;
                 if (lastX_bottom < bottomXLimit - xTolerance) totalRuleInches += (bottomXLimit - lastX_bottom);
-                const leftSlots = blankData.slots.filter(s => Math.abs(s.x - x_left_edge) < xTolerance).sort((a, b) => a.y - b.y);
+                const leftSlots = blankData.slots.filter(s => Math.abs(s.x - x_left_edge) < xTolerance && s.type !== 'corner_cut').sort((a, b) => a.y - b.y);
                 let lastY_left = 0;
                 leftSlots.forEach(slot => { if (slot.y > lastY_left + xTolerance) totalRuleInches += (slot.y - lastY_left); lastY_left = slot.y + slot.h; });
                 if (lastY_left < y_bottom_edge - xTolerance) totalRuleInches += (y_bottom_edge - lastY_left);
                 if (!isGlueTabStyle) {
-                    const rightSlots = blankData.slots.filter(s => Math.abs(s.x + s.w - x_right_edge) < xTolerance).sort((a, b) => a.y - b.y);
+                    const rightSlots = blankData.slots.filter(s => Math.abs(s.x + s.w - x_right_edge) < xTolerance && s.type !== 'corner_cut').sort((a, b) => a.y - b.y);
                     let lastY_right = 0;
                     rightSlots.forEach(slot => { if (slot.y > lastY_right + xTolerance) totalRuleInches += (slot.y - lastY_right); lastY_right = slot.y + slot.h; });
                     if (lastY_right < y_bottom_edge - xTolerance) totalRuleInches += (y_bottom_edge - lastY_right);
                 }
                 blankData.slots.forEach(slot => {
-                    totalRuleInches += slot.h; // Left vertical
-                    if (slot.type === 'full') { totalRuleInches += slot.h; } // Right vertical
-                    totalRuleInches += slot.w; // Inner horizontal
+                    if (slot.type !== 'corner_cut') {
+                        totalRuleInches += slot.h; // Left vertical
+                        if (slot.type === 'full') { totalRuleInches += slot.h; } // Right vertical
+                        totalRuleInches += slot.w; // Inner horizontal
+                    } else {
+                         // Corner cut rule is the interior boundary of the cut
+                         totalRuleInches += slot.w + slot.h;
+                    }
                 });
 
                 const pricingInputs = {
@@ -663,7 +809,7 @@
                          <h1 className="text-4xl md:text-5xl font-extrabold text-slate-800 flex items-baseline justify-center">
                             <span>corru</span><span className="text-orange-500 text-5xl md:text-6xl font-normal mx-1" style={{ transform: 'translateY(2px)' }}>~</span><span className="font-black">CAD</span>
                         </h1>
-                        <p className="text-md text-gray-600">v1.1 - Precision Engine with Presets</p>
+                        <p className="text-md text-gray-600">v1.5.1 - Precision Engine with Presets</p>
                     </div>
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-sm space-y-6">
@@ -673,8 +819,8 @@
                                 <div className="mb-4">
                                      <label className="block text-sm font-medium text-gray-700">Top 10 SKU Presets</label>
                                      <select value={appState.topTenSelection} onChange={e => handleStateChange({ topTenSelection: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md bg-yellow-50">
-                                         <option value="custom">-- Custom Dimensions --</option>
-                                         {topTenSkus.map(sku => <option key={sku.name} value={sku.name}>{sku.name}</option>)}
+                                          <option value="custom">-- Custom Dimensions --</option>
+                                          {topTenSkus.map(sku => <option key={sku.name} value={sku.name}>{sku.name}</option>)}
                                      </select>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

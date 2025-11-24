@@ -568,50 +568,88 @@
 
             const canvasRef = useRef(null);
 
-            // --- START KIWIPLAN EXPORT FUNCTION ---
+// --- START ENHANCED KIWIPLAN EXPORT (v1.7) ---
             const exportToKiwiplan = () => {
-                // Map appState to the expected format
-                const boxData = {
-                    sku: appState.topTenSelection !== 'custom' ? appState.topTenSelection : `CUSTOM-${appState.length}x${appState.width}x${appState.height}`,
-                    style: appState.fefcoStyle,
-                    L: parseFloat(appState.length),
-                    W: parseFloat(appState.width),
-                    D: parseFloat(appState.height),
-                    quantity: parseInt(appState.quantity),
-                    grade: appState.boardProfile,
-                    flute: appState.flute1 // Simplifying to primary flute for the CSV
-                };
+                // Check if we have valid calculation results first
+                if (!results.blankDimensions) {
+                    setResults(prev => ({...prev, message: 'Please calculate dimensions before exporting.'}));
+                    return;
+                }
 
-                // Standard Kiwiplan KMC Order Ingestion Layout
-                const headers = ["RecordType","Customer","OrderNo","ItemCode","Style","L","W","D","Qty","Due"];
+                // 1. Define the Enhanced Headers (The "Production Ready" Schema)
+                const headers = [
+                    "RecordType",   // ORD
+                    "Action",       // NEW
+                    "OrderNo",      // Unique ID
+                    "CustomerCode", // ERP ID
+                    "ItemCode",     // SKU
+                    "StyleCode",    // FEFCO
+                    "OrderQty",     
+                    "DueDate",      
+                    "BoardGrade",   // Critical: Material Spec
+                    "Flute",        // Critical: Caliper Logic
+                    "Length_mm",    
+                    "Width_mm",     
+                    "Depth_mm",     
+                    "BlankW_mm",    // Critical: The "Web" Width
+                    "BlankL_mm",    // Critical: The "Chop" Length
+                    "Score1_mm",    // First Score Position
+                    "Score2_mm",    // Second Score Position (if applicable)
+                    "Notes"
+                ];
                 
-                // Convert to Metric (Kiwiplan native)
-                const L_mm = Math.round(boxData.L * 25.4);
-                const W_mm = Math.round(boxData.W * 25.4);
-                const D_mm = Math.round(boxData.D * 25.4);
+                // 2. Metric Conversions (The "Box Math")
+                // Box Dimensions
+                const L_mm = Math.round(parseFloat(appState.length) * 25.4);
+                const W_mm = Math.round(parseFloat(appState.width) * 25.4);
+                const D_mm = Math.round(parseFloat(appState.height) * 25.4);
+                
+                // Blank Dimensions (Pulled from your Physics Engine)
+                // Note: In Corrugated, "Width" is usually the corrugator web width, "Length" is the chop.
+                // We map your blankWidth to W and blankHeight to L for standard machine feed.
+                const BlankW_mm = Math.round(results.blankDimensions.blankWidth * 25.4);
+                const BlankL_mm = Math.round(results.blankDimensions.blankHeight * 25.4);
 
+                // Score Logic (Simple mapping for RSC - pulling from your engine's scoreLines)
+                // We grab the first vertical score (panel 1) and second vertical score (panel 1+2)
+                // This helps the machine auto-set heads.
+                let Score1_mm = 0;
+                let Score2_mm = 0;
+                
+                // Find vertical scores from your blank data
+                const vertScores = results.blankDimensions.scoreLines.filter(l => l.type === 'vertical' || l.type === 'vertical_glue_tab');
+                if (vertScores.length > 0) Score1_mm = Math.round(vertScores[0].x1 * 25.4);
+                if (vertScores.length > 1) Score2_mm = Math.round(vertScores[1].x1 * 25.4);
+
+                // 3. Generate the Row
                 const row = [
-                    "ORD",
-                    "TEMP", // Placeholder for Cust ID
-                    `JOB-${Date.now()}`,
-                    boxData.sku || "NEW-ITEM",
-                    boxData.style,
-                    L_mm, W_mm, D_mm,
-                    boxData.quantity,
-                    new Date().toISOString().slice(0,10).replace(/-/g,"")
+                    "ORD",                          // RecordType
+                    "NEW",                          // Action
+                    `JOB-${Date.now()}`,            // OrderNo
+                    "TEMP-CUST",                    // CustomerCode
+                    appState.topTenSelection !== 'custom' ? appState.topTenSelection : `CUSTOM-${appState.length}x${appState.width}x${appState.height}`, // ItemCode
+                    appState.fefcoStyle,            // StyleCode
+                    appState.quantity,              // OrderQty
+                    new Date().toISOString().slice(0,10).replace(/-/g,""), // DueDate
+                    appState.boardProfile,          // BoardGrade (e.g. "32 ECT C")
+                    appState.flute1,                // Flute (e.g. "1.42")
+                    L_mm, W_mm, D_mm,               // Box Dims
+                    BlankW_mm, BlankL_mm,           // Blank Dims (The Value Add)
+                    Score1_mm, Score2_mm,           // Machine Setup Dims
+                    "Generated by corru~CAD v1.7"   // Notes
                 ];
 
+                // 4. Build and Download
                 const csvContent = "data:text/csv;charset=utf-8," + headers.join(",") + "\n" + row.join(",");
-                
+                const encodedUri = encodeURI(csvContent);
                 const link = document.createElement("a");
-                link.setAttribute("href", encodeURI(csvContent));
-                link.setAttribute("download", `Kiwiplan_Load_${boxData.sku.replace(/[^a-z0-9]/gi, '_')}.csv`);
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", `Kiwiplan_Standard_Export_${appState.fefcoStyle}.csv`);
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
             };
-            // --- END KIWIPLAN EXPORT FUNCTION ---
-
+            // --- END ENHANCED KIWIPLAN EXPORT ---
             const handleStateChange = useCallback((changes) => {
                 setAppState(prevState => {
                     let newState = { ...prevState, ...changes };

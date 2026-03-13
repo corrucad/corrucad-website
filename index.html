@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CorruCAD v1.7</title>
+    <title>CorruCAD v2.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -23,6 +23,7 @@
     </style>
         <script src="/_vercel/insights/script.js" defer></script>
 <script async src="https://js.stripe.com/v3/buy-button.js"></script>
+
 </head>
 
 <body class="bg-gray-100">
@@ -32,7 +33,7 @@
         const { useState, useEffect, useRef, useCallback } = React;
         const createRoot = ReactDOM.createRoot;
 
-        // --- CorruCAD Precision Estimating Engine v1.7 ---
+        // --- CorruCAD Precision Estimating Engine v2.0 ---
         const estimatingEngine = (() => {
             const calculateQuote = (inputs) => {
                 const defaults = {
@@ -125,7 +126,7 @@
                     const glueTabScoreLine = { x1: x_inner_glue_tab, y1: y_top_body_crease, x2: x_inner_glue_tab, y2: y_bottom_body_crease };
                     const outsideDimensions = { length: L_in + (2 * thickness), width: W_in + (2 * thickness), height: H_in + (4 * thickness) };
                     const slots = [ { x: panel1_width - (slotWidth_full_in / 2), y: 0, w: slotWidth_full_in, h: majorFlapLength_inches, type: 'full' }, { x: (panel1_width + panel2_width) - (slotWidth_full_in / 2), y: 0, w: slotWidth_full_in, h: majorFlapLength_inches, type: 'full' }, { x: (panel1_width + panel2_width + panel3_width) - (slotWidth_full_in / 2), y: 0, w: slotWidth_full_in, h: majorFlapLength_inches, type: 'full' }, { x: x_inner_glue_tab - slotWidth_half_in, y: 0, w: slotWidth_half_in, h: majorFlapLength_inches, type: 'half_right_open' }, { x: panel1_width - (slotWidth_full_in / 2), y: internalH_for_blank + majorFlapLength_inches, w: slotWidth_full_in, h: majorFlapLength_inches, type: 'full' }, { x: (panel1_width + panel2_width) - (slotWidth_full_in / 2), y: internalH_for_blank + majorFlapLength_inches, w: slotWidth_full_in, h: majorFlapLength_inches, type: 'full' }, { x: (panel1_width + panel2_width + panel3_width) - (slotWidth_full_in / 2), y: internalH_for_blank + majorFlapLength_inches, w: slotWidth_full_in, h: majorFlapLength_inches, type: 'full' }, { x: x_inner_glue_tab - slotWidth_half_in, y: internalH_for_blank + majorFlapLength_inches, w: slotWidth_half_in, h: majorFlapLength_inches, type: 'half_right_open' } ];
-                    return { blankWidth, blankHeight, outsideDimensions, layout: [ { x: 0, y: majorFlapLength_inches, w: panel1_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width, y: majorFlapLength_inches, w: panel2_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width + panel2_width, y: majorFlapLength_inches, w: panel3_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width + panel2_width + panel3_width, y: majorFlapLength_inches, w: panel4_width, h: internalH_for_blank, type: 'panel' }, { points: glueTabPoints, type: 'polygon_cut' }, { x: 0, y: 0, w: panel1_width, h: majorFlapLength_inches, type: 'flap' }, { x: panel1_width, y: 0, w: panel2_width, h: majorFlapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width, y: 0, w: panel3_width, h: majorFlapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width + panel3_width, y: 0, w: panel4_width, h: majorFlapLength_inches, type: 'flap' }, { x: 0, y: internalH_for_blank + majorFlapLength_inches, w: panel1_width, h: majorFlapLength_inches, type: 'flap' }, { x: panel1_width, y: internalH_for_blank + majorFlapLength_inches, w: panel2_width, h: majorFlapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width, y: internalH_for_blank + majorFlapLength_inches, w: panel3_width, h: majorFlapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width + panel3_width, y: internalH_for_blank + majorFlapLength_inches, w: panel4_width, h: majorFlapLength_inches, type: 'flap' }, ], scoreLines: [ { x1: panel1_width, y: 0, x2: panel1_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width, y: 0, x2: panel1_width + panel2_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width + panel3_width, y: 0, x2: panel1_width + panel2_width + panel3_width, y2: blankHeight, type: 'vertical' }, { x1: glueTabScoreLine.x1, y1: glueTabScoreLine.y1, x2: glueTabScoreLine.x2, y2: glueTabScoreLine.y2, type: 'vertical_glue_tab' }, { x1: 0, y1: majorFlapLength_inches, x2: blankWidth, y2: majorFlapLength_inches, type: 'horizontal' }, { x1: 0, y1: internalH_for_blank + majorFlapLength_inches, x2: blankWidth, y2: internalH_for_blank + majorFlapLength_inches, type: 'horizontal' }, ], dxfGlueTabPerimeterPoints, slots };
+                    return { blankWidth, blankHeight, outsideDimensions, layout: [ { x: 0, y: majorFlapLength_inches, w: panel1_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width, y: majorFlapLength_inches, w: panel2_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width + panel2_width, y: majorFlapLength_inches, w: panel3_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width + panel2_width + panel3_width, y: majorFlapLength_inches, w: panel4_width, h: internalH_for_blank, type: 'panel' }, { points: glueTabPoints, type: 'polygon_cut' }, { x: 0, y: 0, w: panel1_width, h: majorFlapLength_inches, type: 'flap' }, { x: panel1_width, y: 0, w: panel2_width, h: majorFlapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width, y: 0, w: panel3_width, h: majorFlapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width + panel3_width, y: 0, w: panel4_width, h: majorFlapLength_inches, type: 'flap' }, { x: 0, y: internalH_for_blank + majorFlapLength_inches, w: panel1_width, h: majorFlapLength_inches, type: 'flap' }, { x: panel1_width, y: internalH_for_blank + majorFlapLength_inches, w: panel2_width, h: majorFlapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width, y: internalH_for_blank + majorFlapLength_inches, w: panel3_width, h: majorFlapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width + panel3_width, y: internalH_for_blank + majorFlapLength_inches, w: panel4_width, h: majorFlapLength_inches, type: 'flap' }, ], scoreLines: [ { x1: panel1_width, y1: 0, x2: panel1_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width, y1: 0, x2: panel1_width + panel2_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width + panel3_width, y1: 0, x2: panel1_width + panel2_width + panel3_width, y2: blankHeight, type: 'vertical' }, { x1: glueTabScoreLine.x1, y1: glueTabScoreLine.y1, x2: glueTabScoreLine.x2, y2: glueTabScoreLine.y2, type: 'vertical_glue_tab' }, { x1: 0, y1: majorFlapLength_inches, x2: blankWidth, y2: majorFlapLength_inches, type: 'horizontal' }, { x1: 0, y1: internalH_for_blank + majorFlapLength_inches, x2: blankWidth, y2: internalH_for_blank + majorFlapLength_inches, type: 'horizontal' }, ], dxfGlueTabPerimeterPoints, slots };
                 }
             },
             '0200_HSC': {
@@ -145,7 +146,7 @@
                     const glueTabScoreLine = { x1: x_inner_glue_tab, y1: y_top_body_crease, x2: x_inner_glue_tab, y2: y_bottom_body_crease };
                     const outsideDimensions = { length: L_in + (2 * thickness), width: W_in + (2 * thickness), height: H_in + (2 * thickness) };
                     const slots = [ { x: panel1_width - (slotWidth_full_in / 2), y: internalH_for_blank, w: slotWidth_full_in, h: flapLength_inches, type: 'full' }, { x: (panel1_width + panel2_width) - (slotWidth_full_in / 2), y: internalH_for_blank, w: slotWidth_full_in, h: flapLength_inches, type: 'full' }, { x: (panel1_width + panel2_width + panel3_width) - (slotWidth_full_in / 2), y: internalH_for_blank, w: slotWidth_full_in, h: flapLength_inches, type: 'full' }, { x: x_inner_glue_tab - slotWidth_half_in, y: internalH_for_blank, w: slotWidth_half_in, h: flapLength_inches, type: 'half_right_open' } ];
-                    return { blankWidth, blankHeight, outsideDimensions, layout: [ { x: 0, y: 0, w: panel1_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width, y: 0, w: panel2_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width + panel2_width, y: 0, w: panel3_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width + panel2_width + panel3_width, y: 0, w: panel4_width, h: internalH_for_blank, type: 'panel' }, { points: glueTabPoints, type: 'polygon_cut' }, { x: 0, y: internalH_for_blank, w: panel1_width, h: flapLength_inches, type: 'flap' }, { x: panel1_width, y: internalH_for_blank, w: panel2_width, h: flapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width, y: internalH_for_blank, w: panel3_width, h: flapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width + panel3_width, y: internalH_for_blank, w: panel4_width, h: flapLength_inches, type: 'flap' }, ], scoreLines: [ { x1: panel1_width, y: 0, x2: panel1_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width, y: 0, x2: panel1_width + panel2_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width + panel3_width, y: 0, x2: panel1_width + panel2_width + panel3_width, y2: blankHeight, type: 'vertical' }, { x1: glueTabScoreLine.x1, y1: glueTabScoreLine.y1, x2: glueTabScoreLine.x2, y2: glueTabScoreLine.y2, type: 'vertical_glue_tab' }, { x1: 0, y1: internalH_for_blank, x2: blankWidth, y2: internalH_for_blank, type: 'horizontal' }, ], slots, dxfGlueTabPerimeterPoints };
+                    return { blankWidth, blankHeight, outsideDimensions, layout: [ { x: 0, y: 0, w: panel1_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width, y: 0, w: panel2_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width + panel2_width, y: 0, w: panel3_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width + panel2_width + panel3_width, y: 0, w: panel4_width, h: internalH_for_blank, type: 'panel' }, { points: glueTabPoints, type: 'polygon_cut' }, { x: 0, y: internalH_for_blank, w: panel1_width, h: flapLength_inches, type: 'flap' }, { x: panel1_width, y: internalH_for_blank, w: panel2_width, h: flapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width, y: internalH_for_blank, w: panel3_width, h: flapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width + panel3_width, y: internalH_for_blank, w: panel4_width, h: flapLength_inches, type: 'flap' }, ], scoreLines: [ { x1: panel1_width, y1: 0, x2: panel1_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width, y1: 0, x2: panel1_width + panel2_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width + panel3_width, y1: 0, x2: panel1_width + panel2_width + panel3_width, y2: blankHeight, type: 'vertical' }, { x1: glueTabScoreLine.x1, y1: glueTabScoreLine.y1, x2: glueTabScoreLine.x2, y2: glueTabScoreLine.y2, type: 'vertical_glue_tab' }, { x1: 0, y1: internalH_for_blank, x2: blankWidth, y2: internalH_for_blank, type: 'horizontal' }, ], slots, dxfGlueTabPerimeterPoints };
                 }
             },
             '0501': {
@@ -162,7 +163,7 @@
                     const dxfGlueTabPerimeterPoints = [ { x: x_panel4_end_before_glue_tab, y: y_bottom_body_crease }, { x: x_outer_glue_tab, y: y_bottom_body_crease - angleOffset }, { x: x_outer_glue_tab, y: y_top_body_crease + angleOffset }, { x: x_panel4_end_before_glue_tab, y: y_top_body_crease } ];
                     const glueTabScoreLine = { x1: x_inner_glue_tab, y1: y_top_body_crease, x2: x_inner_glue_tab, y2: y_bottom_body_crease };
                     const outsideDimensions = { length: L_input + (2 * thickness), width: W_input + (2 * thickness), height: H_input };
-                    return { blankWidth, blankHeight, outsideDimensions, layout: [ { x: 0, y: 0, w: panel1_width, h: blankHeight, type: 'panel' }, { x: panel1_width, y: 0, w: panel2_width, h: blankHeight, type: 'panel' }, { x: panel1_width + panel2_width, y: 0, w: panel3_width, h: blankHeight, type: 'panel' }, { x: panel1_width + panel2_width + panel3_width, y: 0, w: panel4_width, h: blankHeight, type: 'panel' }, { points: glueTabPoints, type: 'polygon_cut' } ], scoreLines: [ { x1: panel1_width, y: 0, x2: panel1_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width, y: 0, x2: panel1_width + panel2_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width + panel3_width, y: 0, x2: panel1_width + panel2_width + panel3_width, y2: blankHeight, type: 'vertical' }, { x1: glueTabScoreLine.x1, y1: glueTabScoreLine.y1, x2: glueTabScoreLine.x2, y2: glueTabScoreLine.y2, type: 'vertical_glue_tab' } ], slots: [], dxfGlueTabPerimeterPoints };
+                    return { blankWidth, blankHeight, outsideDimensions, layout: [ { x: 0, y: 0, w: panel1_width, h: blankHeight, type: 'panel' }, { x: panel1_width, y: 0, w: panel2_width, h: blankHeight, type: 'panel' }, { x: panel1_width + panel2_width, y: 0, w: panel3_width, h: blankHeight, type: 'panel' }, { x: panel1_width + panel2_width + panel3_width, y: 0, w: panel4_width, h: blankHeight, type: 'panel' }, { points: glueTabPoints, type: 'polygon_cut' } ], scoreLines: [ { x1: panel1_width, y1: 0, x2: panel1_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width, y1: 0, x2: panel1_width + panel2_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width + panel3_width, y1: 0, x2: panel1_width + panel2_width + panel3_width, y2: blankHeight, type: 'vertical' }, { x1: glueTabScoreLine.x1, y1: glueTabScoreLine.y1, x2: glueTabScoreLine.x2, y2: glueTabScoreLine.y2, type: 'vertical_glue_tab' } ], slots: [], dxfGlueTabPerimeterPoints };
                 }
             },
             '0301_TRAY': {
@@ -189,7 +190,7 @@
                     return { blankWidth, blankHeight, outsideDimensions, layout: [ { x: 0, y: 0, w: blankWidth, h: blankHeight, type: 'panel' } ], scoreLines: [ { x1: flap_W, y1: 0, x2: flap_W, y2: blankHeight, type: 'vertical' }, { x1: flap_W + center_L, y1: 0, x2: flap_W + center_L, y2: blankHeight, type: 'vertical' }, { x1: 0, y1: flap_H, x2: blankWidth, y2: flap_H, type: 'horizontal' }, { x1: 0, y1: flap_H + center_W, x2: blankWidth, y2: flap_H + center_W, type: 'horizontal' }, ], slots, dxfGlueTabPerimeterPoints: [] };
                 }
             },
-            '0401': {
+'0401': {
                 name: 'One Piece Folder (0401)',
                 calculateBlank: (L_in, W_in, H_in, thickness) => {
                     const CAL = thickness;
@@ -218,11 +219,11 @@
                     const y_main_h = W_in + (2 * CAL); 
 
                     const y0 = 0;
-                    const y1 = y0 + y_lid_h;        // Score: Top Lid -> Top Depth
-                    const y2 = y1 + y_depth_h;      // Score: Top Depth -> Main (Top Edge of Main)
-                    const y3 = y2 + y_main_h;       // Score: Main -> Bottom Depth (Bottom Edge of Main)
-                    const y4 = y3 + y_depth_h;      // Score: Bottom Depth -> Bottom Lid
-                    const y5 = y4 + y_lid_h;        // End
+                    const y1 = y0 + y_lid_h;       // Score: Top Lid -> Top Depth
+                    const y2 = y1 + y_depth_h;     // Score: Top Depth -> Main (Top Edge of Main)
+                    const y3 = y2 + y_main_h;      // Score: Main -> Bottom Depth (Bottom Edge of Main)
+                    const y4 = y3 + y_depth_h;     // Score: Bottom Depth -> Bottom Lid
+                    const y5 = y4 + y_lid_h;       // End
                     const blankHeight = y5;
 
                     // --- Wing Geometry Fix ---
@@ -285,8 +286,7 @@
 
                     return { blankWidth, blankHeight, outsideDimensions, layout, scoreLines, slots, dxfGlueTabPerimeterPoints };
                 }
-            }
-        }; 
+                }        }; // <--- THIS WAS MISSING IN YOUR CODE
 
         const getCleanedLineSegments = (line, cutRects, glueTabInternalPoints) => {
             const xTolerance = 1e-6;
@@ -337,7 +337,7 @@
             }).filter(l => (Math.abs(l.x1 - l.x2) > xTolerance || Math.abs(l.y1 - l.y2) > xTolerance));
         };
 
-        const generateDxfContent = (blankData, fefcoStyle, L_in, W_in, H_in) => {
+const generateDxfContent = (blankData, fefcoStyle, L_in, W_in, H_in) => {
             let dxf = `0\nSECTION\n2\nHEADER\n9\n$ACADVER\n1\nAC1009\n0\nENDSEC\n0\nSECTION\n2\nENTITIES\n`;
             const xTolerance = 1e-6;
             const addLine = (color, x1, y1, x2, y2) => {
@@ -355,6 +355,7 @@
                 addLine(1, p1.x, p1.y, p2.x, p2.y); addLine(1, p2.x, p2.y, p3.x, p3.y); addLine(1, p3.x, p3.y, p4.x, p4.y);
             }
 
+            // FIX 1: Removed "&& s.type !== 'corner_cut'" from filters
             const topSlots = blankData.slots.filter(s => Math.abs(s.y - y_top_edge) < xTolerance).sort((a, b) => a.x - b.x);
             let lastX_top = 0;
             topSlots.forEach(slot => { if (slot.x > lastX_top + xTolerance) addLine(1, lastX_top, y_top_edge, slot.x, y_top_edge); lastX_top = slot.x + slot.w; });
@@ -382,6 +383,7 @@
             blankData.slots.forEach(slot => {
                 if (slot.type === 'full') { addLine(1, slot.x, slot.y, slot.x, slot.y + slot.h); addLine(1, slot.x + slot.w, slot.y, slot.x + slot.w, slot.y + slot.h); const hLineY = Math.abs(slot.y - y_top_edge) < xTolerance ? slot.y + slot.h : slot.y; addLine(1, slot.x, hLineY, slot.x + slot.w, hLineY); }
                 else if (slot.type === 'half_right_open') { addLine(1, slot.x, slot.y, slot.x, slot.y + slot.h); const hLineY = Math.abs(slot.y - y_top_edge) < xTolerance ? slot.y + slot.h : slot.y; addLine(1, slot.x, hLineY, x_inner_glue_tab, hLineY); }
+                // FIX 2: Added Logic to draw the inner boundaries of corner cuts in DXF
                 else if (slot.type === 'corner_cut') {
                     if (Math.abs(slot.x - x_left_edge) > xTolerance) addLine(1, slot.x, slot.y, slot.x, slot.y + slot.h);
                     if (Math.abs(slot.x + slot.w - x_right_edge) > xTolerance) addLine(1, slot.x + slot.w, slot.y, slot.x + slot.w, slot.y + slot.h);
@@ -399,8 +401,7 @@
             dxf += `0\nENDSEC\n0\nEOF`;
             return dxf;
         };
-
-        const generatePdf = (blankData, fefcoStyle, L_in, W_in, H_in, unit, setMessage) => {
+const generatePdf = (blankData, fefcoStyle, L_in, W_in, H_in, unit, setMessage) => {
             const { jsPDF } = window.jspdf;
             const pdfUnit = 'in';
             const margin = 0.5;
@@ -426,6 +427,7 @@
                 addLineToPdf(p1.x, p1.y, p2.x, p2.y); addLineToPdf(p2.x, p2.y, p3.x, p3.y); addLineToPdf(p3.x, p3.y, p4.x, p4.y);
             }
 
+            // FIX 1: Removed "&& s.type !== 'corner_cut'" from filters so perimeter lines break at cuts
             const topSlots = blankData.slots.filter(s => Math.abs(s.y - y_top_edge) < xTolerance).sort((a, b) => a.x - b.x);
             let lastX_top = 0;
             topSlots.forEach(slot => { if (slot.x > lastX_top + xTolerance) addLineToPdf(lastX_top, y_top_edge, slot.x, y_top_edge); lastX_top = slot.x + slot.w; });
@@ -462,10 +464,15 @@
                     const hLineY = Math.abs(slot.y - y_top_edge) < xTolerance ? slot.y + slot.h : slot.y; 
                     addLineToPdf(slot.x, hLineY, x_inner_glue_tab, hLineY); 
                 }
+                // FIX 2: Added Logic to draw the inner boundaries of corner cuts
                 else if (slot.type === 'corner_cut') {
+                    // If NOT touching left edge, draw left vertical line
                     if (Math.abs(slot.x - x_left_edge) > xTolerance) addLineToPdf(slot.x, slot.y, slot.x, slot.y + slot.h);
+                    // If NOT touching right edge, draw right vertical line
                     if (Math.abs(slot.x + slot.w - x_right_edge) > xTolerance) addLineToPdf(slot.x + slot.w, slot.y, slot.x + slot.w, slot.y + slot.h);
+                    // If NOT touching top edge, draw top horizontal line
                     if (Math.abs(slot.y - y_top_edge) > xTolerance) addLineToPdf(slot.x, slot.y, slot.x + slot.w, slot.y);
+                    // If NOT touching bottom edge, draw bottom horizontal line
                     if (Math.abs(slot.y + slot.h - y_bottom_edge) > xTolerance) addLineToPdf(slot.x, slot.y + slot.h, slot.x + slot.w, slot.y + slot.h);
                 }
             });
@@ -480,7 +487,6 @@
             doc.save(`FEFCO_${fefcoStyle}_${L_in.toFixed(2)}x${W_in.toFixed(2)}x${H_in.toFixed(2)}.pdf`);
             setMessage('PDF file downloaded successfully!');
         };
-        
         const drawBlank = (blank, canvas, ctx) => {
             if (!ctx || !blank) return;
             const parentWidth = canvas.parentElement.clientWidth;
@@ -492,13 +498,6 @@
             const padding = 0.5 * scale;
             ctx.translate(padding, padding);
             ctx.scale(scale, scale);
-            
-            const x_left_edge = 0;
-            const x_right_edge = blank.blankWidth;
-            const y_top_edge = 0;
-            const y_bottom_edge = blank.blankHeight;
-            const xTolerance = 1e-6;
-
             blank.layout.forEach(part => {
                 if (part.type === 'panel' || part.type === 'flap') {
                     ctx.fillStyle = part.type === 'panel' ? '#D4EDDA' : '#C3E6CB';
@@ -536,11 +535,6 @@
                     const hLineY = Math.abs(slot.y) < 1e-6 ? slot.y + slot.h : slot.y;
                     const hLineX2 = slot.type === 'half_right_open' ? x_inner_glue_tab_canvas : slot.x + slot.w;
                     ctx.moveTo(slot.x, hLineY); ctx.lineTo(hLineX2, hLineY);
-                } else if (slot.type === 'corner_cut') {
-                     if (Math.abs(slot.x - x_left_edge) > xTolerance) { ctx.moveTo(slot.x, slot.y); ctx.lineTo(slot.x, slot.y + slot.h); }
-                     if (Math.abs(slot.x + slot.w - x_right_edge) > xTolerance) { ctx.moveTo(slot.x + slot.w, slot.y); ctx.lineTo(slot.x + slot.w, slot.y + slot.h); }
-                     if (Math.abs(slot.y - y_top_edge) > xTolerance) { ctx.moveTo(slot.x, slot.y); ctx.lineTo(slot.x + slot.w, slot.y); }
-                     if (Math.abs(slot.y + slot.h - y_bottom_edge) > xTolerance) { ctx.moveTo(slot.x, slot.y + slot.h); ctx.lineTo(slot.x + slot.w, slot.y + slot.h); }
                 }
                 ctx.stroke();
             });
@@ -650,6 +644,8 @@
                 document.body.removeChild(link);
             };
             // --- END ENHANCED KIWIPLAN EXPORT ---
+
+
             const handleStateChange = useCallback((changes) => {
                 setAppState(prevState => {
                     let newState = { ...prevState, ...changes };
@@ -893,7 +889,7 @@
                          <h1 className="text-4xl md:text-5xl font-extrabold text-slate-800 flex items-baseline justify-center">
                             <span>corru</span><span className="text-orange-500 text-5xl md:text-6xl font-normal mx-1" style={{ transform: 'translateY(2px)' }}>~</span><span className="font-black">CAD</span>
                         </h1>
-                        <p className="text-md text-gray-600">v1.7 - Precision Engine with Presets</p>
+                        <p className="text-md text-gray-600">v2.0 - Precision Engine with Presets</p>
                     </div>
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-sm space-y-6">
@@ -938,70 +934,70 @@
                                 <h2 className="section-title">Precision Estimating Inputs</h2>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-4 p-4 border rounded-md bg-gray-50">
-                                            <h3 className="font-semibold text-gray-700">Material Definition</h3>
+                                        <h3 className="font-semibold text-gray-700">Material Definition</h3>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">Market Price ($/msf)</label>
+                                            <input type="number" value={appState.priceMsf} onChange={e => handleStateChange({ priceMsf: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-2">
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700">Market Price ($/msf)</label>
-                                                <input type="number" value={appState.priceMsf} onChange={e => handleStateChange({ priceMsf: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
+                                                <label className="block text-sm font-medium text-gray-700">Outer Liner</label>
+                                                <input type="number" value={appState.outerLiner} onChange={e => handleStateChange({ outerLiner: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
                                             </div>
-                                            <div className="grid grid-cols-2 gap-2">
-                                                <div>
-                                                    <label className="block text-sm font-medium text-gray-700">Outer Liner</label>
-                                                    <input type="number" value={appState.outerLiner} onChange={e => handleStateChange({ outerLiner: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
-                                                </div>
-                                                <div>
-                                                    <label className="block text-sm font-medium text-gray-700">Inner Liner</label>
-                                                    <input type="number" value={appState.innerLiner} onChange={e => handleStateChange({ innerLiner: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
-                                                </div>
-                                                <div>
-                                                    <label className="block text-sm font-medium text-gray-700">Medium 1</label>
-                                                    <input type="number" value={appState.medium1} onChange={e => handleStateChange({ medium1: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
-                                                </div>
-                                                <div>
-                                                    <label className="block text-sm font-medium text-gray-700">Flute 1</label>
-                                                    <select value={appState.flute1} onChange={e => handleStateChange({ flute1: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
-                                                        <option value="1.42">C Flute</option>
-                                                        <option value="1.32">B Flute</option>
-                                                    </select>
-                                                </div>
-                                                {boardData[appState.boardProfile]?.type === 'doublewall' && (
-                                                    <>
-                                                        <div>
-                                                            <label className="block text-sm font-medium text-gray-700">Middle Liner</label>
-                                                            <input type="number" value={appState.middleLiner} onChange={e => handleStateChange({ middleLiner: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
-                                                        </div>
-                                                        <div>
-                                                            <label className="block text-sm font-medium text-gray-700">Medium 2</label>
-                                                            <input type="number" value={appState.medium2} onChange={e => handleStateChange({ medium2: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
-                                                        </div>
-                                                         <div>
-                                                            <label className="block text-sm font-medium text-gray-700">Flute 2</label>
-                                                            <select value={appState.flute2} onChange={e => handleStateChange({ flute2: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
-                                                                <option value="1.42">C Flute</option>
-                                                                <option value="1.32">B Flute</option>
-                                                            </select>
-                                                        </div>
-                                                    </>
-                                                )}
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700">Inner Liner</label>
+                                                <input type="number" value={appState.innerLiner} onChange={e => handleStateChange({ innerLiner: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
                                             </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700">Medium 1</label>
+                                                <input type="number" value={appState.medium1} onChange={e => handleStateChange({ medium1: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700">Flute 1</label>
+                                                <select value={appState.flute1} onChange={e => handleStateChange({ flute1: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                                                    <option value="1.42">C Flute</option>
+                                                    <option value="1.32">B Flute</option>
+                                                </select>
+                                            </div>
+                                            {boardData[appState.boardProfile]?.type === 'doublewall' && (
+                                                <>
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-700">Middle Liner</label>
+                                                        <input type="number" value={appState.middleLiner} onChange={e => handleStateChange({ middleLiner: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-700">Medium 2</label>
+                                                        <input type="number" value={appState.medium2} onChange={e => handleStateChange({ medium2: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
+                                                    </div>
+                                                     <div>
+                                                        <label className="block text-sm font-medium text-gray-700">Flute 2</label>
+                                                        <select value={appState.flute2} onChange={e => handleStateChange({ flute2: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                                                            <option value="1.42">C Flute</option>
+                                                            <option value="1.32">B Flute</option>
+                                                        </select>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
                                     </div>
                                     <div className="space-y-4 p-4 border rounded-md bg-gray-50">
-                                            <h3 className="font-semibold text-gray-700">Quote Details</h3>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700">Margin (%)</label>
-                                                <input type="number" value={appState.margin} onChange={e => handleStateChange({ margin: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700">Printing ($/box)</label>
-                                                <input type="number" step="0.01" value={appState.printUpcharge} onChange={e => handleStateChange({ printUpcharge: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700">Setup Fee ($)</label>
-                                                <input type="number" value={appState.setupFee} onChange={e => handleStateChange({ setupFee: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
-                                            </div>
+                                        <h3 className="font-semibold text-gray-700">Quote Details</h3>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">Margin (%)</label>
+                                            <input type="number" value={appState.margin} onChange={e => handleStateChange({ margin: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">Printing ($/box)</label>
+                                            <input type="number" step="0.01" value={appState.printUpcharge} onChange={e => handleStateChange({ printUpcharge: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">Setup Fee ($)</label>
+                                            <input type="number" value={appState.setupFee} onChange={e => handleStateChange({ setupFee: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div className="mt-8 flex justify-center items-center w-full">
+                                                        <div className="mt-8 flex justify-center items-center w-full">
                                     <stripe-buy-button
                                         buy-button-id="buy_btn_1T8Q43Rzsz4Jj05NjlRGjOeT"
                                         publishable-key="pk_live_51SgXCORzsz4Jj05NqK7cEkrJc4G6TAyvu6pfD71p1rsz3B1zW2yRUntSEK0SQwbnvWEHwU7lX0iYgPHEjeyJZLqX00RI73YRn7"
@@ -1016,78 +1012,60 @@
                                 <h3 className="font-semibold text-gray-700 mb-2">CAD Output</h3>
                                 {blankDimensions && outsideDimensions ? (
                                     <div className="bg-white p-4 rounded-md shadow-inner text-sm space-y-1 mb-4">
-                                            <h3 className="font-semibold text-gray-800 mb-2">Calculated Dimensions:</h3>
-                                            <div className="grid grid-cols-2 gap-x-4">
-                                                <span>Internal L:</span><span className="font-medium text-right">{parseFloat(appState.length).toFixed(3)} in</span>
-                                                <span>Internal W:</span><span className="font-medium text-right">{parseFloat(appState.width).toFixed(3)} in</span>
-                                                <span>Internal H:</span><span className="font-medium text-right">{parseFloat(appState.height).toFixed(3)} in</span>
-                                            </div>
-                                            <div className="border-t my-2"></div>
-                                            <div className="grid grid-cols-2 gap-x-4">
-                                                <span>Outside L:</span><span className="font-medium text-right">{outsideDimensions.length.toFixed(3)} in</span>
-                                                <span>Outside W:</span><span className="font-medium text-right">{outsideDimensions.width.toFixed(3)} in</span>
-                                                <span>Outside H:</span><span className="font-medium text-right">{outsideDimensions.height.toFixed(3)} in</span>
-                                            </div>
-                                            <div className="border-t my-2"></div>
-                                            <div className="grid grid-cols-2 gap-x-4">
-                                                <span>Blank W:</span><span className="font-medium text-right">{blankDimensions.blankWidth.toFixed(3)} in</span>
-                                                <span>Blank H:</span><span className="font-medium text-right">{blankDimensions.blankHeight.toFixed(3)} in</span>
-                                            </div>
-                                            <div className="border-t my-2"></div>
-                                            <div className="grid grid-cols-2 gap-x-4 text-base">
-                                                <span className="font-bold">Sq. Footage:</span><span className="font-bold text-right">{squareFootage ? squareFootage.toFixed(4) : 'N/A'} ft²</span>
-                                                {/* MODIFIED: Display restored values */}
-                                                <span className="font-bold">Inches of Rule:</span><span className="font-bold text-right">{inchesOfRule ? inchesOfRule.toFixed(2) : 'N/A'} in</span>
-                                                <span className="font-bold">Est. Waste:</span><span className="font-bold text-right">{wastePercentage ? wastePercentage.toFixed(2) : 'N/A'}%</span>
-                                            </div>
+                                        <h3 className="font-semibold text-gray-800 mb-2">Calculated Dimensions:</h3>
+                                        <div className="grid grid-cols-2 gap-x-4">
+                                            <span>Internal L:</span><span className="font-medium text-right">{parseFloat(appState.length).toFixed(3)} in</span>
+                                            <span>Internal W:</span><span className="font-medium text-right">{parseFloat(appState.width).toFixed(3)} in</span>
+                                            <span>Internal H:</span><span className="font-medium text-right">{parseFloat(appState.height).toFixed(3)} in</span>
+                                        </div>
+                                        <div className="border-t my-2"></div>
+                                        <div className="grid grid-cols-2 gap-x-4">
+                                            <span>Outside L:</span><span className="font-medium text-right">{outsideDimensions.length.toFixed(3)} in</span>
+                                            <span>Outside W:</span><span className="font-medium text-right">{outsideDimensions.width.toFixed(3)} in</span>
+                                            <span>Outside H:</span><span className="font-medium text-right">{outsideDimensions.height.toFixed(3)} in</span>
+                                        </div>
+                                        <div className="border-t my-2"></div>
+                                        <div className="grid grid-cols-2 gap-x-4">
+                                            <span>Blank W:</span><span className="font-medium text-right">{blankDimensions.blankWidth.toFixed(3)} in</span>
+                                            <span>Blank H:</span><span className="font-medium text-right">{blankDimensions.blankHeight.toFixed(3)} in</span>
+                                        </div>
+                                        <div className="border-t my-2"></div>
+                                        <div className="grid grid-cols-2 gap-x-4 text-base">
+                                            <span className="font-bold">Sq. Footage:</span><span className="font-bold text-right">{squareFootage ? squareFootage.toFixed(4) : 'N/A'} ft²</span>
+                                            {/* MODIFIED: Display restored values */}
+                                            <span className="font-bold">Inches of Rule:</span><span className="font-bold text-right">{inchesOfRule ? inchesOfRule.toFixed(2) : 'N/A'} in</span>
+                                            <span className="font-bold">Est. Waste:</span><span className="font-bold text-right">{wastePercentage ? wastePercentage.toFixed(2) : 'N/A'}%</span>
+                                        </div>
                                     </div>
                                 ) : <div className="text-sm text-gray-500">Enter valid dimensions...</div>}
                                 <div className="mt-4 border rounded-md bg-white overflow-hidden">
                                     <canvas ref={canvasRef}></canvas>
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-    <button 
-        onClick={() => handleDownload('dxf')} 
-        disabled={!blankDimensions} 
-        className="w-full flex justify-center items-center bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md disabled:bg-gray-400"
-    >
-        Download DXF
-    </button>
-    <button 
-        onClick={() => handleDownload('pdf')} 
-        disabled={!blankDimensions} 
-        className="w-full flex justify-center items-center bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md disabled:bg-gray-400"
-    >
-        Download PDF
-    </button>
-    <button 
-        onClick={exportToKiwiplan} 
-        disabled={!blankDimensions} 
-        className="w-full flex justify-center items-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md disabled:bg-gray-400"
-    >
-        Export to Kiwiplan (.CSV)
-    </button>
-</div>
+                                <div className="grid grid-cols-2 gap-4 mt-4">
+                                    <button onClick={() => handleDownload('dxf')} disabled={!blankDimensions} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md disabled:bg-gray-400">Download DXF</button>
+                                    <button onClick={() => handleDownload('pdf')} disabled={!blankDimensions} className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md disabled:bg-gray-400">Download PDF</button>
+                                      <button onClick={exportToKiwiplan} disabled={!blankDimensions} className="w-full flex justify-center items-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md disabled:bg-gray-400">Export to Kiwiplan (.CSV)</button>
+                                </div>
                             </div>
                             <div className="bg-indigo-50 p-4 rounded-md">
                                 <h3 className="font-semibold text-indigo-800 mb-2">Pricing Output</h3>
                                 {quoteResults ? (
                                     <>
-                                            <div className="space-y-2 text-sm text-indigo-900">
-                                                <div className="flex justify-between"><span>Material Cost / Box:</span><span className="font-medium">${quoteResults.baseMaterialCost.toFixed(4)}</span></div>
-                                                <div className="flex justify-between"><span>Margin / Box:</span><span className="font-medium">${quoteResults.marginAmount.toFixed(4)}</span></div>
-                                                <div className="flex justify-between"><span>Printing / Box:</span><span className="font-medium">${parseFloat(appState.printUpcharge).toFixed(4)}</span></div>
-                                                <div className="border-t border-indigo-200 my-1"></div>
-                                                <div className="flex justify-between font-bold text-base"><span>Cost per Box:</span><span>${quoteResults.costPerBox.toFixed(4)}</span></div>
+                                        <div className="space-y-2 text-sm text-indigo-900">
+                                            <div className="flex justify-between"><span>Material Cost / Box:</span><span className="font-medium">${quoteResults.baseMaterialCost.toFixed(4)}</span></div>
+                                            <div className="flex justify-between"><span>Margin / Box:</span><span className="font-medium">${quoteResults.marginAmount.toFixed(4)}</span></div>
+                                            <div className="flex justify-between"><span>Printing / Box:</span><span className="font-medium">${parseFloat(appState.printUpcharge).toFixed(4)}</span></div>
+                                            <div className="border-t border-indigo-200 my-1"></div>
+                                            <div className="flex justify-between font-bold text-base"><span>Cost per Box:</span><span>${quoteResults.costPerBox.toFixed(4)}</span></div>
+                                        </div>
+                                        <div className="mt-4 text-center">
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+                                            <input type="number" value={appState.quantity} onChange={e => handleStateChange({ quantity: e.target.value })} className="w-full p-2 rounded-md mb-2 border-gray-300"/>
+                                            <div className="bg-white p-3 rounded-md">
+                                                <span className="text-gray-600">Total Cost:</span>
+                                                <span className="final-quote-value text-2xl font-bold ml-2">${quoteResults.totalCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                             </div>
-                                            <div className="mt-4 text-center">
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
-                                                <input type="number" value={appState.quantity} onChange={e => handleStateChange({ quantity: e.target.value })} className="w-full p-2 rounded-md mb-2 border-gray-300"/>
-                                                <div className="bg-white p-3 rounded-md">
-                                                    <span className="text-gray-600">Total Cost:</span>
-                                                    <span className="final-quote-value text-2xl font-bold ml-2">${quoteResults.totalCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                </div>
-                                            </div>
+                                        </div>
                                     </>
                                 ) : <div className="text-sm text-indigo-700">Enter valid CAD dimensions to calculate a quote.</div>}
                             </div>

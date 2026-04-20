@@ -91,28 +91,27 @@
         const ALL_VENDORS = ['Uline', 'PaperMart', 'Packaging Hero', 'Boxery', 'Grainger', 'Staples', 'Global Industrial', 'Wagner Supply'];
 
         const getVendorLink = (vendor, l, w, h, sku) => {
+            // 1. Direct SKU links for vendors whose architecture supports it cleanly
             if (sku) {
-                switch(vendor) {
-                    case 'Uline': return `https://www.uline.com/Product/Detail/${sku}`;
-                    case 'Boxery': return `https://www.theboxery.com/Product.asp?Product=${sku.replace('*', '').trim()}`;
-                    case 'Grainger': return `https://www.grainger.com/product/${sku}`;
-                    case 'Packaging Hero': return `https://www.packaginghero.com/search?q=${sku}`;
-                    case 'Global Industrial': return `https://www.globalindustrial.com/searchResult?q=${sku}`;
-                    case 'Staples': return `https://www.staples.com/search?q=${sku}`;
-                    case 'Wagner Supply': return `https://www.wagnersupply.com/search?q=${sku}`;
-                    case 'PaperMart': return `https://www.papermart.com/search?q=${sku}`;
-                }
+                if (vendor === 'Uline') return `https://www.uline.com/Product/Detail/${sku}`;
+                if (vendor === 'Boxery') return `https://www.theboxery.com/Product.asp?Product=${sku.replace('*', '').trim()}`;
+                if (vendor === 'Grainger') return `https://www.grainger.com/product/${sku}`;
+                if (vendor === 'Global Industrial') return `https://www.globalindustrial.com/searchResult?q=${sku}`;
             }
+
+            // 2. Safe, exact fallbacks provided to permanently fix 404s
+            if (vendor === 'PaperMart') return 'https://www.papermart.com/p/standard-rsc-corrugated-cartons/1001';
+            if (vendor === 'Packaging Hero') return 'https://www.packaginghero.com/popular-boxes';
+            if (vendor === 'Wagner Supply') return 'https://www.wagnersupply.com/Items/JMTBCO/Industrial-Packaging/Boxes/';
+            if (vendor === 'Staples') return 'https://www.staples.com/search?q=corrugated+boxes'; // Safe universal search endpoint
+
+            // 3. Fallbacks for the reliable ones if SKU happens to be missing
             const dim = `${l}x${w}x${h}`;
             switch(vendor) {
                 case 'Uline': return `https://www.uline.com/Product/AdvSearchResult?keywords=${dim}`;
-                case 'PaperMart': return `https://www.papermart.com/search?q=${dim}`;
-                case 'Packaging Hero': return `https://www.packaginghero.com/search?q=${dim}`;
                 case 'Boxery': return `https://www.theboxery.com/search.asp?q=${dim}`;
                 case 'Grainger': return `https://www.grainger.com/search?searchQuery=${dim}+corrugated+box`;
-                case 'Staples': return `https://www.staples.com/box+${dim}/directory_box%2520${dim}`;
                 case 'Global Industrial': return `https://www.globalindustrial.com/searchResult?q=${dim}+box`;
-                case 'Wagner Supply': return `https://www.wagnersupply.com/search?q=${dim}`;
                 default: return '#';
             }
         };

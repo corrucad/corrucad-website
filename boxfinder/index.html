@@ -96,11 +96,11 @@
                     case 'Uline': return `https://www.uline.com/Product/Detail/${sku}`;
                     case 'Boxery': return `https://www.theboxery.com/Product.asp?Product=${sku.replace('*', '').trim()}`;
                     case 'Grainger': return `https://www.grainger.com/product/${sku}`;
-                    case 'Packaging Hero': return `https://www.packaginghero.com/Search.aspx?k=${sku}`;
+                    case 'Packaging Hero': return `https://www.packaginghero.com/search?q=${sku}`;
                     case 'Global Industrial': return `https://www.globalindustrial.com/searchResult?q=${sku}`;
-                    case 'Staples': return `https://www.staples.com/product_${sku}`;
-                    case 'Wagner Supply': return `https://www.wagnersupply.com/product/${sku}`;
-                    case 'PaperMart': return `https://www.papermart.com/p/${sku}`;
+                    case 'Staples': return `https://www.staples.com/search?q=${sku}`;
+                    case 'Wagner Supply': return `https://www.wagnersupply.com/search?q=${sku}`;
+                    case 'PaperMart': return `https://www.papermart.com/search?q=${sku}`;
                 }
             }
             const dim = `${l}x${w}x${h}`;

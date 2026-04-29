@@ -34,6 +34,7 @@
         const Info = (p) => <IconBase {...p}><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></IconBase>;
         const Star = (p) => <IconBase {...p}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></IconBase>;
         const ArrowLeft = (p) => <IconBase {...p}><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></IconBase>;
+        const Truck = (p) => <IconBase {...p}><path d="M10 17h4V5H2v12h3"/><path d="M20 17h2v-3.34a4 4 0 0 0-1.17-2.83L19 9h-5v8h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></IconBase>;
 
         // --- UPDATED SKU MAPPED DATA (April 2026 CSV) ---
         const rawData = [
@@ -344,6 +345,30 @@
                                         ))}
                                     </div>
                                 </div>
+                                
+                                {/* NEW SHIPPO REFERRAL CARD ADDED HERE */}
+                                <div className="bg-emerald-600 rounded-xl shadow-sm border border-emerald-500 p-5 text-white relative overflow-hidden">
+                                    <div className="absolute -right-4 -top-4 opacity-10">
+                                        <Package size={80} />
+                                    </div>
+                                    <div className="relative z-10">
+                                        <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
+                                            <Truck size={18} /> Shipping Software
+                                        </h3>
+                                        <p className="text-emerald-50 text-sm mb-4">
+                                            Ready to ship these boxes? Get discounted USPS, UPS, and FedEx rates with our partner, Shippo.
+                                        </p>
+                                        <a 
+                                            href="https://try.shippo.com/rbv7iu7x8361" 
+                                            target="_blank" 
+                                            rel="noopener noreferrer" 
+                                            className="block w-full text-center bg-white text-emerald-700 font-bold py-2 px-4 rounded-lg hover:bg-emerald-50 transition-colors text-sm shadow-sm"
+                                        >
+                                            Try Shippo for Free
+                                        </a>
+                                    </div>
+                                </div>
+
                             </div>
 
                             <div className="flex-1">

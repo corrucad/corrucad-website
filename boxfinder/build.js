@@ -1,16 +1,15 @@
-// build.js
+// boxfinder/build.js
 const fs = require('fs');
+const path = require('path');
 const { rawData, ALL_VENDORS } = require('./data.js');
 
-// Create the public folder where Vercel will look for the finished website
-if (!fs.existsSync('./public')) {
-    fs.mkdirSync('./public');
-}
+// This tells the script to save the generated files in the exact same folder this script is in
+const outputDir = __dirname; 
 
 // Read your template
-const template = fs.readFileSync('./template.html', 'utf8');
+const template = fs.readFileSync(path.join(__dirname, 'template.html'), 'utf8');
 
-// 1. Generate an index.html (Main search page with no specific box pre-filled)
+// 1. Generate the main index.html
 const indexHtml = template
     .replace('{{TITLE}}', 'Corrugated Box Price Compare | BoxFinder')
     .replace('{{DESC}}', 'Compare standard and bulk prices for corrugated boxes across top vendors.')
@@ -22,17 +21,15 @@ const indexHtml = template
     .replace('{{RAW_DATA}}', JSON.stringify(rawData))
     .replace('{{ALL_VENDORS}}', JSON.stringify(ALL_VENDORS));
 
-fs.writeFileSync('./public/index.html', indexHtml);
+fs.writeFileSync(path.join(outputDir, 'index.html'), indexHtml);
 
-// 2. Loop through every box and generate the 50 SEO pages automatically
+// 2. Loop through every box and generate the 50 SEO pages
 rawData.forEach(box => {
     const dim = `${box.l}x${box.w}x${box.h}`;
     
-    // Sort offers to find the cheapest for the SEO description
     const sortedOffers = [...box.offers].sort((a, b) => a.p - b.p);
     const bestPrice = sortedOffers[0].p;
 
-    // Generate the static SEO list for the crawlers
     let seoListHTML = '';
     sortedOffers.forEach(o => {
         const currency = o.v === 'RAJA Pack' ? '£' : '$';
@@ -50,8 +47,8 @@ rawData.forEach(box => {
         .replace('{{RAW_DATA}}', JSON.stringify(rawData))
         .replace('{{ALL_VENDORS}}', JSON.stringify(ALL_VENDORS));
 
-    fs.writeFileSync(`./public/${dim}-corrugated-boxes.html`, boxHtml);
+    fs.writeFileSync(path.join(outputDir, `${dim}-corrugated-boxes.html`), boxHtml);
     console.log(`Generated page for ${dim}`);
 });
 
-console.log('Build complete! All files generated in the /public folder.');
+console.log('Build complete! All files generated in the boxfinder folder.');

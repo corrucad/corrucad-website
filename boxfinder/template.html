@@ -127,15 +127,17 @@
             </div>
         );
 
-        function BoxCard({ box, qtyMode }) {
-            const [expanded, setExpanded] = useState(true);
+        // NOTICE: We specifically pass "autoExpand" in here now
+        function BoxCard({ box, qtyMode, autoExpand }) {
+            const [expanded, setExpanded] = useState(autoExpand);
+            
             if (!box || !box.offers || box.offers.length === 0) return null;
             const bestOffer = box.offers[0]; 
             const volume = box.l * box.w * box.h;
 
             return (
                 <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-5 hover:shadow-md transition-shadow duration-200">
-                    <div className="p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <div className="p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 cursor-pointer" onClick={() => setExpanded(!expanded)}>
                         <div className="flex items-center space-x-5">
                             <div className="hidden sm:flex h-16 w-16 bg-orange-100 rounded-lg items-center justify-center text-orange-600 flex-shrink-0">
                                 <Package size={32} />
@@ -162,7 +164,7 @@
                                 <p className="text-xs text-slate-500 mt-1">via {bestOffer.v}</p>
                             </div>
                             
-                            <button onClick={() => setExpanded(!expanded)} className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                            <button className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-medium transition-colors text-sm">
                                 {expanded ? 'Hide Offers' : 'Compare All Options'}
                                 {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                             </button>
@@ -227,7 +229,6 @@
         }
 
         function App() {
-            // LOAD INJECTED DIMS IF PRESENT, OTHERWISE FALLBACK TO EMPTY
             const initDims = window.INJECTED_DIMS || { l: '', w: '', h: '' };
             const [l, setL] = useState(initDims.l);
             const [w, setW] = useState(initDims.w);
@@ -267,7 +268,6 @@
             return (
                 <div className="min-h-screen bg-slate-100 font-sans text-slate-900">
                     <header className="bg-gradient-to-r from-orange-500 to-orange-600 shadow-md relative">
-                        {/* Navigation Header */}
                         <div className="bg-orange-700 text-orange-100 px-4 py-2 text-sm flex items-center justify-between">
                             <a href="/" className="flex items-center gap-1 hover:text-white transition-colors">
                                 <ArrowLeft size={16} /> Back to corru~CAD Estimator
@@ -370,7 +370,8 @@
                                 {filteredBoxes.length > 0 ? (
                                     <div className="space-y-4">
                                         {filteredBoxes.map((box, idx) => (
-                                            <BoxCard key={`${box.l}-${box.w}-${box.h}-${idx}`} box={box} qtyMode={qtyMode} />
+                                            /* NOTICE: We dynamically inject autoExpand based on the array length! */
+                                            <BoxCard key={`${box.l}-${box.w}-${box.h}-${idx}`} box={box} qtyMode={qtyMode} autoExpand={filteredBoxes.length === 1} />
                                         ))}
                                     </div>
                                 ) : (

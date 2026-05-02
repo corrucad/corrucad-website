@@ -21,7 +21,12 @@
     </style>
     
     <script>
-        window.INJECTED_DIMS = {{INJECTED_DIMS}};
+        let dims = { l: '', w: '', h: '' };
+        const dimsStr = `{{INJECTED_DIMS}}`;
+        if (!dimsStr.startsWith('{{')) {
+            dims = eval('(' + dimsStr + ')');
+        }
+        window.INJECTED_DIMS = dims;
     </script>
 </head>
 <body class="bg-slate-100">
@@ -40,8 +45,17 @@
         const { useState, useMemo } = React;
 
         // INJECTED DATA FROM BUILD SCRIPT
-        const rawData = {{RAW_DATA}};
-        const ALL_VENDORS = {{ALL_VENDORS}};
+        let rawData = [];
+        const rawDataStr = `{{RAW_DATA}}`;
+        if (!rawDataStr.startsWith('{{')) {
+            rawData = eval('(' + rawDataStr + ')');
+        }
+        
+        let ALL_VENDORS = ['Uline', 'PaperMart', 'Packaging Hero', 'Boxery', 'Grainger', 'Staples', 'Global Industrial', 'Wagner Supply', 'Zoro', 'MSC Direct', 'RAJA Pack', 'Arka'];
+        const allVendorsStr = `{{ALL_VENDORS}}`;
+        if (!allVendorsStr.startsWith('{{')) {
+            ALL_VENDORS = eval('(' + allVendorsStr + ')');
+        }
 
         // --- NATIVE SVG ICONS ---
         const IconBase = ({ size = 24, className = "", children, ...props }) => (

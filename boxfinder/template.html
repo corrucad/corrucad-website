@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <title>{{TITLE}}</title>
-    <link rel="icon" href="/favicon.png" type="image/png" sizes="192x192">
     <meta name="description" content="{{DESC}}">
     <link rel="canonical" href="{{CANONICAL}}" />
-
     
     <script src="/_vercel/insights/script.js" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -129,7 +127,6 @@
             </div>
         );
 
-        // NOTICE: We specifically pass "autoExpand" in here now
         function BoxCard({ box, qtyMode, autoExpand }) {
             const [expanded, setExpanded] = useState(autoExpand);
             
@@ -291,7 +288,16 @@
                                     </button>
                                 </div>
                             </div>
+                            
                             <h2 className="text-white text-xl font-medium mb-6">Compare shipping supplies across top vendors and save.</h2>
+                            
+                            {/* --- PRODUCT HUNT BADGE ADDED HERE --- */}
+                            <div className="mb-8">
+                                <a href="https://www.producthunt.com/products/boxfinder?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-boxfinder" target="_blank" rel="noopener noreferrer" className="inline-block hover:opacity-90 transition-opacity">
+                                    <img alt="BoxFinder - metasearch engine for cardboard boxes | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1138218&theme=light&t=1777838370728" />
+                                </a>
+                            </div>
+                            
                             <div className="bg-white p-6 rounded-2xl shadow-xl flex flex-col md:flex-row items-end gap-6 relative z-10 translate-y-12 border border-slate-100">
                                 <div className="flex-1 w-full grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-4">
                                     <SizeInput label="Length (in)" value={l} onChange={setL} />
@@ -372,7 +378,6 @@
                                 {filteredBoxes.length > 0 ? (
                                     <div className="space-y-4">
                                         {filteredBoxes.map((box, idx) => (
-                                            /* NOTICE: We dynamically inject autoExpand based on the array length! */
                                             <BoxCard key={`${box.l}-${box.w}-${box.h}-${idx}`} box={box} qtyMode={qtyMode} autoExpand={filteredBoxes.length === 1} />
                                         ))}
                                     </div>

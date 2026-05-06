@@ -21,10 +21,15 @@
     </style>
     
     <script>
+        // SAFE PARSING: Removed eval() in favor of JSON.parse()
         let dims = { l: '', w: '', h: '' };
         const dimsStr = `{{INJECTED_DIMS}}`;
         if (!dimsStr.startsWith('{{')) {
-            dims = eval('(' + dimsStr + ')');
+            try {
+                dims = JSON.parse(dimsStr);
+            } catch (e) {
+                console.error("Failed to parse dimensions:", e);
+            }
         }
         window.INJECTED_DIMS = dims;
     </script>
@@ -48,14 +53,21 @@
         let rawData = [];
         const rawDataStr = `{{RAW_DATA}}`;
         if (!rawDataStr.startsWith('{{')) {
-            rawData = eval('(' + rawDataStr + ')');
+            try {
+                rawData = JSON.parse(rawDataStr);
+            } catch (e) {
+                console.error("Failed to parse raw data:", e);
+            }
         }
         
-        // --- ADDED PACKAGINGPRICE HERE ---
         let ALL_VENDORS = ['Uline', 'PaperMart', 'Packaging Hero', 'Boxery', 'Grainger', 'Staples', 'Global Industrial', 'Wagner Supply', 'Zoro', 'MSC Direct', 'RAJA Pack', 'Arka', 'PackagingPrice'];
         const allVendorsStr = `{{ALL_VENDORS}}`;
         if (!allVendorsStr.startsWith('{{')) {
-            ALL_VENDORS = eval('(' + allVendorsStr + ')');
+            try {
+                ALL_VENDORS = JSON.parse(allVendorsStr);
+            } catch (e) {
+                console.error("Failed to parse vendors:", e);
+            }
         }
 
         // --- NATIVE SVG ICONS ---
@@ -76,7 +88,7 @@
 
         const getCurrency = (vendor) => vendor === 'RAJA Pack' ? '£' : '$';
 
-       const getVendorLink = (vendor, l, w, h, sku) => {
+        const getVendorLink = (vendor, l, w, h, sku) => {
             if (vendor === 'Arka') {
                 let arkaPath = `${l}x${w}x${h}-box`;
                 if (sku && sku !== 'n/a' && sku.trim() !== '') {
@@ -96,8 +108,6 @@
                 if (vendor === 'Zoro') return `https://www.zoro.com/search?q=${sku}`;
                 if (vendor === 'MSC Direct') return `https://www.mscdirect.com/product/details/${sku}`;
                 if (vendor === 'RAJA Pack') return `https://www.rajapack.co.uk/search/${sku}.html`;
-                
-                // --- FIXED PACKAGING HERO ---
                 if (vendor === 'Packaging Hero') return `https://www.packaginghero.com/${l}-x-${w}-x-${h}-corrugated-boxes-${sku.toLowerCase()}`;
                 
                 // PackagingPrice Smart Routing
@@ -125,7 +135,7 @@
                 case 'MSC Direct': return `https://www.mscdirect.com/browse/tn/?searchterm=${dim}+corrugated+box`;
                 case 'RAJA Pack': return `https://www.rajapack.co.uk/search/${dim}.html`;
                 case 'PackagingPrice': return `https://www.packagingprice.com/search.php?search_query=${dim}`;
-                case 'Packaging Hero': return `https://www.packaginghero.com/popular-boxes`; // Just in case a SKU is missing
+                case 'Packaging Hero': return `https://www.packaginghero.com/popular-boxes`; 
                 default: return '#';
             }
         };
@@ -201,7 +211,7 @@
                                         </thead>
                                         <tbody className="divide-y divide-slate-200">
                                             {box.offers.map((offer, idx) => (
-                                                <tr key={idx} className={`hover:bg-white transition-colors ${idx === 0 ? 'bg-green-50/50 hover:bg-green-50' : ''}`}>
+                                                <tr key={offer.v} className={`hover:bg-white transition-colors ${idx === 0 ? 'bg-green-50/50 hover:bg-green-50' : ''}`}>
                                                     <td className="py-4 px-4 whitespace-nowrap">
                                                         <div className="flex items-center gap-2">
                                                             <span className={`font-semibold ${idx === 0 ? 'text-green-700' : 'text-slate-800'}`}>
@@ -307,7 +317,6 @@
                             
                             <h2 className="text-white text-xl font-medium mb-6">Compare shipping supplies across top vendors and save.</h2>
                             
-                            {/* --- PRODUCT HUNT BADGE ADDED HERE --- */}
                             <div className="mb-8">
                                 <a href="https://www.producthunt.com/products/boxfinder?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-boxfinder" target="_blank" rel="noopener noreferrer" className="inline-block hover:opacity-90 transition-opacity">
                                     <img alt="BoxFinder - metasearch engine for cardboard boxes | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1138218&theme=light&t=1777838370728" />

@@ -76,7 +76,7 @@
 
         const getCurrency = (vendor) => vendor === 'RAJA Pack' ? '£' : '$';
 
-        const getVendorLink = (vendor, l, w, h, sku) => {
+       const getVendorLink = (vendor, l, w, h, sku) => {
             if (vendor === 'Arka') {
                 let arkaPath = `${l}x${w}x${h}-box`;
                 if (sku && sku !== 'n/a' && sku.trim() !== '') {
@@ -87,6 +87,7 @@
                 return `https://www.dpbolvw.net/click-101732774-15600472?url=${encodedUrl}`;
             }
 
+            // --- DIRECT SKU / EXACT SLUG ROUTING ---
             if (sku && sku !== 'n/a' && sku.trim() !== '') {
                 if (vendor === 'Uline') return `https://www.uline.com/Product/Detail/${sku}`;
                 if (vendor === 'Boxery') return `https://www.theboxery.com/Product.asp?Product=${sku.replace('*', '').trim()}`;
@@ -95,13 +96,25 @@
                 if (vendor === 'Zoro') return `https://www.zoro.com/search?q=${sku}`;
                 if (vendor === 'MSC Direct') return `https://www.mscdirect.com/product/details/${sku}`;
                 if (vendor === 'RAJA Pack') return `https://www.rajapack.co.uk/search/${sku}.html`;
+                
+                // --- FIXED PACKAGING HERO ---
+                if (vendor === 'Packaging Hero') return `https://www.packaginghero.com/${l}-x-${w}-x-${h}-corrugated-boxes-${sku.toLowerCase()}`;
+                
+                // PackagingPrice Smart Routing
+                if (vendor === 'PackagingPrice') {
+                    if (/^\d+$/.test(sku)) {
+                        return `https://www.packagingprice.com/search.php?search_query=${sku}`;
+                    }
+                    return `https://www.packagingprice.com/${sku.replace(/^\//, '')}`;
+                }
             }
 
+            // --- FALLBACK GENERIC VENDOR LINKS ---
             if (vendor === 'PaperMart') return 'https://www.papermart.com/p/standard-rsc-corrugated-cartons/1001';
-            if (vendor === 'Packaging Hero') return 'https://www.packaginghero.com/popular-boxes';
             if (vendor === 'Wagner Supply') return 'https://www.wagnersupply.com/Items/JMTBCO/Industrial-Packaging/Boxes/';
             if (vendor === 'Staples') return 'https://www.staples.com/Shipping-Boxes/cat_CL213835';
 
+            // --- FALLBACK DIMENSIONAL SEARCH ROUTING ---
             const dim = `${l}x${w}x${h}`;
             switch(vendor) {
                 case 'Uline': return `https://www.uline.com/Product/AdvSearchResult?keywords=${dim}`;
@@ -112,6 +125,7 @@
                 case 'MSC Direct': return `https://www.mscdirect.com/browse/tn/?searchterm=${dim}+corrugated+box`;
                 case 'RAJA Pack': return `https://www.rajapack.co.uk/search/${dim}.html`;
                 case 'PackagingPrice': return `https://www.packagingprice.com/search.php?search_query=${dim}`;
+                case 'Packaging Hero': return `https://www.packaginghero.com/popular-boxes`; // Just in case a SKU is missing
                 default: return '#';
             }
         };

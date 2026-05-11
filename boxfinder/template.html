@@ -107,7 +107,7 @@
                 if (vendor === 'Global Industrial') return `https://www.globalindustrial.com/searchResult?q=${sku}`;
                 if (vendor === 'Zoro') return `https://www.zoro.com/search?q=${sku}`;
                 if (vendor === 'MSC Direct') return `https://www.mscdirect.com/product/details/${sku}`;
-                if (vendor === 'RAJA Pack') return `https://www.rajapack.co.uk/search/${sku}.html`;
+                if (vendor === 'RAJA Pack') return 'https://www.rajapack.co.uk/cardboard-boxes.html';
                 if (vendor === 'Packaging Hero') return `https://www.packaginghero.com/${l}-x-${w}-x-${h}-corrugated-boxes-${sku.toLowerCase()}`;
                 
                 // PackagingPrice Smart Routing
@@ -133,7 +133,7 @@
                 case 'Global Industrial': return `https://www.globalindustrial.com/searchResult?q=${dim}+box`;
                 case 'Zoro': return `https://www.zoro.com/search?q=${dim}+corrugated+box`;
                 case 'MSC Direct': return `https://www.mscdirect.com/browse/tn/?searchterm=${dim}+corrugated+box`;
-                case 'RAJA Pack': return `https://www.rajapack.co.uk/search/${dim}.html`;
+                case 'RAJA Pack': return 'https://www.rajapack.co.uk/cardboard-boxes.html';
                 case 'PackagingPrice': return `https://www.packagingprice.com/search.php?search_query=${dim}`;
                 case 'Packaging Hero': return `https://www.packaginghero.com/popular-boxes`; 
                 default: return '#';

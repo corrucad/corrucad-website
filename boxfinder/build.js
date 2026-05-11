@@ -19,10 +19,10 @@ const template = fs.readFileSync(path.join(__dirname, 'template.html'), 'utf8');
 
 // 1. Generate the main index.html
 const indexHtml = template
-    .replace('{{TITLE}}', 'Corrugated Box Price Compare | BoxFinder')
-    .replace('{{DESC}}', 'Compare standard and bulk prices for corrugated boxes across top vendors.')
+    .replace('{{TITLE}}', 'Compare Box Prices: Uline vs. Grainger vs. PackagingPrice | BoxFinder')
+    .replace('{{DESC}}', 'Stop overpaying for corrugated boxes. BoxFinder shows you real prices from Uline, Grainger, and PackagingPrice side-by-side — enter your dimensions and find the lowest price instantly.')
     .replace('{{CANONICAL}}', 'https://www.corrucad.com/boxfinder/') // Clean URL
-    .replace('{{H1}}', 'Compare Corrugated Box Prices')
+    .replace('{{H1}}', 'Find the cheapest corrugated box — Uline, Grainger, and PackagingPrice compared')
     .replace('{{P}}', 'Find the best deals on shipping boxes.')
     .replace('{{SEO_LIST}}', '')
     .replace('{{INJECTED_DIMS}}', 'null')

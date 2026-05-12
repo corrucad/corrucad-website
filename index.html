@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CorruCAD: Free Corrugated Box Cost & Price Calculator</title>
-    <meta name="description" content="Instantly calculate your exact packaging costs and compare live spot prices across 13 major US suppliers. Stop overpaying for standard corrugated shipping boxes." />
+   <title>CorruCAD: Free Corrugated Box Cost & Price Calculator</title>
+<meta name="description" content="Instantly calculate your exact packaging costs and compare live spot prices across 13 major US suppliers. Stop overpaying for standard corrugated shipping boxes." />
     <link rel="canonical" href="https://www.corrucad.com/" />
     <link rel="icon" href="/favicon.png" type="image/png" sizes="192x192">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -26,17 +26,17 @@
     </style>
     <script src="/_vercel/insights/script.js" defer></script>
     <script async src="https://js.stripe.com/v3/buy-button.js"></script>
+
 </head>
 
 <body class="bg-gray-100">
-    <!-- MOVED THE PROMO BUTTON HERE SO IT DOESN'T BREAK THE HEAD PARSER -->
-    <div class="mt-4 flex justify-center">
-        <a href="/boxfinder" class="bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 px-6 py-2 rounded-full font-bold text-sm transition-colors shadow-sm">
-            Try the new BoxFinder Tool →
-        </a>
-    </div>
-
     <div id="root"></div>
+
+    <div class="mt-4 flex justify-center">
+    <a href="/boxfinder" class="bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 px-6 py-2 rounded-full font-bold text-sm transition-colors shadow-sm">
+        Try the new BoxFinder Tool →
+    </a>
+</div>
 
     <script type="text/babel">
         const { useState, useEffect, useRef, useCallback } = React;
@@ -135,7 +135,7 @@
                     const glueTabScoreLine = { x1: x_inner_glue_tab, y1: y_top_body_crease, x2: x_inner_glue_tab, y2: y_bottom_body_crease };
                     const outsideDimensions = { length: L_input + (2 * thickness), width: W_input + (2 * thickness), height: H_input + (3 * thickness) };
                     const slots = [ { x: panel1_width - (slotWidth_full_in / 2), y: 0, w: slotWidth_full_in, h: minorFlapLength_inches, type: 'full' }, { x: (panel1_width + panel2_width) - (slotWidth_full_in / 2), y: 0, w: slotWidth_full_in, h: minorFlapLength_inches, type: 'full' }, { x: (panel1_width + panel2_width + panel3_width) - (slotWidth_full_in / 2), y: 0, w: slotWidth_full_in, h: minorFlapLength_inches, type: 'full' }, { x: x_inner_glue_tab - slotWidth_half_in, y: 0, w: slotWidth_half_in, h: minorFlapLength_inches, type: 'half_right_open' }, { x: panel1_width - (slotWidth_full_in / 2), y: internalH_for_blank + minorFlapLength_inches, w: slotWidth_full_in, h: minorFlapLength_inches, type: 'full' }, { x: (panel1_width + panel2_width) - (slotWidth_full_in / 2), y: internalH_for_blank + minorFlapLength_inches, w: slotWidth_full_in, h: minorFlapLength_inches, type: 'full' }, { x: (panel1_width + panel2_width + panel3_width) - (slotWidth_full_in / 2), y: internalH_for_blank + minorFlapLength_inches, w: slotWidth_full_in, h: minorFlapLength_inches, type: 'full' }, { x: x_inner_glue_tab - slotWidth_half_in, y: internalH_for_blank + minorFlapLength_inches, w: slotWidth_half_in, h: minorFlapLength_inches, type: 'half_right_open' } ];
-                    return { blankWidth, blankHeight, outsideDimensions, layout: [ { x: 0, y: minorFlapLength_inches, w: panel1_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width, y: minorFlapLength_inches, w: panel2_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width + panel2_width, y: minorFlapLength_inches, w: panel3_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width + panel2_width + panel3_width, y: minorFlapLength_inches, w: panel4_width, h: internalH_for_blank, type: 'panel' }, { points: glueTabPoints, type: 'polygon_cut' }, { x: 0, y: 0, w: panel1_width, h: minorFlapLength_inches, type: 'flap' }, { x: panel1_width, y: 0, w: panel2_width, h: minorFlapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width, y: 0, w: panel3_width, h: minorFlapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width + panel3_width, y: 0, w: panel4_width, h: minorFlapLength_inches, type: 'flap' }, { x: 0, y: internalH_for_blank + minorFlapLength_inches, w: panel1_width, h: minorFlapLength_inches, type: 'flap' }, { x: panel1_width, y: internalH_for_blank + minorFlapLength_inches, w: panel2_width, h: minorFlapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width, y: internalH_for_blank + minorFlapLength_inches, w: panel3_width, h: minorFlapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width + panel3_width, y: internalH_for_blank + minorFlapLength_inches, w: panel4_width, h: minorFlapLength_inches, type: 'flap' }, ], scoreLines: [ { x1: panel1_width, y1: 0, x2: panel1_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width, y1: 0, x2: panel1_width + panel2_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width + panel3_width, y1: 0, x2: panel1_width + panel2_width + panel3_width, y2: blankHeight, type: 'vertical' }, { x1: glueTabScoreLine.x1, y1: glueTabScoreLine.y1, x2: glueTabScoreLine.x2, y2: glueTabScoreLine.y2, type: 'vertical_glue_tab' }, { x1: 0, y: minorFlapLength_inches, x2: blankWidth, y2: minorFlapLength_inches, type: 'horizontal' }, { x1: 0, y: internalH_for_blank + minorFlapLength_inches, x2: blankWidth, y2: internalH_for_blank + minorFlapLength_inches, type: 'horizontal' }, ], dxfGlueTabPerimeterPoints, slots };
+                    return { blankWidth, blankHeight, outsideDimensions, layout: [ { x: 0, y: minorFlapLength_inches, w: panel1_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width, y: minorFlapLength_inches, w: panel2_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width + panel2_width, y: minorFlapLength_inches, w: panel3_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width + panel2_width + panel3_width, y: minorFlapLength_inches, w: panel4_width, h: internalH_for_blank, type: 'panel' }, { points: glueTabPoints, type: 'polygon_cut' }, { x: 0, y: 0, w: panel1_width, h: minorFlapLength_inches, type: 'flap' }, { x: panel1_width, y: 0, w: panel2_width, h: minorFlapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width, y: 0, w: panel3_width, h: minorFlapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width + panel3_width, y: 0, w: panel4_width, h: minorFlapLength_inches, type: 'flap' }, { x: 0, y: internalH_for_blank + minorFlapLength_inches, w: panel1_width, h: minorFlapLength_inches, type: 'flap' }, { x: panel1_width, y: internalH_for_blank + minorFlapLength_inches, w: panel2_width, h: minorFlapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width, y: internalH_for_blank + minorFlapLength_inches, w: panel3_width, h: minorFlapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width + panel3_width, y: internalH_for_blank + minorFlapLength_inches, w: panel4_width, h: minorFlapLength_inches, type: 'flap' }, ], scoreLines: [ { x1: panel1_width, y1: 0, x2: panel1_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width, y1: 0, x2: panel1_width + panel2_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width + panel3_width, y1: 0, x2: panel1_width + panel2_width + panel3_width, y2: blankHeight, type: 'vertical' }, { x1: glueTabScoreLine.x1, y1: glueTabScoreLine.y1, x2: glueTabScoreLine.x2, y2: glueTabScoreLine.y2, type: 'vertical_glue_tab' }, { x1: 0, y1: minorFlapLength_inches, x2: blankWidth, y2: minorFlapLength_inches, type: 'horizontal' }, { x1: 0, y1: internalH_for_blank + minorFlapLength_inches, x2: blankWidth, y2: internalH_for_blank + minorFlapLength_inches, type: 'horizontal' }, ], dxfGlueTabPerimeterPoints, slots };
                 }
             },
             '0203': {

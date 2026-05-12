@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>CorruCAD: Free Corrugated Box Cost & Price Calculator</title>
-<meta name="description" content="Instantly calculate your exact packaging costs and compare live spot prices across 13 major US suppliers. Stop overpaying for standard corrugated shipping boxes." />
+   <title>CorruCAD | Precision Corrugated CAD & Pricing Engine</title>
+<meta name="description" content="Professional engineering tool for corrugated packaging. Generate FEFCO geometry, calculate $/ton fiber costs, and export production-ready DXF & Kiwiplan CSV files.">
     <link rel="canonical" href="https://www.corrucad.com/" />
     <link rel="icon" href="/favicon.png" type="image/png" sizes="192x192">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -36,14 +36,22 @@
         Try the new BoxFinder Tool →
     </a>
 </div>
-    <div id="root">
-  <section class="sr-only">
-    <h1>Free Online Cardboard Box Calculator</h1>
-    <p>Calculate box dimensions, sheet prices, and board strength for 32 ECT and 200# Mullen corrugated. Generate DXF and PDF CAD files instantly.</p>
-  </section>
+    
+   <div id="root">
+    <div style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0;">
+        <h1>CorruCAD: Industrial Corrugated Design & CAD Engine</h1>
+        <p>
+            Generate production-ready FEFCO geometry for RSC, FOL, and 0401 folders. 
+            Our precision estimating engine converts $/ton paper market assumptions into 
+            instant $/MSF quotes for 32 ECT and 200# Mullen board. 
+            Export DXF CAD files and Kiwiplan-ready CSVs directly to production.
+        </p>
+        <nav>
+            <a href="/boxfinder">Compare live vendor prices on BoxFinder</a>
+        </nav>
+    </div>
 </div>
-    <div id="root"></div>
-
+    
     <script type="text/babel">
         const { useState, useEffect, useRef, useCallback } = React;
         const createRoot = ReactDOM.createRoot;

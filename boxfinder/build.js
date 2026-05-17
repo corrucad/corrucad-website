@@ -17,14 +17,27 @@ sitemapXml += `  <url>\n    <loc>https://www.corrucad.com/boxfinder/</loc>\n    
 // Read your template
 const template = fs.readFileSync(path.join(__dirname, 'template.html'), 'utf8');
 
+// MAIN INDEX PAGE SCHEMA
+const indexSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "BoxFinder by CorruCAD",
+    "description": "Compare real-time pricing for corrugated shipping boxes across top industrial vendors.",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+    }
+};
+
 // 1. Generate the main index.html
 const indexHtml = template
     .replace('{{TITLE}}', 'Compare Box Prices: Uline vs. Grainger vs. PackagingPrice | BoxFinder')
     .replace('{{DESC}}', 'Stop overpaying for corrugated boxes. BoxFinder shows you real prices from Uline, Grainger, and PackagingPrice side-by-side — enter your dimensions and find the lowest price instantly.')
     .replace('{{CANONICAL}}', 'https://www.corrucad.com/boxfinder/') // Clean URL
-    .replace('{{H1}}', 'Find the cheapest corrugated box — Uline, Grainger, and PackagingPrice compared')
-    .replace('{{P}}', 'Find the best deals on shipping boxes.')
-    .replace('{{SEO_LIST}}', '')
+    .replace('{{SCHEMA_MARKUP}}', JSON.stringify(indexSchema, null, 2))
     .replace('{{INJECTED_DIMS}}', 'null')
     .replace('{{RAW_DATA}}', JSON.stringify(rawData))
     .replace('{{ALL_VENDORS}}', JSON.stringify(ALL_VENDORS));
@@ -35,26 +48,37 @@ fs.writeFileSync(path.join(outputDir, 'index.html'), indexHtml);
 rawData.forEach(box => {
     const dim = `${box.l}x${box.w}x${box.h}`;
     
-    // NEW: Separate the clean URL slug from the physical filename
+    // Separate the clean URL slug from the physical filename
     const cleanSlug = `${dim}-corrugated-boxes`; 
     const filename = `${cleanSlug}.html`; 
     
+    // Sort offers to find the price range for the Schema
     const sortedOffers = [...box.offers].sort((a, b) => a.p - b.p);
     const bestPrice = sortedOffers[0].p;
+    const highestPrice = sortedOffers[sortedOffers.length - 1].p;
 
-    let seoListHTML = '';
-    sortedOffers.forEach(o => {
-        const currency = o.v === 'RAJA Pack' ? '£' : '$';
-        seoListHTML += `            <li>${o.v} (${o.g}) - ${currency}${o.p.toFixed(2)}/box</li>\n`;
-    });
+    // GENERATE PROPER JSON-LD AGGREGATE SCHEMA
+    const schemaMarkup = {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": `${dim} Corrugated Shipping Box`,
+        "description": `Independent price comparison for ${dim} boxes across top packaging vendors.`,
+        "category": "Shipping Supplies",
+        "offers": {
+            "@type": "AggregateOffer",
+            "offerCount": sortedOffers.length,
+            "lowPrice": bestPrice,
+            "highPrice": highestPrice,
+            "priceCurrency": "USD"
+        }
+    };
 
     const boxHtml = template
-        .replace('{{TITLE}}', `Compare ${dim} Corrugated Box Prices | BoxFinder`)
-        .replace('{{DESC}}', `Stop overpaying. Compare prices for ${dim} corrugated boxes across top vendors. Top pick: $${bestPrice.toFixed(2)}/box.`)
-        .replace('{{CANONICAL}}', `https://www.corrucad.com/boxfinder/${cleanSlug}`) // Clean URL
-        .replace('{{H1}}', `Compare Prices for ${dim} Corrugated Boxes`)
-        .replace('{{P}}', `Find the best deals on ${dim} shipping boxes. We compare prices from top vendors.`)
-        .replace('{{SEO_LIST}}', seoListHTML)
+        // OPTIMIZED FOR COMMERCIAL INTENT
+        .replace('{{TITLE}}', `Cheapest ${dim} Shipping Boxes | Cost Calculator & Price Checker`)
+        .replace('{{DESC}}', `Stop overpaying. Use our BoxFinder tool to compare prices for ${dim} corrugated boxes across top vendors. Top pick: $${bestPrice.toFixed(2)}/box.`)
+        .replace('{{CANONICAL}}', `https://www.corrucad.com/boxfinder/${cleanSlug}`) 
+        .replace('{{SCHEMA_MARKUP}}', JSON.stringify(schemaMarkup, null, 2))
         .replace('{{INJECTED_DIMS}}', JSON.stringify({ l: box.l.toString(), w: box.w.toString(), h: box.h.toString() }))
         .replace('{{RAW_DATA}}', JSON.stringify(rawData))
         .replace('{{ALL_VENDORS}}', JSON.stringify(ALL_VENDORS));

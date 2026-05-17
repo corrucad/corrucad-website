@@ -80,6 +80,16 @@
         const ArrowLeft = (p) => <IconBase {...p}><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></IconBase>;
         const Truck = (p) => <IconBase {...p}><path d="M10 17h4V5H2v12h3"/><path d="M20 17h2v-3.34a4 4 0 0 0-1.17-2.83L19 9h-5v8h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></IconBase>;
 
+        // --- VERCEL TRACKING FUNCTION ---
+        const trackOutboundClick = (type, targetName) => {
+            // Check if Vercel Analytics is loaded
+            if (window.va) {
+                window.va('event', type, { target: targetName });
+            }
+            // (Optional) console.log for your own local testing
+            console.log(`Tracked: ${type} -> ${targetName}`);
+        };
+
         const getCurrency = (vendor) => vendor === 'RAJA Pack' ? '£' : '$';
 
         const getVendorLink = (vendor, l, w, h, sku) => {
@@ -227,7 +237,13 @@
                                                         {getCurrency(offer.v)}{offer.displayPrice.toFixed(2)}
                                                     </td>
                                                     <td className="py-4 px-4 whitespace-nowrap text-right">
-                                                        <a href={getVendorLink(offer.v, box.l, box.w, box.h, offer.s)} target="_blank" rel="noopener noreferrer" className="text-orange-600 hover:text-orange-700 font-medium text-sm flex items-center justify-end gap-1 w-full group-hover:underline">
+                                                        <a 
+                                                            href={getVendorLink(offer.v, box.l, box.w, box.h, offer.s)} 
+                                                            target="_blank" 
+                                                            rel="noopener noreferrer" 
+                                                            className="text-orange-600 hover:text-orange-700 font-medium text-sm flex items-center justify-end gap-1 w-full group-hover:underline"
+                                                            onClick={() => trackOutboundClick('Vendor_Click', offer.v)}
+                                                        >
                                                             View Site <ExternalLink size={14} />
                                                         </a>
                                                     </td>
@@ -383,6 +399,7 @@
                                             target="_blank" 
                                             rel="noopener noreferrer" 
                                             className="block w-full text-center bg-white text-emerald-700 font-bold py-2 px-4 rounded-lg hover:bg-emerald-50 transition-colors text-sm shadow-sm"
+                                            onClick={() => trackOutboundClick('Affiliate_Click', 'Shippo')}
                                         >
                                             Try Shippo for Free
                                         </a>

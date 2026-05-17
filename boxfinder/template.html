@@ -12,7 +12,15 @@
         {{SCHEMA_MARKUP}}
     </script>
     
-    <script src="/_vercel/insights/script.js" defer></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-S6H2RNY5QM"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-S6H2RNY5QM');
+    </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -79,16 +87,6 @@
         const Star = (p) => <IconBase {...p}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></IconBase>;
         const ArrowLeft = (p) => <IconBase {...p}><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></IconBase>;
         const Truck = (p) => <IconBase {...p}><path d="M10 17h4V5H2v12h3"/><path d="M20 17h2v-3.34a4 4 0 0 0-1.17-2.83L19 9h-5v8h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></IconBase>;
-
-        // --- VERCEL TRACKING FUNCTION ---
-        const trackOutboundClick = (type, targetName) => {
-            // Check if Vercel Analytics is loaded
-            if (window.va) {
-                window.va('event', type, { target: targetName });
-            }
-            // (Optional) console.log for your own local testing
-            console.log(`Tracked: ${type} -> ${targetName}`);
-        };
 
         const getCurrency = (vendor) => vendor === 'RAJA Pack' ? '£' : '$';
 
@@ -242,7 +240,6 @@
                                                             target="_blank" 
                                                             rel="noopener noreferrer" 
                                                             className="text-orange-600 hover:text-orange-700 font-medium text-sm flex items-center justify-end gap-1 w-full group-hover:underline"
-                                                            onClick={() => trackOutboundClick('Vendor_Click', offer.v)}
                                                         >
                                                             View Site <ExternalLink size={14} />
                                                         </a>
@@ -399,7 +396,6 @@
                                             target="_blank" 
                                             rel="noopener noreferrer" 
                                             className="block w-full text-center bg-white text-emerald-700 font-bold py-2 px-4 rounded-lg hover:bg-emerald-50 transition-colors text-sm shadow-sm"
-                                            onClick={() => trackOutboundClick('Affiliate_Click', 'Shippo')}
                                         >
                                             Try Shippo for Free
                                         </a>

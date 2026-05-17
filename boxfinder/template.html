@@ -8,6 +8,10 @@
     <meta name="description" content="{{DESC}}">
     <link rel="canonical" href="{{CANONICAL}}" />
     
+    <script type="application/ld+json">
+        {{SCHEMA_MARKUP}}
+    </script>
+    
     <script src="/_vercel/insights/script.js" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -16,8 +20,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
-        /* Hide the SEO block from humans, keep it visible for search engine crawlers */
-        .seo-crawler-block { display: none; }
     </style>
     
     <script>
@@ -35,14 +37,6 @@
     </script>
 </head>
 <body class="bg-slate-100">
-
-    <div class="seo-crawler-block">
-        <h1>{{H1}}</h1>
-        <p>{{P}}</p>
-        <ul>
-{{SEO_LIST}}
-        </ul>
-    </div>
 
     <div id="root"></div>
 
@@ -267,43 +261,43 @@
             };
 
             // Hardcoded exchange rate as of May 11, 2026
-const GBP_TO_USD = 1.364; 
+            const GBP_TO_USD = 1.364; 
 
-const filteredBoxes = useMemo(() => {
-    return rawData
-        .map(box => {
-            const validOffers = box.offers.filter(o => selectedVendors.includes(o.v));
-            
-            const pricedOffers = validOffers.map(o => {
-                const basePrice = qtyMode === 'bulk' ? o.b : o.p;
-                const isGBP = o.v === 'RAJA Pack';
-                
-                return {
-                    ...o,
-                    // Keep original price for UI rendering
-                    displayPrice: basePrice, 
-                    // Calculate USD equivalent for accurate sorting
-                    sortPrice: isGBP ? (basePrice * GBP_TO_USD) : basePrice 
-                };
-            });
-            
-            // Sort the vendor offers inside the box by their USD equivalent
-            return { ...box, offers: pricedOffers.sort((a, b) => a.sortPrice - b.sortPrice) };
-        })
-        .filter(box => {
-            if (box.offers.length === 0) return false;
-            if (l && box.l.toString() !== l) return false;
-            if (w && box.w.toString() !== w) return false;
-            if (h && box.h.toString() !== h) return false;
-            return true;
-        })
-        .sort((a, b) => {
-            // Sort the overall box cards by the absolute lowest USD equivalent
-            if (sortBy === 'price-asc') return (a.offers[0]?.sortPrice || 999) - (b.offers[0]?.sortPrice || 999);
-            if (sortBy === 'size-desc') return (b.l * b.w * b.h) - (a.l * a.w * a.h);
-            return (a.l * a.w * a.h) - (b.l * b.w * b.h);
-        });
-}, [l, w, h, selectedVendors, qtyMode, sortBy]);
+            const filteredBoxes = useMemo(() => {
+                return rawData
+                    .map(box => {
+                        const validOffers = box.offers.filter(o => selectedVendors.includes(o.v));
+                        
+                        const pricedOffers = validOffers.map(o => {
+                            const basePrice = qtyMode === 'bulk' ? o.b : o.p;
+                            const isGBP = o.v === 'RAJA Pack';
+                            
+                            return {
+                                ...o,
+                                // Keep original price for UI rendering
+                                displayPrice: basePrice, 
+                                // Calculate USD equivalent for accurate sorting
+                                sortPrice: isGBP ? (basePrice * GBP_TO_USD) : basePrice 
+                            };
+                        });
+                        
+                        // Sort the vendor offers inside the box by their USD equivalent
+                        return { ...box, offers: pricedOffers.sort((a, b) => a.sortPrice - b.sortPrice) };
+                    })
+                    .filter(box => {
+                        if (box.offers.length === 0) return false;
+                        if (l && box.l.toString() !== l) return false;
+                        if (w && box.w.toString() !== w) return false;
+                        if (h && box.h.toString() !== h) return false;
+                        return true;
+                    })
+                    .sort((a, b) => {
+                        // Sort the overall box cards by the absolute lowest USD equivalent
+                        if (sortBy === 'price-asc') return (a.offers[0]?.sortPrice || 999) - (b.offers[0]?.sortPrice || 999);
+                        if (sortBy === 'size-desc') return (b.l * b.w * b.h) - (a.l * a.w * a.h);
+                        return (a.l * a.w * a.h) - (b.l * b.w * b.h);
+                    });
+            }, [l, w, h, selectedVendors, qtyMode, sortBy]);
 
             return (
                 <div className="min-h-screen bg-slate-100 font-sans text-slate-900">

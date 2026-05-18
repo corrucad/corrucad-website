@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-S6H2RNY5QM"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-S6H2RNY5QM');
+    </script>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corrugated Pricing Engine | CorruCAD</title>
+    <meta name="description" content="Calculate finished $/MSF corrugated board quotes instantly from raw $/ton paper market inputs.">
+    
+    <link rel="icon" href="/favicon.png" type="image/png" sizes="192x192">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+    <script src="/_vercel/insights/script.js" defer></script>
+</head>
+<body class="bg-slate-100">
+
+    <!-- Simple Navigation to get back home -->
+    <div class="mt-4 flex justify-center gap-4">
+        <a href="/" class="text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors">
+            &larr; Back to CAD Engine
+        </a>
+        <a href="/boxfinder" class="bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 px-6 py-1 rounded-full font-bold text-sm transition-colors shadow-sm">
+            Try BoxFinder Tool &rarr;
+        </a>
+    </div>
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- INLINE ICONS ---
+        const IconCalculator = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16.01" y1="10" y2="10"/><line x1="12" x2="12.01" y1="10" y2="10"/><line x1="8" x2="8.01" y1="10" y2="10"/><line x1="8" x2="8.01" y1="14" y2="14"/><line x1="12" x2="12.01" y1="14" y2="14"/><line x1="16" x2="16.01" y1="14" y2="14"/><line x1="8" x2="8.01" y1="18" y2="18"/><line x1="12" x2="12.01" y1="18" y2="18"/><line x1="16" x2="16.01" y1="18" y2="18"/></svg>;
+        const IconDollarSign = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>;
+        const IconPackage = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>;
+        const IconSettings = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>;
+        const IconBarChart3 = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>;
+        const IconInfo = () => <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>;
+
+        const FluteFactors = {
+            'A Flute': 1.53,
+            'B Flute': 1.32,
+            'C Flute': 1.42,
+            'E Flute': 1.23,
+            'F Flute': 1.15,
+            'Custom': 1.00
+        };
+
+        const PricingEngine = () => {
+            // --- STATE ---
+            const [liner1Weight, setLiner1Weight] = useState(42);
+            const [liner2Weight, setLiner2Weight] = useState(42);
+            const [mediumWeight, setMediumWeight] = useState(26);
+            const [fluteProfile, setFluteProfile] = useState('C Flute');
+            const [customFluteFactor, setCustomFluteFactor] = useState(1.42);
+
+            const [linerPriceTon, setLinerPriceTon] = useState(925);
+            const [mediumPriceTon, setMediumPriceTon] = useState(850);
+
+            const [starchCostMsf, setStarchCostMsf] = useState(1.50);
+            const [convertingCostMsf, setConvertingCostMsf] = useState(12.00);
+            const [freightCostMsf, setFreightCostMsf] = useState(4.50);
+            const [wastePercent, setWastePercent] = useState(8);
+            const [marginPercent, setMarginPercent] = useState(20);
+
+            const [results, setResults] = useState({
+                linerCostMsf: 0,
+                mediumCostMsf: 0,
+                rawFiberCost: 0,
+                wasteCost: 0,
+                totalMaterialCost: 0,
+                manufacturedCost: 0,
+                sellingPriceMsf: 0,
+                marginDollars: 0
+            });
+
+            // --- LOGIC ---
+            useEffect(() => {
+                const linerPriceLb = (parseFloat(linerPriceTon) || 0) / 2000;
+                const mediumPriceLb = (parseFloat(mediumPriceTon) || 0) / 2000;
+
+                const totalLinerWeight = (parseFloat(liner1Weight) || 0) + (parseFloat(liner2Weight) || 0);
+                const linerCostMsf = totalLinerWeight * linerPriceLb;
+
+                const takeUpFactor = fluteProfile === 'Custom' ? parseFloat(customFluteFactor) || 1 : FluteFactors[fluteProfile];
+                const mediumTakeUpWeight = (parseFloat(mediumWeight) || 0) * takeUpFactor;
+                const mediumCostMsf = mediumTakeUpWeight * mediumPriceLb;
+
+                const rawFiberCost = linerCostMsf + mediumCostMsf;
+
+                const wasteMultiplier = 1 + ((parseFloat(wastePercent) || 0) / 100);
+                const totalMaterialCost = rawFiberCost * wasteMultiplier;
+                const wasteCost = totalMaterialCost - rawFiberCost;
+
+                const manufacturedCost = totalMaterialCost 
+                    + (parseFloat(starchCostMsf) || 0) 
+                    + (parseFloat(convertingCostMsf) || 0) 
+                    + (parseFloat(freightCostMsf) || 0);
+
+                const marginDec = (parseFloat(marginPercent) || 0) / 100;
+                const safeMarginDec = marginDec >= 1 ? 0.99 : marginDec; 
+                
+                const sellingPriceMsf = manufacturedCost / (1 - safeMarginDec);
+                const marginDollars = sellingPriceMsf - manufacturedCost;
+
+                setResults({
+                    linerCostMsf, mediumCostMsf, rawFiberCost, wasteCost,
+                    totalMaterialCost, manufacturedCost, sellingPriceMsf, marginDollars
+                });
+            }, [
+                liner1Weight, liner2Weight, mediumWeight, fluteProfile, customFluteFactor,
+                linerPriceTon, mediumPriceTon, starchCostMsf, convertingCostMsf, 
+                freightCostMsf, wastePercent, marginPercent
+            ]);
+
+            const formatCurrency = (val) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
+
+            return (
+                <div className="p-4 md:p-8 text-slate-800">
+                <div className="max-w-6xl mx-auto space-y-6">
+                    
+                    {/* Header */}
+                    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+                    <div>
+                        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 flex items-center gap-2">
+                        <span className="text-blue-600"><IconCalculator /></span>
+                        Corrugated Pricing Engine
+                        </h1>
+                        <p className="text-slate-500 mt-1">Convert $/ton paper costs to finished $/MSF board quotes.</p>
+                    </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    
+                    {/* LEFT COLUMN: INPUTS */}
+                    <div className="lg:col-span-7 space-y-6">
+                        
+                        {/* Paper Specifications */}
+                        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div className="bg-slate-50 px-6 py-4 border-b border-slate-200 flex items-center gap-2">
+                            <span className="text-slate-500"><IconPackage /></span>
+                            <h2 className="text-lg font-semibold">Board Construction (Single Wall)</h2>
+                        </div>
+                        <div className="p-6 grid grid-cols-1 sm:grid-cols-3 gap-6">
+                            <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Outside Liner</label>
+                            <div className="relative">
+                                <input type="number" value={liner1Weight} onChange={e => setLiner1Weight(e.target.value)} className="w-full pl-3 pr-12 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <span className="text-slate-400 text-sm">lbs</span>
+                                </div>
+                            </div>
+                            </div>
+                            <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Medium</label>
+                            <div className="relative">
+                                <input type="number" value={mediumWeight} onChange={e => setMediumWeight(e.target.value)} className="w-full pl-3 pr-12 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <span className="text-slate-400 text-sm">lbs</span>
+                                </div>
+                            </div>
+                            </div>
+                            <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Inside Liner</label>
+                            <div className="relative">
+                                <input type="number" value={liner2Weight} onChange={e => setLiner2Weight(e.target.value)} className="w-full pl-3 pr-12 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <span className="text-slate-400 text-sm">lbs</span>
+                                </div>
+                            </div>
+                            </div>
+
+                            <div className="sm:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t border-slate-100">
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Flute Profile</label>
+                                <select value={fluteProfile} onChange={e => setFluteProfile(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white">
+                                {Object.keys(FluteFactors).map(flute => (
+                                    <option key={flute} value={flute}>{flute} (Take-up: {FluteFactors[flute]})</option>
+                                ))}
+                                </select>
+                            </div>
+                            {fluteProfile === 'Custom' && (
+                                <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Custom Take-up Factor</label>
+                                <input type="number" step="0.01" value={customFluteFactor} onChange={e => setCustomFluteFactor(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                                </div>
+                            )}
+                            </div>
+                        </div>
+                        </div>
+
+                        {/* Paper Market Pricing */}
+                        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div className="bg-slate-50 px-6 py-4 border-b border-slate-200 flex items-center gap-2">
+                            <span className="text-emerald-600"><IconDollarSign /></span>
+                            <h2 className="text-lg font-semibold">Paper Market Pricing ($/Ton)</h2>
+                        </div>
+                        <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Kraft Linerboard Price</label>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span className="text-slate-500 sm:text-sm">$</span>
+                                </div>
+                                <input type="number" value={linerPriceTon} onChange={e => setLinerPriceTon(e.target.value)} className="w-full pl-7 pr-12 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <span className="text-slate-400 text-sm">/ ton</span>
+                                </div>
+                            </div>
+                            </div>
+                            <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Corrugating Medium Price</label>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span className="text-slate-500 sm:text-sm">$</span>
+                                </div>
+                                <input type="number" value={mediumPriceTon} onChange={e => setMediumPriceTon(e.target.value)} className="w-full pl-7 pr-12 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <span className="text-slate-400 text-sm">/ ton</span>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        </div>
+
+                        {/* Adders & Margin */}
+                        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div className="bg-slate-50 px-6 py-4 border-b border-slate-200 flex items-center gap-2">
+                            <span className="text-slate-500"><IconSettings /></span>
+                            <h2 className="text-lg font-semibold">Manufacturing Adders & Margin</h2>
+                        </div>
+                        <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Waste Factor</label>
+                            <div className="relative">
+                                <input type="number" step="0.1" value={wastePercent} onChange={e => setWastePercent(e.target.value)} className="w-full pl-3 pr-8 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <span className="text-slate-500 sm:text-sm">%</span>
+                                </div>
+                            </div>
+                            </div>
+                            <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Starch & Adhesive</label>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><span className="text-slate-500 sm:text-sm">$</span></div>
+                                <input type="number" step="0.01" value={starchCostMsf} onChange={e => setStarchCostMsf(e.target.value)} className="w-full pl-7 pr-12 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"><span className="text-slate-400 text-sm">/ MSF</span></div>
+                            </div>
+                            </div>
+                            <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-1 flex items-center gap-1">Converting Cost <span className="text-slate-400" title="Includes corrugator running costs, labor, and overhead"><IconInfo /></span></label>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><span className="text-slate-500 sm:text-sm">$</span></div>
+                                <input type="number" step="0.01" value={convertingCostMsf} onChange={e => setConvertingCostMsf(e.target.value)} className="w-full pl-7 pr-12 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"><span className="text-slate-400 text-sm">/ MSF</span></div>
+                            </div>
+                            </div>
+                            <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Freight / Shipping</label>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><span className="text-slate-500 sm:text-sm">$</span></div>
+                                <input type="number" step="0.01" value={freightCostMsf} onChange={e => setFreightCostMsf(e.target.value)} className="w-full pl-7 pr-12 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"><span className="text-slate-400 text-sm">/ MSF</span></div>
+                            </div>
+                            </div>
+                            <div className="sm:col-span-2 pt-4 border-t border-slate-100">
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Target Margin</label>
+                            <div className="relative w-full sm:w-1/2">
+                                <input type="number" step="0.1" value={marginPercent} onChange={e => setMarginPercent(e.target.value)} className="w-full pl-3 pr-8 py-2 font-bold text-blue-700 bg-blue-50 border border-blue-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <span className="text-blue-700 font-bold sm:text-sm">%</span>
+                                </div>
+                            </div>
+                            <p className="text-xs text-slate-500 mt-2">Note: Selling price is calculated as [Cost / (1 - Margin%)]</p>
+                            </div>
+                        </div>
+                        </div>
+
+                    </div>
+
+                    {/* RIGHT COLUMN: RESULTS */}
+                    <div className="lg:col-span-5 space-y-6">
+                        
+                        <div className="bg-slate-900 text-white rounded-xl shadow-lg overflow-hidden sticky top-6">
+                        <div className="p-6">
+                            <h2 className="text-lg font-semibold text-slate-300 mb-6 flex items-center gap-2">
+                            <span className="text-slate-300"><IconBarChart3 /></span>
+                            Quote Summary ($/MSF)
+                            </h2>
+
+                            <div className="space-y-4">
+                            
+                            {/* Fiber Cost Breakdown */}
+                            <div>
+                                <div className="flex justify-between text-sm mb-1">
+                                <span className="text-slate-400">Total Linerboard Cost</span>
+                                <span>{formatCurrency(results.linerCostMsf)}</span>
+                                </div>
+                                <div className="flex justify-between text-sm mb-1">
+                                <span className="text-slate-400">Total Medium Cost (incl. take-up)</span>
+                                <span>{formatCurrency(results.mediumCostMsf)}</span>
+                                </div>
+                                <div className="flex justify-between font-medium text-slate-200 mt-2 pt-2 border-t border-slate-700">
+                                <span>Raw Fiber Cost</span>
+                                <span>{formatCurrency(results.rawFiberCost)}</span>
+                                </div>
+                            </div>
+
+                            <div className="h-px bg-slate-800 my-4"></div>
+
+                            {/* Adders Breakdown */}
+                            <div>
+                                <div className="flex justify-between text-sm mb-1">
+                                <span className="text-slate-400">Waste Factor ({wastePercent}%)</span>
+                                <span className="text-red-400">+{formatCurrency(results.wasteCost)}</span>
+                                </div>
+                                <div className="flex justify-between text-sm mb-1">
+                                <span className="text-slate-400">Starch & Adhesive</span>
+                                <span>+{formatCurrency(starchCostMsf)}</span>
+                                </div>
+                                <div className="flex justify-between text-sm mb-1">
+                                <span className="text-slate-400">Converting Cost</span>
+                                <span>+{formatCurrency(convertingCostMsf)}</span>
+                                </div>
+                                <div className="flex justify-between text-sm mb-1">
+                                <span className="text-slate-400">Freight</span>
+                                <span>+{formatCurrency(freightCostMsf)}</span>
+                                </div>
+                                <div className="flex justify-between font-medium text-slate-200 mt-2 pt-2 border-t border-slate-700">
+                                <span>Total Manufactured Cost</span>
+                                <span>{formatCurrency(results.manufacturedCost)}</span>
+                                </div>
+                            </div>
+
+                            <div className="h-px bg-slate-800 my-4"></div>
+
+                            {/* Margin & Final Price */}
+                            <div className="bg-slate-800 rounded-lg p-4">
+                                <div className="flex justify-between text-sm mb-2">
+                                <span className="text-emerald-400">Gross Margin ({marginPercent}%)</span>
+                                <span className="text-emerald-400">+{formatCurrency(results.marginDollars)}</span>
+                                </div>
+                                <div className="flex justify-between items-end mt-4 pt-4 border-t border-slate-700">
+                                <span className="text-lg font-medium text-slate-200">Selling Price</span>
+                                <span className="text-3xl font-bold text-white">{formatCurrency(results.sellingPriceMsf)}</span>
+                                </div>
+                                <div className="text-right text-xs text-slate-400 mt-1">per 1,000 sq. ft.</div>
+                            </div>
+
+                            </div>
+                        </div>
+
+                        {/* Visual Breakdown Bar */}
+                        <div className="bg-slate-800 p-6 border-t border-slate-700">
+                            <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Cost Distribution</h3>
+                            <div className="w-full h-4 bg-slate-700 rounded-full overflow-hidden flex">
+                                <div 
+                                style={{ width: `${(results.rawFiberCost / results.sellingPriceMsf) * 100}%` }} 
+                                className="h-full bg-blue-500" title="Paper"
+                                ></div>
+                                <div 
+                                style={{ width: `${((results.manufacturedCost - results.rawFiberCost) / results.sellingPriceMsf) * 100}%` }} 
+                                className="h-full bg-orange-400" title="Adders (Starch, Converting, Freight, Waste)"
+                                ></div>
+                                <div 
+                                style={{ width: `${(results.marginDollars / results.sellingPriceMsf) * 100}%` }} 
+                                className="h-full bg-emerald-500" title="Margin"
+                                ></div>
+                            </div>
+                            <div className="flex justify-between text-xs mt-2 text-slate-400">
+                                <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500"></span> Paper</div>
+                                <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-orange-400"></span> Mfg/Adders</div>
+                                <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500"></span> Margin</div>
+                            </div>
+                        </div>
+
+                        </div>
+
+                    </div>
+
+                    </div>
+                </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<PricingEngine />);
+    </script>
+</body>
+</html>

@@ -44,9 +44,23 @@
         window.INJECTED_DIMS = dims;
     </script>
 </head>
-<body class="bg-slate-100">
+<body class="bg-slate-100 flex flex-col min-h-screen">
 
-    <div id="root"></div>
+    <div id="root" class="flex-grow"></div>
+
+    <footer class="bg-white border-t border-slate-200 mt-12 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 class="text-2xl font-bold text-slate-800 mb-2">{{H1}}</h1>
+            <p class="text-slate-600 mb-6">{{P}}</p>
+            
+            <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                <h3 class="text-sm font-semibold text-slate-800 mb-4 uppercase tracking-wider">Pricing Data Sources:</h3>
+                <ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-sm text-slate-600 list-inside list-disc">
+{{SEO_LIST}}
+                </ul>
+            </div>
+        </div>
+    </footer>
 
     <script type="text/babel">
         const { useState, useMemo } = React;
@@ -235,12 +249,7 @@
                                                         {getCurrency(offer.v)}{offer.displayPrice.toFixed(2)}
                                                     </td>
                                                     <td className="py-4 px-4 whitespace-nowrap text-right">
-                                                        <a 
-                                                            href={getVendorLink(offer.v, box.l, box.w, box.h, offer.s)} 
-                                                            target="_blank" 
-                                                            rel="noopener noreferrer" 
-                                                            className="text-orange-600 hover:text-orange-700 font-medium text-sm flex items-center justify-end gap-1 w-full group-hover:underline"
-                                                        >
+                                                        <a href={getVendorLink(offer.v, box.l, box.w, box.h, offer.s)} target="_blank" rel="noopener noreferrer" className="text-orange-600 hover:text-orange-700 font-medium text-sm flex items-center justify-end gap-1 w-full group-hover:underline">
                                                             View Site <ExternalLink size={14} />
                                                         </a>
                                                     </td>

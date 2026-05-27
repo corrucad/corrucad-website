@@ -112,7 +112,7 @@
             </svg>
         );
 
-        // --- CorruCAD Precision Estimating Engine v2.0 ---
+        // --- CorruCAD Precision Estimating Engine v2.5 ---
         const estimatingEngine = (() => {
             const calculateQuote = (inputs) => {
                 const defaults = {
@@ -227,23 +227,6 @@
                     return { blankWidth, blankHeight, outsideDimensions, layout: [ { x: 0, y: 0, w: panel1_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width, y: 0, w: panel2_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width + panel2_width, y: 0, w: panel3_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width + panel2_width + panel3_width, y: 0, w: panel4_width, h: internalH_for_blank, type: 'panel' }, { points: glueTabPoints, type: 'polygon_cut' }, { x: 0, y: internalH_for_blank, w: panel1_width, h: flapLength_inches, type: 'flap' }, { x: panel1_width, y: internalH_for_blank, w: panel2_width, h: flapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width, y: internalH_for_blank, w: panel3_width, h: flapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width + panel3_width, y: internalH_for_blank, w: panel4_width, h: flapLength_inches, type: 'flap' }, ], scoreLines: [ { x1: panel1_width, y1: 0, x2: panel1_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width, y1: 0, x2: panel1_width + panel2_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width + panel3_width, y1: 0, x2: panel1_width + panel2_width + panel3_width, y2: blankHeight, type: 'vertical' }, { x1: glueTabScoreLine.x1, y1: glueTabScoreLine.y1, x2: glueTabScoreLine.x2, y2: glueTabScoreLine.y2, type: 'vertical_glue_tab' }, { x1: 0, y1: internalH_for_blank, x2: blankWidth, y2: internalH_for_blank, type: 'horizontal' }, ], slots, dxfGlueTabPerimeterPoints };
                 }
             },
-            '0501': {
-                name: 'Glued Tube (FEFCO 0501)',
-                calculateBlank: (L_input, W_input, H_input, thickness) => {
-                    const oneSixteenth_in = 1/16; const glueFlap_in = 1.375; const angle15DegRad = 15 * Math.PI / 180;
-                    const panel1_width = L_input + thickness - oneSixteenth_in; const panel2_width = W_input + thickness; const panel3_width = L_input + thickness; const panel4_width = W_input + thickness - oneSixteenth_in;
-                    const x_inner_glue_tab = panel1_width + panel2_width + panel3_width + panel4_width; const x_outer_glue_tab = x_inner_glue_tab + glueFlap_in; const x_panel4_end_before_glue_tab = panel1_width + panel2_width + panel3_width + panel4_width;
-                    const internalH_for_blank = H_input;
-                    const blankWidth = x_outer_glue_tab; const blankHeight = internalH_for_blank;
-                    const angleOffset = Math.tan(angle15DegRad) * glueFlap_in;
-                    const y_top_body_crease = 0; const y_bottom_body_crease = internalH_for_blank;
-                    const glueTabPoints = [ { x: x_inner_glue_tab, y: y_top_body_crease }, { x: x_outer_glue_tab, y: y_top_body_crease + angleOffset }, { x: x_outer_glue_tab, y: y_bottom_body_crease - angleOffset }, { x: x_inner_glue_tab, y: y_bottom_body_crease } ];
-                    const dxfGlueTabPerimeterPoints = [ { x: x_panel4_end_before_glue_tab, y: y_bottom_body_crease }, { x: x_outer_glue_tab, y: y_bottom_body_crease - angleOffset }, { x: x_outer_glue_tab, y: y_top_body_crease + angleOffset }, { x: x_panel4_end_before_glue_tab, y: y_top_body_crease } ];
-                    const glueTabScoreLine = { x1: x_inner_glue_tab, y1: y_top_body_crease, x2: x_inner_glue_tab, y2: y_bottom_body_crease };
-                    const outsideDimensions = { length: L_input + (2 * thickness), width: W_input + (2 * thickness), height: H_input };
-                    return { blankWidth, blankHeight, outsideDimensions, layout: [ { x: 0, y: 0, w: panel1_width, h: blankHeight, type: 'panel' }, { x: panel1_width, y: 0, w: panel2_width, h: blankHeight, type: 'panel' }, { x: panel1_width + panel2_width, y: 0, w: panel3_width, h: blankHeight, type: 'panel' }, { x: panel1_width + panel2_width + panel3_width, y: 0, w: panel4_width, h: blankHeight, type: 'panel' }, { points: glueTabPoints, type: 'polygon_cut' } ], scoreLines: [ { x1: panel1_width, y1: 0, x2: panel1_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width, y1: 0, x2: panel1_width + panel2_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width + panel3_width, y1: 0, x2: panel1_width + panel2_width + panel3_width, y2: blankHeight, type: 'vertical' }, { x1: glueTabScoreLine.x1, y1: glueTabScoreLine.y1, x2: glueTabScoreLine.x2, y2: glueTabScoreLine.y2, type: 'vertical_glue_tab' } ], slots: [], dxfGlueTabPerimeterPoints };
-                }
-            },
             '0301_TRAY': {
                 name: '0301 Design Style Tray (Base)',
                 calculateBlank: (L_in, W_in, H_in, thickness) => {
@@ -341,6 +324,94 @@
                     
                     const dxfGlueTabPerimeterPoints = [];
                     return { blankWidth, blankHeight, outsideDimensions, layout, scoreLines, slots, dxfGlueTabPerimeterPoints };
+                }
+            },
+            '0410': {
+                name: 'Five Panel Folder (0410)',
+                calculateBlank: (L_input, W_input, H_input, thickness) => {
+                    const slotWidth_full_in = 3/8; const oneSixteenth_in = 1/16;
+                    
+                    const panel1_width = L_input + thickness - oneSixteenth_in;
+                    const panel2_width = W_input + thickness;
+                    const panel3_width = L_input + thickness;
+                    const panel4_width = W_input + thickness - oneSixteenth_in;
+                    const panel5_width = W_input;
+
+                    const x_inner_glue_tab = panel1_width + panel2_width + panel3_width + panel4_width;
+                    const x_outer_glue_tab = x_inner_glue_tab + panel5_width;
+
+                    const internalH_for_blank = H_input + (2 * thickness);
+                    const halfW = W_input / 2; const halfCal = thickness / 2;
+                    const minorFlapLength_inches = roundToNearestFraction(halfW, 1/16) + roundToNearestFraction(halfCal, 1/16);
+
+                    const blankWidth = x_outer_glue_tab;
+                    const blankHeight = internalH_for_blank + (2 * minorFlapLength_inches);
+
+                    const outsideDimensions = { length: L_input + (2 * thickness), width: W_input + (2 * thickness), height: H_input + (3 * thickness) };
+
+                    const slots = [
+                        { x: panel1_width - (slotWidth_full_in / 2), y: 0, w: slotWidth_full_in, h: minorFlapLength_inches, type: 'full' },
+                        { x: (panel1_width + panel2_width) - (slotWidth_full_in / 2), y: 0, w: slotWidth_full_in, h: minorFlapLength_inches, type: 'full' },
+                        { x: (panel1_width + panel2_width + panel3_width) - (slotWidth_full_in / 2), y: 0, w: slotWidth_full_in, h: minorFlapLength_inches, type: 'full' },
+                        // Corner cut removes all void space above Panel 5 and provides the right-side slot edge for Panel 4's top flap
+                        { x: x_inner_glue_tab - (slotWidth_full_in / 2), y: 0, w: (slotWidth_full_in / 2) + panel5_width, h: minorFlapLength_inches, type: 'corner_cut' },
+                        
+                        { x: panel1_width - (slotWidth_full_in / 2), y: internalH_for_blank + minorFlapLength_inches, w: slotWidth_full_in, h: minorFlapLength_inches, type: 'full' },
+                        { x: (panel1_width + panel2_width) - (slotWidth_full_in / 2), y: internalH_for_blank + minorFlapLength_inches, w: slotWidth_full_in, h: minorFlapLength_inches, type: 'full' },
+                        { x: (panel1_width + panel2_width + panel3_width) - (slotWidth_full_in / 2), y: internalH_for_blank + minorFlapLength_inches, w: slotWidth_full_in, h: minorFlapLength_inches, type: 'full' },
+                        // Corner cut removes all void space below Panel 5 and provides the right-side slot edge for Panel 4's bottom flap
+                        { x: x_inner_glue_tab - (slotWidth_full_in / 2), y: internalH_for_blank + minorFlapLength_inches, w: (slotWidth_full_in / 2) + panel5_width, h: minorFlapLength_inches, type: 'corner_cut' }
+                    ];
+
+                    const layout = [
+                        { x: 0, y: minorFlapLength_inches, w: panel1_width, h: internalH_for_blank, type: 'panel' },
+                        { x: panel1_width, y: minorFlapLength_inches, w: panel2_width, h: internalH_for_blank, type: 'panel' },
+                        { x: panel1_width + panel2_width, y: minorFlapLength_inches, w: panel3_width, h: internalH_for_blank, type: 'panel' },
+                        { x: panel1_width + panel2_width + panel3_width, y: minorFlapLength_inches, w: panel4_width, h: internalH_for_blank, type: 'panel' },
+                        { x: x_inner_glue_tab, y: minorFlapLength_inches, w: panel5_width, h: internalH_for_blank, type: 'panel' },
+                        
+                        { x: 0, y: 0, w: panel1_width, h: minorFlapLength_inches, type: 'flap' },
+                        { x: panel1_width, y: 0, w: panel2_width, h: minorFlapLength_inches, type: 'flap' },
+                        { x: panel1_width + panel2_width, y: 0, w: panel3_width, h: minorFlapLength_inches, type: 'flap' },
+                        { x: panel1_width + panel2_width + panel3_width, y: 0, w: panel4_width, h: minorFlapLength_inches, type: 'flap' },
+                        
+                        { x: 0, y: internalH_for_blank + minorFlapLength_inches, w: panel1_width, h: minorFlapLength_inches, type: 'flap' },
+                        { x: panel1_width, y: internalH_for_blank + minorFlapLength_inches, w: panel2_width, h: minorFlapLength_inches, type: 'flap' },
+                        { x: panel1_width + panel2_width, y: internalH_for_blank + minorFlapLength_inches, w: panel3_width, h: minorFlapLength_inches, type: 'flap' },
+                        { x: panel1_width + panel2_width + panel3_width, y: internalH_for_blank + minorFlapLength_inches, w: panel4_width, h: minorFlapLength_inches, type: 'flap' },
+                    ];
+
+                    const scoreLines = [
+                        { x1: panel1_width, y1: 0, x2: panel1_width, y2: blankHeight, type: 'vertical' },
+                        { x1: panel1_width + panel2_width, y1: 0, x2: panel1_width + panel2_width, y2: blankHeight, type: 'vertical' },
+                        { x1: panel1_width + panel2_width + panel3_width, y1: 0, x2: panel1_width + panel2_width + panel3_width, y2: blankHeight, type: 'vertical' },
+                        // This vertical score will be smartly clipped by the corner_cut slots
+                        { x1: x_inner_glue_tab, y1: 0, x2: x_inner_glue_tab, y2: blankHeight, type: 'vertical' },
+                        // Horizontal scores only cross panels 1-4
+                        { x1: 0, y1: minorFlapLength_inches, x2: x_inner_glue_tab, y2: minorFlapLength_inches, type: 'horizontal' },
+                        { x1: 0, y1: internalH_for_blank + minorFlapLength_inches, x2: x_inner_glue_tab, y2: internalH_for_blank + minorFlapLength_inches, type: 'horizontal' },
+                    ];
+
+                    const dxfGlueTabPerimeterPoints = [];
+
+                    return { blankWidth, blankHeight, outsideDimensions, layout, scoreLines, slots, dxfGlueTabPerimeterPoints };
+                }
+            },
+            '0501': {
+                name: 'Glued Tube (FEFCO 0501)',
+                calculateBlank: (L_input, W_input, H_input, thickness) => {
+                    const oneSixteenth_in = 1/16; const glueFlap_in = 1.375; const angle15DegRad = 15 * Math.PI / 180;
+                    const panel1_width = L_input + thickness - oneSixteenth_in; const panel2_width = W_input + thickness; const panel3_width = L_input + thickness; const panel4_width = W_input + thickness - oneSixteenth_in;
+                    const x_inner_glue_tab = panel1_width + panel2_width + panel3_width + panel4_width; const x_outer_glue_tab = x_inner_glue_tab + glueFlap_in; const x_panel4_end_before_glue_tab = panel1_width + panel2_width + panel3_width + panel4_width;
+                    const internalH_for_blank = H_input;
+                    const blankWidth = x_outer_glue_tab; const blankHeight = internalH_for_blank;
+                    const angleOffset = Math.tan(angle15DegRad) * glueFlap_in;
+                    const y_top_body_crease = 0; const y_bottom_body_crease = internalH_for_blank;
+                    const glueTabPoints = [ { x: x_inner_glue_tab, y: y_top_body_crease }, { x: x_outer_glue_tab, y: y_top_body_crease + angleOffset }, { x: x_outer_glue_tab, y: y_bottom_body_crease - angleOffset }, { x: x_inner_glue_tab, y: y_bottom_body_crease } ];
+                    const dxfGlueTabPerimeterPoints = [ { x: x_panel4_end_before_glue_tab, y: y_bottom_body_crease }, { x: x_outer_glue_tab, y: y_bottom_body_crease - angleOffset }, { x: x_outer_glue_tab, y: y_top_body_crease + angleOffset }, { x: x_panel4_end_before_glue_tab, y: y_top_body_crease } ];
+                    const glueTabScoreLine = { x1: x_inner_glue_tab, y1: y_top_body_crease, x2: x_inner_glue_tab, y2: y_bottom_body_crease };
+                    const outsideDimensions = { length: L_input + (2 * thickness), width: W_input + (2 * thickness), height: H_input };
+                    return { blankWidth, blankHeight, outsideDimensions, layout: [ { x: 0, y: 0, w: panel1_width, h: blankHeight, type: 'panel' }, { x: panel1_width, y: 0, w: panel2_width, h: blankHeight, type: 'panel' }, { x: panel1_width + panel2_width, y: 0, w: panel3_width, h: blankHeight, type: 'panel' }, { x: panel1_width + panel2_width + panel3_width, y: 0, w: panel4_width, h: blankHeight, type: 'panel' }, { points: glueTabPoints, type: 'polygon_cut' } ], scoreLines: [ { x1: panel1_width, y1: 0, x2: panel1_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width, y1: 0, x2: panel1_width + panel2_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width + panel3_width, y1: 0, x2: panel1_width + panel2_width + panel3_width, y2: blankHeight, type: 'vertical' }, { x1: glueTabScoreLine.x1, y1: glueTabScoreLine.y1, x2: glueTabScoreLine.x2, y2: glueTabScoreLine.y2, type: 'vertical_glue_tab' } ], slots: [], dxfGlueTabPerimeterPoints };
                 }
             }        
         };
@@ -574,7 +645,7 @@
                 });
             });
             ctx.setLineDash([]);
-            const x_inner_glue_tab_canvas = blank.dxfGlueTabPerimeterPoints.length > 0 ? blank.dxfGlueTabPerimeterPoints[0].x : 0;
+            const x_inner_glue_tab_canvas = blank.dxfGlueTabPerimeterPoints?.length > 0 ? blank.dxfGlueTabPerimeterPoints[0].x : 0;
             ctx.strokeStyle = '#FF0000'; ctx.lineWidth = 1 / scale;
             blank.slots.forEach(slot => {
                 ctx.beginPath();
@@ -617,7 +688,6 @@
                     return;
                 }
 
-                // Added headers for Score 3, 4, and 5
                 const headers = [
                     "RecordType", "Action", "OrderNo", "CustomerCode", "ItemCode",
                     "StyleCode", "OrderQty", "DueDate", "BoardGrade", "Flute",
@@ -634,7 +704,6 @@
 
                 let Score1_mm = 0, Score2_mm = 0, Score3_mm = 0, Score4_mm = 0, Score5_mm = 0;
                 
-                // Get all vertical scores and sort them left-to-right
                 const vertScores = results.blankDimensions.scoreLines
                     .filter(l => l.type === 'vertical' || l.type === 'vertical_glue_tab')
                     .sort((a, b) => a.x1 - b.x1);
@@ -652,7 +721,7 @@
                     new Date().toISOString().slice(0,10).replace(/-/g,""),
                     appState.boardProfile, appState.flute1,
                     L_mm, W_mm, D_mm, BlankW_mm, BlankL_mm,
-                    Score1_mm, Score2_mm, Score3_mm, Score4_mm, Score5_mm, "Generated by corru~CAD v2.0"
+                    Score1_mm, Score2_mm, Score3_mm, Score4_mm, Score5_mm, "Generated by corru~CAD v2.5"
                 ];
 
                 const csvContent = "data:text/csv;charset=utf-8," + headers.join(",") + "\n" + row.join(",");
@@ -792,7 +861,7 @@
                 
                 const xTolerance = 1e-6;
                 const y_top_edge = 0; const y_bottom_edge = blankData.blankHeight; const x_left_edge = 0; const x_right_edge = blankData.blankWidth;
-                const x_inner_glue_tab = blankData.dxfGlueTabPerimeterPoints.length > 0 ? blankData.dxfGlueTabPerimeterPoints[0].x : blankData.blankWidth;
+                const x_inner_glue_tab = blankData.dxfGlueTabPerimeterPoints?.length > 0 ? blankData.dxfGlueTabPerimeterPoints[0].x : blankData.blankWidth;
                 const dxfGlueTabPerimeterPoints = blankData.dxfGlueTabPerimeterPoints || [];
                 const glueTabStyles = ['0201', '0203', '0200_HSC', '0501'];
                 const isGlueTabStyle = glueTabStyles.includes(fefcoStyle);
@@ -899,7 +968,7 @@
                          <h1 className="text-4xl md:text-5xl font-extrabold text-slate-800 flex items-baseline justify-center">
                             <span>corru</span><span className="text-orange-500 text-5xl md:text-6xl font-normal mx-1" style={{ transform: 'translateY(2px)' }}>~</span><span className="font-black">CAD</span>
                         </h1>
-                        <p className="text-md text-gray-600">v2.0 - Precision Engine with Presets</p>
+                        <p className="text-md text-gray-600">v2.5 - Precision Engine with Presets</p>
                     </div>
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-sm space-y-6">

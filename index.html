@@ -331,10 +331,10 @@
                 calculateBlank: (L_input, W_input, H_input, thickness) => {
                     const slotWidth_full_in = 3/8; const oneSixteenth_in = 1/16;
                     
-                    const panel1_width = L_input + thickness - oneSixteenth_in;
-                    const panel2_width = W_input + thickness;
-                    const panel3_width = L_input + thickness;
-                    const panel4_width = W_input + thickness - oneSixteenth_in;
+                    const panel1_width = W_input + thickness - oneSixteenth_in;
+                    const panel2_width = L_input + thickness;
+                    const panel3_width = W_input + thickness;
+                    const panel4_width = L_input + thickness - oneSixteenth_in;
                     const panel5_width = W_input;
 
                     const x_inner_glue_tab = panel1_width + panel2_width + panel3_width + panel4_width;

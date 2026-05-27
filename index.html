@@ -341,44 +341,45 @@
                     const x_outer_glue_tab = x_inner_glue_tab + panel5_width;
 
                     const internalH_for_blank = H_input + (2 * thickness);
-                    const halfW = W_input / 2; const halfCal = thickness / 2;
-                    const minorFlapLength_inches = roundToNearestFraction(halfW, 1/16) + roundToNearestFraction(halfCal, 1/16);
+                    
+                    // Changed to full overlap: flap length is exactly equal to the width (W)
+                    const flapLength_inches = W_input;
 
                     const blankWidth = x_outer_glue_tab;
-                    const blankHeight = internalH_for_blank + (2 * minorFlapLength_inches);
+                    const blankHeight = internalH_for_blank + (2 * flapLength_inches);
 
                     const outsideDimensions = { length: L_input + (2 * thickness), width: W_input + (2 * thickness), height: H_input + (3 * thickness) };
 
                     const slots = [
-                        { x: panel1_width - (slotWidth_full_in / 2), y: 0, w: slotWidth_full_in, h: minorFlapLength_inches, type: 'full' },
-                        { x: (panel1_width + panel2_width) - (slotWidth_full_in / 2), y: 0, w: slotWidth_full_in, h: minorFlapLength_inches, type: 'full' },
-                        { x: (panel1_width + panel2_width + panel3_width) - (slotWidth_full_in / 2), y: 0, w: slotWidth_full_in, h: minorFlapLength_inches, type: 'full' },
+                        { x: panel1_width - (slotWidth_full_in / 2), y: 0, w: slotWidth_full_in, h: flapLength_inches, type: 'full' },
+                        { x: (panel1_width + panel2_width) - (slotWidth_full_in / 2), y: 0, w: slotWidth_full_in, h: flapLength_inches, type: 'full' },
+                        { x: (panel1_width + panel2_width + panel3_width) - (slotWidth_full_in / 2), y: 0, w: slotWidth_full_in, h: flapLength_inches, type: 'full' },
                         // Corner cut removes all void space above Panel 5 and provides the right-side slot edge for Panel 4's top flap
-                        { x: x_inner_glue_tab - (slotWidth_full_in / 2), y: 0, w: (slotWidth_full_in / 2) + panel5_width, h: minorFlapLength_inches, type: 'corner_cut' },
+                        { x: x_inner_glue_tab - (slotWidth_full_in / 2), y: 0, w: (slotWidth_full_in / 2) + panel5_width, h: flapLength_inches, type: 'corner_cut' },
                         
-                        { x: panel1_width - (slotWidth_full_in / 2), y: internalH_for_blank + minorFlapLength_inches, w: slotWidth_full_in, h: minorFlapLength_inches, type: 'full' },
-                        { x: (panel1_width + panel2_width) - (slotWidth_full_in / 2), y: internalH_for_blank + minorFlapLength_inches, w: slotWidth_full_in, h: minorFlapLength_inches, type: 'full' },
-                        { x: (panel1_width + panel2_width + panel3_width) - (slotWidth_full_in / 2), y: internalH_for_blank + minorFlapLength_inches, w: slotWidth_full_in, h: minorFlapLength_inches, type: 'full' },
+                        { x: panel1_width - (slotWidth_full_in / 2), y: internalH_for_blank + flapLength_inches, w: slotWidth_full_in, h: flapLength_inches, type: 'full' },
+                        { x: (panel1_width + panel2_width) - (slotWidth_full_in / 2), y: internalH_for_blank + flapLength_inches, w: slotWidth_full_in, h: flapLength_inches, type: 'full' },
+                        { x: (panel1_width + panel2_width + panel3_width) - (slotWidth_full_in / 2), y: internalH_for_blank + flapLength_inches, w: slotWidth_full_in, h: flapLength_inches, type: 'full' },
                         // Corner cut removes all void space below Panel 5 and provides the right-side slot edge for Panel 4's bottom flap
-                        { x: x_inner_glue_tab - (slotWidth_full_in / 2), y: internalH_for_blank + minorFlapLength_inches, w: (slotWidth_full_in / 2) + panel5_width, h: minorFlapLength_inches, type: 'corner_cut' }
+                        { x: x_inner_glue_tab - (slotWidth_full_in / 2), y: internalH_for_blank + flapLength_inches, w: (slotWidth_full_in / 2) + panel5_width, h: flapLength_inches, type: 'corner_cut' }
                     ];
 
                     const layout = [
-                        { x: 0, y: minorFlapLength_inches, w: panel1_width, h: internalH_for_blank, type: 'panel' },
-                        { x: panel1_width, y: minorFlapLength_inches, w: panel2_width, h: internalH_for_blank, type: 'panel' },
-                        { x: panel1_width + panel2_width, y: minorFlapLength_inches, w: panel3_width, h: internalH_for_blank, type: 'panel' },
-                        { x: panel1_width + panel2_width + panel3_width, y: minorFlapLength_inches, w: panel4_width, h: internalH_for_blank, type: 'panel' },
-                        { x: x_inner_glue_tab, y: minorFlapLength_inches, w: panel5_width, h: internalH_for_blank, type: 'panel' },
+                        { x: 0, y: flapLength_inches, w: panel1_width, h: internalH_for_blank, type: 'panel' },
+                        { x: panel1_width, y: flapLength_inches, w: panel2_width, h: internalH_for_blank, type: 'panel' },
+                        { x: panel1_width + panel2_width, y: flapLength_inches, w: panel3_width, h: internalH_for_blank, type: 'panel' },
+                        { x: panel1_width + panel2_width + panel3_width, y: flapLength_inches, w: panel4_width, h: internalH_for_blank, type: 'panel' },
+                        { x: x_inner_glue_tab, y: flapLength_inches, w: panel5_width, h: internalH_for_blank, type: 'panel' },
                         
-                        { x: 0, y: 0, w: panel1_width, h: minorFlapLength_inches, type: 'flap' },
-                        { x: panel1_width, y: 0, w: panel2_width, h: minorFlapLength_inches, type: 'flap' },
-                        { x: panel1_width + panel2_width, y: 0, w: panel3_width, h: minorFlapLength_inches, type: 'flap' },
-                        { x: panel1_width + panel2_width + panel3_width, y: 0, w: panel4_width, h: minorFlapLength_inches, type: 'flap' },
+                        { x: 0, y: 0, w: panel1_width, h: flapLength_inches, type: 'flap' },
+                        { x: panel1_width, y: 0, w: panel2_width, h: flapLength_inches, type: 'flap' },
+                        { x: panel1_width + panel2_width, y: 0, w: panel3_width, h: flapLength_inches, type: 'flap' },
+                        { x: panel1_width + panel2_width + panel3_width, y: 0, w: panel4_width, h: flapLength_inches, type: 'flap' },
                         
-                        { x: 0, y: internalH_for_blank + minorFlapLength_inches, w: panel1_width, h: minorFlapLength_inches, type: 'flap' },
-                        { x: panel1_width, y: internalH_for_blank + minorFlapLength_inches, w: panel2_width, h: minorFlapLength_inches, type: 'flap' },
-                        { x: panel1_width + panel2_width, y: internalH_for_blank + minorFlapLength_inches, w: panel3_width, h: minorFlapLength_inches, type: 'flap' },
-                        { x: panel1_width + panel2_width + panel3_width, y: internalH_for_blank + minorFlapLength_inches, w: panel4_width, h: minorFlapLength_inches, type: 'flap' },
+                        { x: 0, y: internalH_for_blank + flapLength_inches, w: panel1_width, h: flapLength_inches, type: 'flap' },
+                        { x: panel1_width, y: internalH_for_blank + flapLength_inches, w: panel2_width, h: flapLength_inches, type: 'flap' },
+                        { x: panel1_width + panel2_width, y: internalH_for_blank + flapLength_inches, w: panel3_width, h: flapLength_inches, type: 'flap' },
+                        { x: panel1_width + panel2_width + panel3_width, y: internalH_for_blank + flapLength_inches, w: panel4_width, h: flapLength_inches, type: 'flap' },
                     ];
 
                     const scoreLines = [
@@ -388,8 +389,8 @@
                         // This vertical score will be smartly clipped by the corner_cut slots
                         { x1: x_inner_glue_tab, y1: 0, x2: x_inner_glue_tab, y2: blankHeight, type: 'vertical' },
                         // Horizontal scores only cross panels 1-4
-                        { x1: 0, y1: minorFlapLength_inches, x2: x_inner_glue_tab, y2: minorFlapLength_inches, type: 'horizontal' },
-                        { x1: 0, y1: internalH_for_blank + minorFlapLength_inches, x2: x_inner_glue_tab, y2: internalH_for_blank + minorFlapLength_inches, type: 'horizontal' },
+                        { x1: 0, y1: flapLength_inches, x2: x_inner_glue_tab, y2: flapLength_inches, type: 'horizontal' },
+                        { x1: 0, y1: internalH_for_blank + flapLength_inches, x2: x_inner_glue_tab, y2: internalH_for_blank + flapLength_inches, type: 'horizontal' },
                     ];
 
                     const dxfGlueTabPerimeterPoints = [];

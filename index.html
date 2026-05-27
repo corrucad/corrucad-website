@@ -340,7 +340,7 @@
                     const x_inner_glue_tab = panel1_width + panel2_width + panel3_width + panel4_width;
                     const x_outer_glue_tab = x_inner_glue_tab + panel5_width;
 
-                    const internalH_for_blank = H_input + (2 * thickness);
+                    const internalH_for_blank = H_input + (3 * thickness);
                     
                     // Changed to full overlap: flap length is exactly equal to the width (W)
                     const flapLength_inches = W_input;
@@ -348,7 +348,7 @@
                     const blankWidth = x_outer_glue_tab;
                     const blankHeight = internalH_for_blank + (2 * flapLength_inches);
 
-                    const outsideDimensions = { length: L_input + (2 * thickness), width: W_input + (2 * thickness), height: H_input + (3 * thickness) };
+                    const outsideDimensions = { length: L_input + (2 * thickness), width: W_input + (2 * thickness), height: H_input + (4 * thickness) };
 
                     const slots = [
                         { x: panel1_width - (slotWidth_full_in / 2), y: 0, w: slotWidth_full_in, h: flapLength_inches, type: 'full' },

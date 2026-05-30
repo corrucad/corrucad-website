@@ -10,72 +10,412 @@ sitemapXml += `  <url>\n    <loc>https://www.corrucad.com/boxfinder/</loc>\n    
 
 const template = fs.readFileSync(path.join(__dirname, 'template.html'), 'utf8');
 
-// --- SHARED FOOTER COMPONENT ---
-const HTML_FOOTER = `
-<footer class="bg-white border-t border-slate-200 mt-12 py-12">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h3 class="text-sm font-semibold text-slate-800 mb-4 uppercase tracking-wider">Pricing Data Sources:</h3>
-        <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 text-sm text-slate-600">
-            Independent wholesale cardboard price evaluation tool compiled across major US and UK supply matrices.
-        </div>
-    </div>
-</footer>`;
-
-// --- ROUTING LINK GENERATOR ---
+// Global vendor link output mapping shared by the generator logic
 function getVendorLink(vendor, l, w, h, sku) {
-    const dim = `${l}x${w}x${h}`;
     if (vendor === 'Arka') {
-        return `https://www.dpbolvw.net/click-101732774-15600472?url=` + encodeURIComponent(`https://www.arka.com/products/${sku || dim + '-box'}`);
+        let arkaPath = `${l}x${w}x${h}-box`;
+        if (sku && sku !== 'n/a' && sku.trim() !== '') {
+            arkaPath = sku;
+        }
+        const arkaUrl = `https://www.arka.com/products/${arkaPath}`;
+        const encodedUrl = encodeURIComponent(arkaUrl);
+        return `https://www.dpbolvw.net/click-101732774-15600472?url=${encodedUrl}`;
     }
     if (sku && sku !== 'n/a' && sku.trim() !== '') {
         if (vendor === 'Uline') return `https://www.uline.com/Product/Detail/${sku}`;
         if (vendor === 'Boxery') return `https://www.theboxery.com/Product.asp?Product=${sku.replace('*', '').trim()}`;
         if (vendor === 'Grainger') return `https://www.grainger.com/product/${sku}`;
-        if (vendor === 'PackagingPrice') return `https://www.packagingprice.com/search.php?search_query=${sku}`;
+        if (vendor === 'Global Industrial') return `https://www.globalindustrial.com/searchResult?q=${sku}`;
+        if (vendor === 'Zoro') return `https://www.zoro.com/search?q=${sku}`;
+        if (vendor === 'MSC Direct') return `https://www.mscdirect.com/product/details/${sku}`;
+        if (vendor === 'RAJA Pack') return `https://www.rajapack.co.uk/?query=${sku}`;
+        if (vendor === 'Packaging Hero') return `https://www.packaginghero.com/${l}-x-${w}-x-${h}-corrugated-boxes-${sku.toLowerCase()}`;
+        if (vendor === 'PackagingPrice') {
+            if (/^\d+$/.test(sku)) {
+                return `https://www.packagingprice.com/search.php?search_query=${sku}`;
+            }
+            return `https://www.packagingprice.com/${sku.replace(/^\//, '')}`;
+        }
     }
-    return `https://www.google.com/search?q=${vendor}+${dim}+corrugated+box`;
+    if (vendor === 'PaperMart') return 'https://www.papermart.com/p/standard-rsc-corrugated-cartons/1001';
+    if (vendor === 'Wagner Supply') return 'https://www.wagnersupply.com/Items/JMTBCO/Industrial-Packaging/Boxes/';
+    if (vendor === 'Staples') return 'https://www.staples.com/Shipping-Boxes/cat_CL213835';
+
+    const dim = `${l}x${w}x${h}`;
+    switch(vendor) {
+        case 'Uline': return `https://www.uline.com/Product/AdvSearchResult?keywords=${dim}`;
+        case 'Boxery': return `https://www.theboxery.com/search.asp?q=${dim}`;
+        case 'Grainger': return `https://www.grainger.com/search?searchQuery=${dim}+corrugated+box`;
+        case 'Global Industrial': return `https://www.globalindustrial.com/searchResult?q=${dim}+box`;
+        case 'Zoro': return `https://www.zoro.com/search?q=${dim}+corrugated+box`;
+        case 'MSC Direct': return `https://www.mscdirect.com/browse/tn/?searchterm=${dim}+corrugated+box`;
+        case 'RAJA Pack': return `https://www.rajapack.co.uk/?query=${dim}`;
+        case 'PackagingPrice': return `https://www.packagingprice.com/search.php?search_query=${dim}`;
+        case 'Packaging Hero': return `https://www.packaginghero.com/popular-boxes`; 
+        default: return '#';
+    }
 }
 
-// ==========================================
-// 1. GENERATE INTERACTIVE MAIN INDEX PAGE
-// ==========================================
+// ========================================================
+// 1. GENERATE INTERACTIVE INDEX PAGE (FULL REACT APP EMBED)
+// ========================================================
 const indexSchema = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
     "name": "BoxFinder by CorruCAD",
     "description": "Compare real-time pricing for corrugated shipping boxes across top industrial vendors.",
     "applicationCategory": "BusinessApplication",
-    "operatingSystem": "Web"
+    "operatingSystem": "Web",
+    "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+    }
 };
 
-// We embed the heavy client-side React app code ONLY on the main index tool page
 const indexContent = `
-<div id="root" class="flex-grow"></div>
-${HTML_FOOTER}
-<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script>
-    window.INJECTED_DIMS = null;
-</script>
-<script type="text/babel">
-    // Your React app layout injects here perfectly for client side multi-tool calculations
-    const { useState, useMemo } = React;
-    // ... [Rest of your original React script code goes here, loading rawData via JSON parameters]
-</script>`;
+    <div id="root" class="flex-grow"></div>
+    <footer class="bg-white border-t border-slate-200 mt-12 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 class="text-2xl font-bold text-slate-800 mb-2">Compare Box Prices: Uline vs. Grainger vs. PackagingPrice | BoxFinder</h1>
+            <p class="text-slate-600 mb-6">Stop overpaying for corrugated boxes. BoxFinder shows you real prices from Uline, Grainger, and PackagingPrice side-by-side — enter your dimensions and find the lowest price instantly.</p>
+            <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                <h3 class="text-sm font-semibold text-slate-800 mb-4 uppercase tracking-wider">Pricing Data Sources:</h3>
+                <ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-sm text-slate-600 list-inside list-disc">
+                    ${ALL_VENDORS.map(v => `<li>${v} Integrated Core Matrix</li>`).join('')}
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script type="text/babel">
+        const { useState, useMemo } = React;
+        const rawData = ${JSON.stringify(rawData)};
+        const ALL_VENDORS = ${JSON.stringify(ALL_VENDORS)};
+
+        const IconBase = ({ size = 24, className = "", children, ...props }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>{children}</svg>
+        );
+        const Search = (p) => <IconBase {...p}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></IconBase>;
+        const Package = (p) => <IconBase {...p}><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></IconBase>;
+        const ChevronDown = (p) => <IconBase {...p}><path d="m6 9 6 6 6-6"/></IconBase>;
+        const ChevronUp = (p) => <IconBase {...p}><path d="m18 15-6-6-6 6"/></IconBase>;
+        const Filter = (p) => <IconBase {...p}><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></IconBase>;
+        const Check = (p) => <IconBase {...p}><polyline points="20 6 9 17 4 12"/></IconBase>;
+        const ExternalLink = (p) => <IconBase {...p}><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></IconBase>;
+        const Info = (p) => <IconBase {...p}><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></IconBase>;
+        const Star = (p) => <IconBase {...p}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></IconBase>;
+        const ArrowLeft = (p) => <IconBase {...p}><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></IconBase>;
+        const Truck = (p) => <IconBase {...p}><path d="M10 17h4V5H2v12h3"/><path d="M20 17h2v-3.34a4 4 0 0 0-1.17-2.83L19 9h-5v8h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></IconBase>;
+
+        const getCurrency = (vendor) => vendor === 'RAJA Pack' ? '£' : '$';
+        const getVendorLink = ${getVendorLink.toString()};
+
+        const SizeInput = ({ label, value, onChange }) => (
+            <div className="relative pt-3 w-full">
+                <label className="absolute top-0 left-3 bg-white px-2 text-[10px] font-extrabold text-orange-500 uppercase tracking-wider z-10 rounded-full border border-slate-100 shadow-sm">
+                    {label}
+                </label>
+                <div className="flex border-2 border-slate-200 rounded-xl overflow-hidden bg-white focus-within:border-orange-500 transition-colors h-[54px]">
+                    <button type="button" onClick={() => onChange(value ? String(Math.max(1, Number(value) - 1)) : '')} className="w-14 flex items-center justify-center bg-slate-50 hover:bg-slate-200 text-slate-500 hover:text-orange-600 font-bold text-2xl border-r-2 border-slate-200 transition-colors select-none focus:outline-none">−</button>
+                    <input type="text" placeholder="—" value={value} onChange={(e) => onChange(e.target.value.replace(/\\D/g, ''))} className="flex-1 w-full text-center font-bold text-2xl text-slate-800 focus:outline-none placeholder:text-slate-300" />
+                    <button type="button" onClick={() => onChange(value ? String(Number(value) + 1) : '1')} className="w-14 flex items-center justify-center bg-slate-50 hover:bg-slate-200 text-slate-500 hover:text-orange-600 font-bold text-2xl border-l-2 border-slate-200 transition-colors select-none focus:outline-none">+</button>
+                </div>
+            </div>
+        );
+
+        function BoxCard({ box, qtyMode, autoExpand }) {
+            const [expanded, setExpanded] = useState(autoExpand);
+            if (!box || !box.offers || box.offers.length === 0) return null;
+            const bestOffer = box.offers[0]; 
+            const volume = box.l * box.w * box.h;
+
+            return (
+                <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-5 hover:shadow-md transition-shadow duration-200">
+                    <div className="p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 cursor-pointer" onClick={() => setExpanded(!expanded)}>
+                        <div className="flex items-center space-x-5">
+                            <div className="hidden sm:flex h-16 w-16 bg-orange-100 rounded-lg items-center justify-center text-orange-600 flex-shrink-0">
+                                <Package size={32} />
+                            </div>
+                            <div>
+                                <h2 className="text-2xl font-bold text-slate-800">
+                                    {box.l}" <span className="text-slate-400 font-normal mx-1">×</span> {box.w}" <span className="text-slate-400 font-normal mx-1">×</span> {box.h}"
+                                </h2>
+                                <p className="text-slate-500 text-sm mt-1 flex items-center gap-3">
+                                    <span>{volume} cu in.</span>
+                                    <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                                    <span className="text-blue-600 font-medium">{box.offers.length} vendors found</span>
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div className="text-left md:text-right w-full md:w-auto flex flex-row md:flex-col items-center md:items-end justify-between md:justify-start">
+                            <div className="mb-0 md:mb-2 text-left md:text-right">
+                                <p className="text-xs text-slate-500 uppercase font-semibold tracking-wider mb-1">Our Top Pick</p>
+                                <div className="flex items-baseline md:justify-end gap-1">
+                                    <span className="text-3xl font-extrabold text-green-600">{getCurrency(bestOffer.v)}{bestOffer.displayPrice.toFixed(2)}</span>
+                                    <span className="text-slate-500 text-sm">/box</span>
+                                </div>
+                                <p className="text-xs text-slate-500 mt-1">via {bestOffer.v}</p>
+                            </div>
+                            
+                            <button className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                                {expanded ? 'Hide Offers' : 'Compare All Options'}
+                                {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                            </button>
+                        </div>
+                    </div>
+
+                    {expanded && (
+                        <div className="bg-slate-50 border-t border-slate-200">
+                            <div className="p-5">
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left border-collapse">
+                                        <thead>
+                                            <tr>
+                                                <th className="pb-3 pt-1 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Vendor</th>
+                                                <th className="pb-3 pt-1 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Grade</th>
+                                                <th className="pb-3 pt-1 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Price per Box</th>
+                                                <th className="pb-3 pt-1 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-200">
+                                            {box.offers.map((offer, idx) => (
+                                                <tr key={offer.v} className={\`hover:bg-white transition-colors \${idx === 0 ? 'bg-green-50/50 hover:bg-green-50' : ''}\`}>
+                                                    <td className="py-4 px-4 whitespace-nowrap">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className={\`font-semibold \${idx === 0 ? 'text-green-700' : 'text-slate-800'}\`}>
+                                                                {offer.v}
+                                                            </span>
+                                                            {idx === 0 && (
+                                                                <span className="bg-green-100 text-green-700 text-[10px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
+                                                                    <Star size={10} className="fill-current" /> BEST DEAL
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </td>
+                                                    <td className="py-4 px-4 whitespace-nowrap">
+                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200">
+                                                            {offer.g}
+                                                        </span>
+                                                    </td>
+                                                    <td className="py-4 px-4 whitespace-nowrap text-right font-medium">
+                                                        {getCurrency(offer.v)}{offer.displayPrice.toFixed(2)}
+                                                    </td>
+                                                    <td className="py-4 px-4 whitespace-nowrap text-right">
+                                                        <a href={getVendorLink(offer.v, box.l, box.w, box.h, offer.s)} target="_blank" rel="noopener noreferrer" className="text-orange-600 hover:text-orange-700 font-medium text-sm flex items-center justify-end gap-1 w-full group-hover:underline">
+                                                            View Site <ExternalLink size={14} />
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div className="mt-4 flex items-center gap-2 text-xs text-slate-500 bg-blue-50 text-blue-800 p-3 rounded-lg border border-blue-100 mx-5 mb-5">
+                                    <Info size={16} className="flex-shrink-0" />
+                                    <p>Prices strictly reflect standard ({'<'}100) and bulk/bale (800+) prices as listed in the matrix.</p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        function App() {
+            const [l, setL] = useState('');
+            const [w, setW] = useState('');
+            const [h, setH] = useState('');
+            const [selectedVendors, setSelectedVendors] = useState(ALL_VENDORS);
+            const [qtyMode, setQtyMode] = useState('standard');
+            const [sortBy, setSortBy] = useState('price-asc');
+
+            const handleVendorToggle = (vendor) => {
+                setSelectedVendors(prev => prev.includes(vendor) ? prev.filter(v => v !== vendor) : [...prev, vendor]);
+            };
+
+            const GBP_TO_USD = 1.364; 
+
+            const filteredBoxes = useMemo(() => {
+                return rawData
+                    .map(box => {
+                        const validOffers = box.offers.filter(o => selectedVendors.includes(o.v));
+                        const pricedOffers = validOffers.map(o => {
+                            const basePrice = qtyMode === 'bulk' ? o.b : o.p;
+                            const isGBP = o.v === 'RAJA Pack';
+                            return {
+                                ...o,
+                                displayPrice: basePrice, 
+                                sortPrice: isGBP ? (basePrice * GBP_TO_USD) : basePrice 
+                            };
+                        });
+                        return { ...box, offers: pricedOffers.sort((a, b) => a.sortPrice - b.sortPrice) };
+                    })
+                    .filter(box => {
+                        if (box.offers.length === 0) return false;
+                        if (l && box.l.toString() !== l) return false;
+                        if (w && box.w.toString() !== w) return false;
+                        if (h && box.h.toString() !== h) return false;
+                        return true;
+                    })
+                    .sort((a, b) => {
+                        if (sortBy === 'price-asc') return (a.offers[0]?.sortPrice || 999) - (b.offers[0]?.sortPrice || 999);
+                        if (sortBy === 'size-desc') return (b.l * b.w * b.h) - (a.l * a.w * a.h);
+                        return (a.l * a.w * a.h) - (b.l * b.w * b.h);
+                    });
+            }, [l, w, h, selectedVendors, qtyMode, sortBy]);
+
+            return (
+                <div className="min-h-screen bg-slate-100 font-sans text-slate-900">
+                    <header className="bg-gradient-to-r from-orange-500 to-orange-600 shadow-md relative">
+                        <div className="bg-orange-700 text-orange-100 px-4 py-2 text-sm flex items-center justify-between">
+                            <a href="/" className="flex items-center gap-1 hover:text-white transition-colors">
+                                <ArrowLeft size={16} /> Back to corru~CAD Estimator
+                            </a>
+                        </div>
+                        
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-28">
+                            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
+                                <div className="flex items-center gap-3 text-white">
+                                    <Package size={32} />
+                                    <h1 className="text-3xl font-extrabold tracking-tight">BoxFinder</h1>
+                                </div>
+                                <div className="bg-white/10 p-1 rounded-xl flex items-center backdrop-blur-sm border border-white/20">
+                                    <button onClick={() => setQtyMode('standard')} className={\`px-5 py-2 rounded-lg text-sm font-bold transition-all \${qtyMode === 'standard' ? 'bg-white text-orange-600 shadow-md' : 'text-white/90 hover:text-white hover:bg-white/10'}\`}>
+                                        Standard (&lt; 100)
+                                    </button>
+                                    <button onClick={() => setQtyMode('bulk')} className={\`px-5 py-2 rounded-lg text-sm font-bold transition-all \${qtyMode === 'bulk' ? 'bg-white text-orange-600 shadow-md' : 'text-white/90 hover:text-white hover:bg-white/10'}\`}>
+                                        Pallet / Bulk (800+)
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <h2 className="text-white text-xl font-medium mb-6">Compare shipping supplies across top vendors and save.</h2>
+                            
+                            <div className="mb-8">
+                                <a href="https://www.producthunt.com/products/boxfinder?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-boxfinder" target="_blank" rel="noopener noreferrer" className="inline-block hover:opacity-90 transition-opacity">
+                                    <img alt="BoxFinder - metasearch engine for cardboard boxes | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1138218&theme=light&t=1777838370728" />
+                                </a>
+                            </div>
+                            
+                            <div className="bg-white p-6 rounded-2xl shadow-xl flex flex-col md:flex-row items-end gap-6 relative z-10 translate-y-12 border border-slate-100">
+                                <div className="flex-1 w-full grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-4">
+                                    <SizeInput label="Length (in)" value={l} onChange={setL} />
+                                    <SizeInput label="Width (in)" value={w} onChange={setW} />
+                                    <SizeInput label="Height (in)" value={h} onChange={setH} />
+                                </div>
+                                <div className="w-full md:w-auto flex flex-col sm:flex-row gap-3 flex-shrink-0">
+                                    <button onClick={() => { setL(''); setW(''); setH(''); }} className="h-[54px] bg-slate-100 hover:bg-slate-200 text-slate-600 px-8 rounded-xl font-bold text-base flex items-center justify-center gap-2 transition-colors whitespace-nowrap">
+                                        Clear Search
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+
+                    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 relative">
+                        <div className="flex flex-col lg:flex-row gap-8">
+                            <div className="w-full lg:w-64 flex-shrink-0 space-y-6">
+                                <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+                                    <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                        <Filter size={18} /> Suppliers
+                                    </h3>
+                                    <div className="space-y-3">
+                                        {ALL_VENDORS.map(vendor => (
+                                            <label key={vendor} className="flex items-center gap-3 cursor-pointer group select-none">
+                                                <input type="checkbox" className="hidden" checked={selectedVendors.includes(vendor)} onChange={() => handleVendorToggle(vendor)} />
+                                                <div className={\`w-5 h-5 rounded flex items-center justify-center border transition-colors \${selectedVendors.includes(vendor) ? 'bg-orange-500 border-orange-500' : 'bg-white border-slate-300 group-hover:border-orange-400'}\`}>
+                                                    {selectedVendors.includes(vendor) && <Check size={14} className="text-white" />}
+                                                </div>
+                                                <span className="text-slate-700 text-sm font-medium">{vendor}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+                                
+                                <div className="bg-emerald-600 rounded-xl shadow-sm border border-emerald-500 p-5 text-white relative overflow-hidden">
+                                    <div className="absolute -right-4 -top-4 opacity-10">
+                                        <Package size={80} />
+                                    </div>
+                                    <div className="relative z-10">
+                                        <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
+                                            <Truck size={18} /> Shipping Software
+                                        </h3>
+                                        <p className="text-emerald-50 text-sm mb-4">
+                                            Ready to ship these boxes? Get discounted USPS, UPS, and FedEx rates with our partner, Shippo.
+                                        </p>
+                                        <a href="https://try.shippo.com/rbv7iu7x8361" target="_blank" rel="noopener noreferrer" className="block w-full text-center bg-white text-emerald-700 font-bold py-2 px-4 rounded-lg hover:bg-emerald-50 transition-colors text-sm shadow-sm">
+                                            Try Shippo for Free
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex-1">
+                                <div className="mb-6 flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                                    <p className="text-slate-600 font-medium">
+                                        Showing <span className="font-bold text-slate-900">{filteredBoxes.length}</span> box sizes
+                                        {(l || w || h) && ' matching your dimensions'}
+                                    </p>
+                                    <div className="flex items-center gap-2 text-sm text-slate-500">
+                                        <span>Sort by:</span>
+                                        <div className="relative">
+                                            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="appearance-none font-bold text-slate-800 bg-transparent pr-5 cursor-pointer focus:outline-none focus:ring-0">
+                                                <option value="price-asc">Price (Lowest)</option>
+                                                <option value="size-asc">Size (Smallest)</option>
+                                                <option value="size-desc">Size (Largest)</option>
+                                            </select>
+                                            <ChevronDown size={14} className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none text-slate-800" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {filteredBoxes.length > 0 ? (
+                                    <div className="space-y-4">
+                                        {filteredBoxes.map((box, idx) => (
+                                            <BoxCard key={\`\${box.l}-\${box.w}-\${box.h}-\${idx}\`} box={box} qtyMode={qtyMode} autoExpand={filteredBoxes.length === 1} />
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="bg-white rounded-xl border border-slate-200 p-12 text-center shadow-sm">
+                                        <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <Search size={32} className="text-slate-400" />
+                                        </div>
+                                        <h3 className="text-2xl font-bold text-slate-800 mb-2">No boxes found</h3>
+                                        <p className="text-slate-500 max-w-md mx-auto">We couldn't find any exact matches for those dimensions with the selected suppliers.</p>
+                                        <button onClick={() => { setL(''); setW(''); setH(''); }} className="mt-6 inline-flex items-center gap-2 text-orange-600 font-bold hover:text-orange-700">
+                                            Clear all filters
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+`;
 
 const indexHtml = template
-    .replace('{{TITLE}}', 'Compare Box Prices: Uline vs. Grainger vs. The Boxery | BoxFinder')
-    .replace('{{DESC}}', 'Stop overpaying for corrugated boxes. Enter your custom dimensions to check real-time product options side-by-side.')
-    .replace('{{CANONICAL}}', 'https://www.corrucad.com/boxfinder/')
+    .replace('{{TITLE}}', 'Compare Box Prices: Uline vs. Grainger vs. PackagingPrice | BoxFinder')
+    .replace('{{DESC}}', 'Stop overpaying for corrugated boxes. BoxFinder shows you real prices from Uline, Grainger, and PackagingPrice side-by-side — enter your dimensions and find the lowest price instantly.')
+    .replace('{{CANONICAL}}', 'https://www.corrucad.com/boxfinder/') 
     .replace('{{SCHEMA_MARKUP}}', JSON.stringify(indexSchema, null, 2))
     .replace('{{MAIN_CONTENT}}', indexContent);
 
 fs.writeFileSync(path.join(outputDir, 'index.html'), indexHtml);
 
-// ==========================================
-// 2. GENERATE ULTRA-FAST STATIC BOX PAGES
-// ==========================================
+// ========================================================
+// 2. GENERATE 50 INDIVIDUAL SPEED-OPTIMIZED SIZE PAGES
+// ========================================================
 rawData.forEach(box => {
     const dim = `${box.l}x${box.w}x${box.h}`;
     const cleanSlug = `${dim}-corrugated-boxes`; 
@@ -85,21 +425,21 @@ rawData.forEach(box => {
     const bestPrice = sortedOffers[0].p;
     const highestPrice = sortedOffers[sortedOffers.length - 1].p;
 
-    // Compile the table rows inside node at build time
     let tableRowsHtml = '';
     sortedOffers.forEach((offer, idx) => {
-        const url = getVendorLink(offer.v, box.l, box.w, box.h, offer.s);
+        const outboundUrl = getVendorLink(offer.v, box.l, box.w, box.h, offer.s);
         const currency = offer.v === 'RAJA Pack' ? '£' : '$';
+        
         tableRowsHtml += `
-            <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors ${idx === 0 ? 'bg-green-50/40' : ''}">
+            <tr data-vendor="${offer.v}" data-p="${offer.p.toFixed(2)}" data-b="${offer.b.toFixed(2)}" class="border-b border-slate-100 hover:bg-slate-50 transition-colors ${idx === 0 ? 'bg-green-50/40' : ''}">
                 <td class="py-4 px-6 font-bold text-slate-800 flex items-center gap-2">
                     ${offer.v}
                     ${idx === 0 ? '<span class="bg-green-100 text-green-700 text-[10px] px-2 py-0.5 rounded-full font-extrabold">★ CHEAPEST</span>' : ''}
                 </td>
                 <td class="py-4 px-6 text-sm text-slate-500"><span class="bg-slate-100 border px-2 py-0.5 rounded-md font-medium">${offer.g}</span></td>
-                <td class="py-4 px-6 text-right font-extrabold text-lg ${idx === 0 ? 'text-green-600' : 'text-slate-800'}">${currency}${offer.p.toFixed(2)}</td>
+                <td class="py-4 px-6 text-right font-extrabold text-lg text-slate-800">${currency}<span class="price-val">${offer.p.toFixed(2)}</span></td>
                 <td class="py-4 px-6 text-right">
-                    <a href="${url}" target="_blank" rel="noopener noreferrer" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-1.5 px-4 rounded-lg text-xs shadow-sm transition-colors">Buy Directly →</a>
+                    <a href="${outboundUrl}" target="_blank" rel="noopener noreferrer" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-1.5 px-4 rounded-lg text-xs shadow-sm transition-colors">Buy Directly →</a>
                 </td>
             </tr>`;
     });
@@ -109,6 +449,7 @@ rawData.forEach(box => {
         "@type": "Product",
         "name": `${dim} Corrugated Shipping Box`,
         "description": `Price comparison matrix for ${dim} boxes across top packaging vendors.`,
+        "category": "Shipping Supplies",
         "offers": {
             "@type": "AggregateOffer",
             "offerCount": sortedOffers.length,
@@ -118,37 +459,100 @@ rawData.forEach(box => {
         }
     };
 
-    // Bake our exact responsive UI layout wrapper right into the file string
     const boxContent = `
-    <header class="bg-gradient-to-r from-orange-500 to-orange-600 shadow-md pb-24 pt-6">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <a href="/boxfinder/" class="text-orange-100 hover:text-white font-semibold text-sm">← Back to Multi-Search Tool</a>
-            <h1 class="text-3xl font-extrabold text-white mt-4">${dim} Corrugated Shipping Boxes</h1>
-            <p class="text-orange-100 mt-2">Independent real-time wholesale cost evaluation matrix for ${box.l}" × ${box.w}" × ${box.h}" standard configurations.</p>
-        </div>
-    </header>
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -translate-y-12 w-full flex-grow">
-        <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                        <th class="py-3 px-6">Supplier Vendor</th>
-                        <th class="py-3 px-6">Material Specification</th>
-                        <th class="py-3 px-6 text-right">Unit Price</th>
-                        <th class="py-3 px-6 text-right">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${tableRowsHtml}
-                </tbody>
-            </table>
-        </div>
-    </main>
-    ${HTML_FOOTER}`;
+    <div class="min-h-screen bg-slate-100 font-sans text-slate-900">
+        <header class="bg-gradient-to-r from-orange-500 to-orange-600 shadow-md pb-28 pt-6 relative">
+            <div class="bg-orange-700 text-orange-100 px-4 py-2 text-sm flex items-center justify-between absolute top-0 left-0 right-0">
+                <a href="/boxfinder/" class="flex items-center gap-1 hover:text-white transition-colors">
+                    ← Back to corru~CAD Estimator
+                </a>
+            </div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <a href="/boxfinder/" class="text-orange-100 hover:text-white font-semibold text-sm">← Back to Multi-Search Tool</a>
+                        <h1 class="text-3xl font-extrabold text-white mt-2">${dim} Corrugated Shipping Boxes</h1>
+                    </div>
+                    <div class="bg-white/10 p-1 rounded-xl flex text-white text-sm border border-white/20 font-bold backdrop-blur-sm">
+                        <button id="mode-std" onclick="switchQty('standard')" class="px-4 py-2 bg-white text-orange-600 rounded-lg shadow">Standard</button>
+                        <button id="mode-bulk" onclick="switchQty('bulk')" class="px-4 py-2 rounded-lg">Bulk (800+)</button>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-xl flex flex-col md:flex-row gap-4 translate-y-12 border border-slate-100">
+                    <div class="relative pt-3 w-full">
+                        <label class="absolute top-0 left-3 bg-white px-2 text-[10px] font-extrabold text-orange-500 uppercase tracking-wider z-10 rounded-full border border-slate-100 shadow-sm">Length</label>
+                        <div class="flex border-2 border-orange-500 rounded-xl overflow-hidden bg-white h-[54px]"><input type="text" readonly value="${box.l}" class="flex-1 text-center font-bold text-2xl text-slate-800 focus:outline-none" /></div>
+                    </div>
+                    <div class="relative pt-3 w-full">
+                        <label class="absolute top-0 left-3 bg-white px-2 text-[10px] font-extrabold text-orange-500 uppercase tracking-wider z-10 rounded-full border border-slate-100 shadow-sm">Width</label>
+                        <div class="flex border-2 border-orange-500 rounded-xl overflow-hidden bg-white h-[54px]"><input type="text" readonly value="${box.w}" class="flex-1 text-center font-bold text-2xl text-slate-800 focus:outline-none" /></div>
+                    </div>
+                    <div class="relative pt-3 w-full">
+                        <label class="absolute top-0 left-3 bg-white px-2 text-[10px] font-extrabold text-orange-500 uppercase tracking-wider z-10 rounded-full border border-slate-100 shadow-sm">Height</label>
+                        <div class="flex border-2 border-orange-500 rounded-xl overflow-hidden bg-white h-[54px]"><input type="text" readonly value="${box.h}" class="flex-1 text-center font-bold text-2xl text-slate-800 focus:outline-none" /></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 w-full flex-grow grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div class="bg-white p-5 rounded-xl border h-fit">
+                <h3 class="font-bold mb-4">Suppliers</h3>
+                ${box.offers.map(o => `
+                    <label class="flex items-center gap-2 mb-2 cursor-pointer">
+                        <input type="checkbox" checked id="chk-${o.v}" onchange="filterVendors()" class="rounded border-slate-300 text-orange-500" />
+                        <span class="text-sm font-medium text-slate-700">${o.v}</span>
+                    </label>
+                `).join('')}
+            </div>
+            <div class="lg:col-span-3 bg-white rounded-xl shadow-sm border overflow-hidden h-fit">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 border-b text-xs font-bold text-slate-500 uppercase tracking-wider">
+                            <th class="py-3 px-6">Supplier Vendor</th>
+                            <th class="py-3 px-6">Material Specification</th>
+                            <th class="py-3 px-6 text-right">Unit Price</th>
+                            <th class="py-3 px-6 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="matrix-rows">
+                        ${tableRowsHtml}
+                    </tbody>
+                </table>
+            </div>
+        </main>
+        <footer class="bg-white border-t mt-12 py-12">
+            <div class="max-w-7xl mx-auto px-4 text-center text-sm text-slate-500">
+                <p>© 2026 corruCAD BoxFinder Index. Compiled cross-vendor benchmark utility.</p>
+            </div>
+        </footer>
+        <script>
+            function switchQty(mode) {
+                const isStd = mode === 'standard';
+                document.getElementById('mode-std').className = isStd ? 'px-4 py-2 bg-white text-orange-600 rounded-lg shadow' : 'px-4 py-2 rounded-lg';
+                document.getElementById('mode-bulk').className = !isStd ? 'px-4 py-2 bg-white text-orange-600 rounded-lg shadow' : 'px-4 py-2 rounded-lg';
+                
+                const rows = Array.from(document.querySelectorAll('#matrix-rows tr'));
+                rows.forEach(row => {
+                    const price = isStd ? row.getAttribute('data-p') : row.getAttribute('data-b');
+                    row.querySelector('.price-val').innerText = price;
+                });
+                rows.sort((a, b) => parseFloat(a.querySelector('.price-val').innerText) - parseFloat(b.querySelector('.price-val').innerText));
+                const tbody = document.getElementById('matrix-rows');
+                rows.forEach(r => tbody.appendChild(r));
+            }
+            function filterVendors() {
+                document.querySelectorAll('#matrix-rows tr').forEach(row => {
+                    const v = row.getAttribute('data-vendor');
+                    const chk = document.getElementById('chk-' + v);
+                    row.style.display = chk && chk.checked ? '' : 'none';
+                });
+            }
+        </script>
+    </div>`;
 
     const boxHtml = template
-        .replace('{{TITLE}}', `Wholesale ${dim} Shipping Boxes | Real-Time Price Checker`)
-        .replace('{{DESC}}', `Compare trade rates on ${dim} corrugated choices. Best wholesale market rate located: $${bestPrice.toFixed(2)}/box.`)
+        .replace('{{TITLE}}', `Cheapest ${dim} Shipping Boxes | Cost Calculator & Price Checker`)
+        .replace('{{DESC}}', `Stop overpaying. Use our BoxFinder tool to compare prices for ${dim} corrugated boxes across top vendors. Top pick: $${bestPrice.toFixed(2)}/box.`)
         .replace('{{CANONICAL}}', `https://www.corrucad.com/boxfinder/${cleanSlug}`)
         .replace('{{SCHEMA_MARKUP}}', JSON.stringify(schemaMarkup, null, 2))
         .replace('{{MAIN_CONTENT}}', boxContent);
@@ -157,6 +561,7 @@ rawData.forEach(box => {
     sitemapXml += `  <url>\n    <loc>https://www.corrucad.com/boxfinder/${cleanSlug}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n`;
 });
 
-sitemapXml += `</urlset>`;
+sitemapXml += `</urlset> ${''} \n`;
 fs.writeFileSync(path.join(outputDir, 'sitemap.xml'), sitemapXml);
-console.log('Build complete! True static generation deployment prepared with zero render overhead.');
+
+console.log('Build complete! All 50 size targets completely constructed and ready for live Vercel initialization.');

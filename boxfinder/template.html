@@ -133,10 +133,27 @@
                     }
                     return `https://www.packagingprice.com/${sku.replace(/^\//, '')}`;
                 }
+
+                // Paper Mart Dynamic Affiliate Routing
+                if (vendor === 'PaperMart') {
+                    // Paper Mart requires a 6-digit SKU (e.g., data.js has "16040", but link needs "016040")
+                    const paddedSku = sku.padStart(6, '0');
+                    
+                    // Construct the actual destination URL
+                    const targetUrl = `https://www.papermart.com/p/standard-rsc-corrugated-cartons/1001?SearchItemNumber=${paddedSku}`;
+                    const encodedUrl = encodeURIComponent(targetUrl);
+                    
+                    // Wrap it in your CJ tracking link
+                    return `https://www.jdoqocy.com/click-101732774-13236874?url=${encodedUrl}&cjsku=${paddedSku}`;
+                }
             }
 
             // --- FALLBACK GENERIC VENDOR LINKS ---
-            if (vendor === 'PaperMart') return 'https://www.papermart.com/p/standard-rsc-corrugated-cartons/1001';
+            // Update the Paper Mart fallback to use the affiliate link for the main category page
+            if (vendor === 'PaperMart') {
+                const fallbackUrl = encodeURIComponent('https://www.papermart.com/p/standard-rsc-corrugated-cartons/1001');
+                return `https://www.jdoqocy.com/click-101732774-13236874?url=${fallbackUrl}`;
+            }
             if (vendor === 'Wagner Supply') return 'https://www.wagnersupply.com/Items/JMTBCO/Industrial-Packaging/Boxes/';
             if (vendor === 'Staples') return 'https://www.staples.com/Shipping-Boxes/cat_CL213835';
 

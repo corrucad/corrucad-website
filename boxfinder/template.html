@@ -130,7 +130,6 @@
             }
 
             // --- FALLBACK GENERIC VENDOR LINKS ---
-            // Updated PaperMart generic link from the links.csv file
             if (vendor === 'PaperMart') return 'https://www.anrdoezrs.net/click-101732774-12336139';
             if (vendor === 'Wagner Supply') return 'https://www.wagnersupply.com/Items/JMTBCO/Industrial-Packaging/Boxes/';
             if (vendor === 'Staples') return 'https://www.staples.com/Shipping-Boxes/cat_CL213835';
@@ -221,35 +220,81 @@
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-200">
-                                            {box.offers.map((offer, idx) => (
-                                                <tr key={offer.v} className={`hover:bg-white transition-colors ${idx === 0 ? 'bg-green-50/50 hover:bg-green-50' : ''}`}>
-                                                    <td className="py-4 px-4 whitespace-nowrap">
-                                                        <div className="flex items-center gap-2">
-                                                            <span className={`font-semibold ${idx === 0 ? 'text-green-700' : 'text-slate-800'}`}>
-                                                                {offer.v}
-                                                            </span>
-                                                            {idx === 0 && (
-                                                                <span className="bg-green-100 text-green-700 text-[10px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
-                                                                    <Star size={10} className="fill-current" /> BEST DEAL
+                                            {box.offers.map((offer, idx) => {
+                                                const isArka = offer.v === 'Arka';
+                                                const isBestDeal = idx === 0;
+
+                                                return (
+                                                    <tr 
+                                                        key={offer.v} 
+                                                        className={`transition-colors hover:bg-slate-50 
+                                                            ${isBestDeal ? 'bg-green-50/50 hover:bg-green-50' : ''} 
+                                                            ${isArka ? 'bg-slate-50/80 border-l-4 border-l-slate-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.5)]' : ''}
+                                                        `}
+                                                    >
+                                                        {/* Vendor Column */}
+                                                        <td className="py-4 px-4 whitespace-nowrap">
+                                                            <div className="flex items-center gap-2">
+                                                                <span className={`font-semibold ${isBestDeal ? 'text-green-700' : (isArka ? 'text-slate-900' : 'text-slate-800')}`}>
+                                                                    {offer.v}
                                                                 </span>
+                                                                
+                                                                {isBestDeal && !isArka && (
+                                                                    <span className="bg-green-100 text-green-700 text-[10px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
+                                                                        <Star size={10} className="fill-current" /> BEST DEAL
+                                                                    </span>
+                                                                )}
+
+                                                                {isArka && (
+                                                                    <span className="bg-slate-900 text-amber-300 text-[10px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1 shadow-sm border border-slate-700 tracking-wider uppercase">
+                                                                        ✨ Premium Custom
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </td>
+
+                                                        {/* Grade Column */}
+                                                        <td className="py-4 px-4 whitespace-nowrap">
+                                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200">
+                                                                {offer.g}
+                                                            </span>
+                                                        </td>
+
+                                                        {/* Price Column */}
+                                                        <td className="py-4 px-4 whitespace-nowrap text-right font-medium">
+                                                            <div className="flex flex-col items-end">
+                                                                <span className={isArka ? 'text-slate-800 font-bold' : ''}>
+                                                                    {getCurrency(offer.v)}{offer.displayPrice.toFixed(2)}
+                                                                </span>
+                                                                {isArka && <span className="text-[10px] text-slate-500 font-normal">base price</span>}
+                                                            </div>
+                                                        </td>
+
+                                                        {/* Action Column */}
+                                                        <td className="py-4 px-4 whitespace-nowrap text-right">
+                                                            {isArka ? (
+                                                                <a 
+                                                                    href={getVendorLink(offer.v, box.l, box.w, box.h, offer.s)} 
+                                                                    target="_blank" 
+                                                                    rel="noopener noreferrer" 
+                                                                    className="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-black text-white px-4 py-2 rounded-lg font-bold text-sm shadow-md transition-transform hover:scale-[1.02] active:scale-95 whitespace-nowrap"
+                                                                >
+                                                                    Design Custom Box <ExternalLink size={14} className="text-amber-300" />
+                                                                </a>
+                                                            ) : (
+                                                                <a 
+                                                                    href={getVendorLink(offer.v, box.l, box.w, box.h, offer.s)} 
+                                                                    target="_blank" 
+                                                                    rel="noopener noreferrer" 
+                                                                    className="text-orange-600 hover:text-orange-700 font-medium text-sm flex items-center justify-end gap-1 w-full group-hover:underline"
+                                                                >
+                                                                    View Site <ExternalLink size={14} />
+                                                                </a>
                                                             )}
-                                                        </div>
-                                                    </td>
-                                                    <td className="py-4 px-4 whitespace-nowrap">
-                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200">
-                                                            {offer.g}
-                                                        </span>
-                                                    </td>
-                                                    <td className="py-4 px-4 whitespace-nowrap text-right font-medium">
-                                                        {getCurrency(offer.v)}{offer.displayPrice.toFixed(2)}
-                                                    </td>
-                                                    <td className="py-4 px-4 whitespace-nowrap text-right">
-                                                        <a href={getVendorLink(offer.v, box.l, box.w, box.h, offer.s)} target="_blank" rel="noopener noreferrer" className="text-orange-600 hover:text-orange-700 font-medium text-sm flex items-center justify-end gap-1 w-full group-hover:underline">
-                                                            View Site <ExternalLink size={14} />
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                            ))}
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
                                         </tbody>
                                     </table>
                                 </div>

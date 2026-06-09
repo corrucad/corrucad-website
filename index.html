@@ -118,9 +118,11 @@
                 const defaults = {
                     outerLiner: 0, innerLiner: 0, middleLiner: 0, medium1: 0, medium2: 0,
                     takeUpFactor1: 0, takeUpFactor2: 0, priceMsf: 0, blankAreaSqFt: 0,
-                    quantity: 0, marginPercent: 0, printUpcharge: 0, setupFee: 0
+                    quantity: 0, marginPercent: 0, convertingCostPerM: 0, printUpcharge: 0, setupFee: 0
                 };
                 const data = { ...defaults, ...inputs };
+                
+                // Fiber Weight & Cost Math
                 const mediumWeight = (data.medium1 * data.takeUpFactor1) + (data.medium2 * data.takeUpFactor2);
                 const totalFiberWeightLbsMsf = data.outerLiner + data.innerLiner + data.middleLiner + mediumWeight;
                 const totalTonsPerMsf = totalFiberWeightLbsMsf / 2000;
@@ -128,12 +130,21 @@
                 const boxWeightLbs = (data.blankAreaSqFt / 1000) * totalFiberWeightLbsMsf;
                 const boxWeightTons = boxWeightLbs / 2000;
                 const baseMaterialCost = boxWeightTons * pricePerTon;
-                const marginAmount = baseMaterialCost * (data.marginPercent / 100);
-                const finalCostPerBox = baseMaterialCost + marginAmount + data.printUpcharge;
+                
+                // Converting Overhead Cost
+                const convertingCostPerBox = data.convertingCostPerM / 1000;
+                
+                // True Gross Margin Calculation: Price = Cost / (1 - Margin%)
+                const totalCostBeforeMargin = baseMaterialCost + convertingCostPerBox + data.printUpcharge;
+                const safeMargin = Math.min(data.marginPercent, 99.99); // Prevent division by zero
+                const finalCostPerBox = totalCostBeforeMargin / (1 - (safeMargin / 100));
+                
+                const marginAmount = finalCostPerBox - totalCostBeforeMargin;
                 const totalCost = (finalCostPerBox * data.quantity) + data.setupFee;
+                
                 return {
                     pricePerTon, totalFiberWeightLbsMsf, boxWeightLbs, baseMaterialCost,
-                    marginAmount, costPerBox: finalCostPerBox, totalCost
+                    convertingCostPerBox, marginAmount, costPerBox: finalCostPerBox, totalCost
                 };
             };
             return { calculate: calculateQuote };
@@ -685,7 +696,7 @@
                 priceMsf: 58, outerLiner: 35, innerLiner: 35,
                 medium1: 23, middleLiner: 0, medium2: 0,
                 flute1: '1.42', flute2: '1.32',
-                margin: 0, printUpcharge: 0.00, setupFee: 0, quantity: 1000,
+                margin: 0, convertingCostPerM: 0.00, printUpcharge: 0.00, setupFee: 0, quantity: 1000,
                 topTenSelection: '12 x 12 x 12 (S-4125)',
             });
 
@@ -704,6 +715,7 @@
                     let newW = parseFloat(prev.width) || 0;
                     let newH = parseFloat(prev.height) || 0;
                     let newPrice = parseFloat(prev.priceMsf) || 0;
+                    let newConverting = parseFloat(prev.convertingCostPerM) || 0;
                     let newPrint = parseFloat(prev.printUpcharge) || 0;
                     let newSetup = parseFloat(prev.setupFee) || 0;
 
@@ -711,8 +723,9 @@
                         newL = Math.round(newL * 25.4).toString();
                         newW = Math.round(newW * 25.4).toString();
                         newH = Math.round(newH * 25.4).toString();
-                        // Convert $/MSF to €/m²
+                        // Convert $/MSF to €/m² and USD to EUR
                         newPrice = newPrice / (1.15 * 92.90304);
+                        newConverting = newConverting / 1.15;
                         newPrint = newPrint / 1.15;
                         newSetup = newSetup / 1.15;
                     } else {
@@ -721,8 +734,9 @@
                         newL = snap(newL);
                         newW = snap(newW);
                         newH = snap(newH);
-                        // Convert €/m² to $/MSF
+                        // Convert €/m² to $/MSF and EUR to USD
                         newPrice = newPrice * (1.15 * 92.90304);
+                        newConverting = newConverting * 1.15;
                         newPrint = newPrint * 1.15;
                         newSetup = newSetup * 1.15;
                     }
@@ -731,6 +745,7 @@
                         ...prev, unit: newUnit, 
                         length: newL, width: newW, height: newH, 
                         priceMsf: newUnit === 'mm' ? newPrice.toFixed(4) : newPrice.toFixed(2),
+                        convertingCostPerM: newConverting.toFixed(2),
                         printUpcharge: newPrint.toFixed(2),
                         setupFee: newSetup.toFixed(2),
                         topTenSelection: 'custom' 
@@ -864,7 +879,7 @@
                 const {
                     length, width, height, boardProfile, fefcoStyle, unit,
                     priceMsf, outerLiner, innerLiner, medium1, middleLiner, medium2,
-                    flute1, flute2, margin, printUpcharge, setupFee, quantity
+                    flute1, flute2, margin, convertingCostPerM, printUpcharge, setupFee, quantity
                 } = appState;
 
                 // Engine calculations are STRICTLY in standard inches
@@ -973,6 +988,7 @@
 
                 // Convert dynamic prices back to USD before running the estimation engine
                 const enginePriceMsf = unit === 'mm' ? parseFloat(priceMsf) * 1.15 * 92.90304 : parseFloat(priceMsf) || 0;
+                const engineConverting = unit === 'mm' ? parseFloat(convertingCostPerM) * 1.15 : parseFloat(convertingCostPerM) || 0;
                 const enginePrintUpcharge = unit === 'mm' ? parseFloat(printUpcharge) * 1.15 : parseFloat(printUpcharge) || 0;
                 const engineSetupFee = unit === 'mm' ? parseFloat(setupFee) * 1.15 : parseFloat(setupFee) || 0;
 
@@ -983,7 +999,7 @@
                     takeUpFactor2: board.type === 'doublewall' ? (parseFloat(flute2) || 0) : 0,
                     priceMsf: enginePriceMsf, blankAreaSqFt: blankAreaSqFt,
                     quantity: parseInt(quantity) || 0, marginPercent: parseFloat(margin) || 0,
-                    printUpcharge: enginePrintUpcharge, setupFee: engineSetupFee,
+                    convertingCostPerM: engineConverting, printUpcharge: enginePrintUpcharge, setupFee: engineSetupFee,
                 };
 
                 const quote = estimatingEngine.calculate(pricingInputs);
@@ -1048,6 +1064,7 @@
 
             // Display costs conversion back from the Engine's native USD calculation out to EUR if running in metric mode
             const displayMaterialCost = quoteResults ? (appState.unit === 'mm' ? quoteResults.baseMaterialCost / 1.15 : quoteResults.baseMaterialCost) : 0;
+            const displayConvertingCost = quoteResults ? (appState.unit === 'mm' ? quoteResults.convertingCostPerBox / 1.15 : quoteResults.convertingCostPerBox) : 0;
             const displayMargin = quoteResults ? (appState.unit === 'mm' ? quoteResults.marginAmount / 1.15 : quoteResults.marginAmount) : 0;
             const displayPrint = parseFloat(appState.printUpcharge) || 0;
             const displayCostPerBox = quoteResults ? (appState.unit === 'mm' ? quoteResults.costPerBox / 1.15 : quoteResults.costPerBox) : 0;
@@ -1169,6 +1186,10 @@
                                             <input type="number" value={appState.margin} onChange={e => handleStateChange({ margin: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
                                         </div>
                                         <div>
+                                            <label className="block text-sm font-medium text-gray-700">Converting Overhead ({appState.unit === 'mm' ? '€/M' : '$/M'})</label>
+                                            <input type="number" step="0.01" value={appState.convertingCostPerM} onChange={e => handleStateChange({ convertingCostPerM: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
+                                        </div>
+                                        <div>
                                             <label className="block text-sm font-medium text-gray-700">Printing ({appState.unit === 'mm' ? '€/box' : '$/box'})</label>
                                             <input type="number" step="0.01" value={appState.printUpcharge} onChange={e => handleStateChange({ printUpcharge: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
                                         </div>
@@ -1242,8 +1263,9 @@
                                     <>
                                         <div className="space-y-2 text-sm text-indigo-900">
                                             <div className="flex justify-between"><span>Material Cost / Box:</span><span className="font-medium">{currencySym}{displayMaterialCost.toFixed(4)}</span></div>
-                                            <div className="flex justify-between"><span>Margin / Box:</span><span className="font-medium">{currencySym}{displayMargin.toFixed(4)}</span></div>
+                                            <div className="flex justify-between"><span>Converting / Box:</span><span className="font-medium">{currencySym}{displayConvertingCost.toFixed(4)}</span></div>
                                             <div className="flex justify-between"><span>Printing / Box:</span><span className="font-medium">{currencySym}{displayPrint.toFixed(4)}</span></div>
+                                            <div className="flex justify-between"><span>Margin / Box:</span><span className="font-medium">{currencySym}{displayMargin.toFixed(4)}</span></div>
                                             <div className="border-t border-indigo-200 my-1"></div>
                                             <div className="flex justify-between font-bold text-base"><span>Cost per Box:</span><span>{currencySym}{displayCostPerBox.toFixed(4)}</span></div>
                                         </div>

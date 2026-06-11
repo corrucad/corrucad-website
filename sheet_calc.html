@@ -14,7 +14,10 @@
       gtag('config', 'G-S6H2RNY5QM');
     </script>
 
-    <!-- Vercel Web Analytics (forces page tracking onto Vercel dashboard) -->
+    <!-- Official Vercel Web Analytics Boilerplate -->
+    <script>
+      window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
     <script src="/_vercel/insights/script.js"></script>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -448,13 +451,24 @@
             we: 30.47
         };
 
-        // Helper to send custom GA events without flooding network requests
-        function trackGAEvent(action, label, val) {
+        // Track custom analytics helper
+        function trackEvent(action, label, val) {
+            console.log(`[Analytics Event] Action: ${action} | Label: ${label} | Value: ${val}`);
+            
+            // Send to Google Analytics (gtag.js)
             if (typeof gtag === 'function') {
                 gtag('event', action, {
                     'event_category': 'Engagement',
                     'event_label': label,
                     'value': val
+                });
+            }
+            
+            // Send to Vercel Analytics (window.va)
+            if (typeof window.va === 'function') {
+                window.va('event', { 
+                    name: action, 
+                    data: { label: label, value: val } 
                 });
             }
         }
@@ -468,13 +482,13 @@
             sliderTakeup.value = data.takeup;
             sliderJuneIncrease.value = data.increase;
             calculate();
-            trackGAEvent('apply_preset', key, data.rec);
+            trackEvent('apply_preset', key, data.rec);
         }
 
         // Reset to original May 2026 baseline
         document.getElementById('btnReset').addEventListener('click', () => {
             applyPreset('may26');
-            trackGAEvent('click', 'reset_sliders', 1);
+            trackEvent('click', 'reset_sliders', 1);
         });
         
         // Benchmarks button hooks
@@ -486,7 +500,7 @@
         // Event listener for region change
         regionSelector.addEventListener('change', () => {
             calculate();
-            trackGAEvent('select_region', regionSelector.value, 1);
+            trackEvent('select_region', regionSelector.value, 1);
         });
 
         // Core Mathematical Processing
@@ -594,7 +608,7 @@
             
             // Track GA adjustments only when user FINISHES dragging (avoids log spam)
             el.addEventListener('change', () => {
-                trackGAEvent('slider_adjust', el.id, parseFloat(el.value));
+                trackEvent('slider_adjust', el.id, parseFloat(el.value));
             });
         });
 

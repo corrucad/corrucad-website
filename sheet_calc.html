@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full bg-[#111216]">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corrugated Cost Simulator & Regional Backtester</title>
     
-     <!-- Google tag (gtag.js) -->
+    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-S6H2RNY5QM"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -10,10 +13,10 @@
       gtag('js', new Date());
       gtag('config', 'G-S6H2RNY5QM');
     </script>
-    
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Corrugated Cost Simulator & Regional Backtester</title>
+
+    <!-- Vercel Web Analytics (forces page tracking onto Vercel dashboard) -->
+    <script src="/_vercel/insights/script.js"></script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
@@ -445,6 +448,17 @@
             we: 30.47
         };
 
+        // Helper to send custom GA events without flooding network requests
+        function trackGAEvent(action, label, val) {
+            if (typeof gtag === 'function') {
+                gtag('event', action, {
+                    'event_category': 'Engagement',
+                    'event_label': label,
+                    'value': val
+                });
+            }
+        }
+
         // Load Preset Values
         function applyPreset(key) {
             const data = presets[key];
@@ -454,10 +468,14 @@
             sliderTakeup.value = data.takeup;
             sliderJuneIncrease.value = data.increase;
             calculate();
+            trackGAEvent('apply_preset', key, data.rec);
         }
 
         // Reset to original May 2026 baseline
-        document.getElementById('btnReset').addEventListener('click', () => applyPreset('may26'));
+        document.getElementById('btnReset').addEventListener('click', () => {
+            applyPreset('may26');
+            trackGAEvent('click', 'reset_sliders', 1);
+        });
         
         // Benchmarks button hooks
         document.getElementById('btnMay26').addEventListener('click', () => applyPreset('may26'));
@@ -466,7 +484,10 @@
         document.getElementById('btnFeb23').addEventListener('click', () => applyPreset('feb23'));
 
         // Event listener for region change
-        regionSelector.addEventListener('change', calculate);
+        regionSelector.addEventListener('change', () => {
+            calculate();
+            trackGAEvent('select_region', regionSelector.value, 1);
+        });
 
         // Core Mathematical Processing
         function calculate() {
@@ -570,6 +591,11 @@
         const elements = [sliderRecycled, sliderVirgin, sliderMedium, sliderJuneIncrease, sliderTakeup];
         elements.forEach(el => {
             el.addEventListener('input', calculate);
+            
+            // Track GA adjustments only when user FINISHES dragging (avoids log spam)
+            el.addEventListener('change', () => {
+                trackGAEvent('slider_adjust', el.id, parseFloat(el.value));
+            });
         });
 
         // Bootstrap on page mount

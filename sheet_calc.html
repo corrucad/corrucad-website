@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-[#111216]">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corrugated Cost Simulator & Regional Backtester</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        
+        .font-mono-custom {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Custom Slider Styling */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: #272a34;
+            height: 6px;
+            border-radius: 9999px;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #6366f1;
+            border: 2px solid #ffffff;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: all 0.1s ease-in-out;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background: #4f46e5;
+            transform: scale(1.1);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111216;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2e323e;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4b5265;
+        }
+    </style>
+</head>
+<body class="h-full text-slate-100 antialiased flex flex-col bg-[#111216]">
+
+    <div class="min-h-full flex flex-col">
+        <!-- Header -->
+        <header class="border-b border-[#242731] bg-[#161822] py-4 px-6 shrink-0 shadow-lg">
+            <div class="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div>
+                    <h1 class="text-xl font-bold text-white tracking-tight mt-1">Corrugated Cost Simulator & Regional Backtester</h1>
+                    <p class="text-xs text-[#94a3b8] mt-0.5">Analyze production markups and backtest raw board margins against historical industry sources</p>
+                </div>
+
+                <!-- Quick Presets -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="text-xs font-medium text-slate-400">Historical Benchmarks:</span>
+                    <button id="btnMay26" class="px-2.5 py-1.5 text-xs font-semibold rounded-lg border border-[#2e323e] bg-[#1e212f]/80 text-indigo-300 hover:bg-[#25293c] transition">
+                        May 2026 Base
+                    </button>
+                    <button id="btnAug25" class="px-2.5 py-1.5 text-xs font-semibold rounded-lg border border-[#2e323e] bg-[#1e212f]/40 text-slate-300 hover:bg-[#222635] transition">
+                        August 2025 Base
+                    </button>
+                    <button id="btnJan25" class="px-2.5 py-1.5 text-xs font-semibold rounded-lg border border-[#2e323e] bg-[#1e212f]/40 text-slate-300 hover:bg-[#222635] transition">
+                        January 2025 Base
+                    </button>
+                    <button id="btnFeb23" class="px-2.5 py-1.5 text-xs font-semibold rounded-lg border border-[#2e323e] bg-[#1e212f]/40 text-slate-300 hover:bg-[#222635] transition">
+                        February 2023 Sample
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Left Panel: Pricing Adjustments & Sliders -->
+            <section class="lg:col-span-5 space-y-6">
+                <!-- Top Key Fact Cards Grid -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-[#161822] border border-[#242731] rounded-xl p-3.5">
+                        <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Recycled Linerboard (30-31)</span>
+                        <div id="lblRecycledCard" class="text-lg font-bold text-white mt-0.5">$890/ton</div>
+                        <span class="text-[10px] text-slate-500">Active May 2026 Base</span>
+                    </div>
+                    <div class="bg-[#161822] border border-[#242731] rounded-xl p-3.5">
+                        <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Virgin Kraftliner (42 lb)</span>
+                        <div id="lblVirginCard" class="text-lg font-bold text-white mt-0.5">$995/ton</div>
+                        <span class="text-[10px] text-slate-500">Active May 2026 Base</span>
+                    </div>
+                    <div class="bg-[#161822] border border-[#242731] rounded-xl p-3.5">
+                        <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Semi-Chem Medium (26)</span>
+                        <div id="lblMediumCard" class="text-lg font-bold text-white mt-0.5">$885/ton</div>
+                        <span class="text-[10px] text-indigo-400 font-semibold">Derived from Industry Reports</span>
+                    </div>
+                    <div class="bg-[#161822] border border-[#242731] rounded-xl p-3.5">
+                        <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">C-Flute Takeup Factor</span>
+                        <div id="lblTakeupCard" class="text-lg font-bold text-white mt-0.5">1.42×</div>
+                        <span class="text-[10px] text-slate-500">Industry standard ratio</span>
+                    </div>
+                </div>
+
+                <!-- Sliders Form -->
+                <div class="bg-[#161822] border border-[#242731] rounded-2xl p-6 shadow-xl space-y-6">
+                    <div class="border-b border-[#242731] pb-3 flex items-center justify-between">
+                        <h2 class="text-sm uppercase tracking-wider font-bold text-white flex items-center gap-2">
+                            <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                            Adjust Simulator Inputs
+                        </h2>
+                        <button id="btnReset" class="text-xs text-slate-400 hover:text-white transition">Reset Sliders</button>
+                    </div>
+
+                    <!-- Recycled Liner -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <label for="linerRecycled" class="font-medium text-slate-300">Recycled Linerboard ($/ton)</label>
+                            <span id="linerRecycledVal" class="font-mono-custom font-bold text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded">$890</span>
+                        </div>
+                        <input type="range" id="linerRecycled" min="500" max="1200" step="5" value="890" class="w-full">
+                    </div>
+
+                    <!-- Virgin Kraftliner -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <label for="linerVirgin" class="font-medium text-slate-300">Virgin Kraftliner ($/ton)</label>
+                            <span id="linerVirginVal" class="font-mono-custom font-bold text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded">$995</span>
+                        </div>
+                        <input type="range" id="linerVirgin" min="600" max="1300" step="5" value="995" class="w-full">
+                    </div>
+
+                    <!-- Semi-Chem Medium -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <label for="medium" class="font-medium text-slate-300">Semi-Chemical Medium ($/ton)</label>
+                            <span id="mediumVal" class="font-mono-custom font-bold text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded">$885</span>
+                        </div>
+                        <input type="range" id="medium" min="400" max="1200" step="5" value="885" class="w-full">
+                    </div>
+
+                    <!-- Anticipated June increase -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <label for="juneIncrease" class="font-medium text-slate-300">Anticipated June Increase ($/ton)</label>
+                            <span id="juneIncreaseVal" class="font-mono-custom font-bold text-rose-400 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded">+$50</span>
+                        </div>
+                        <input type="range" id="juneIncrease" min="0" max="100" step="5" value="50" class="w-full">
+                    </div>
+
+                    <!-- C-Flute Takeup Factor -->
+                    <div class="space-y-2 pt-2 border-t border-[#242731]">
+                        <div class="flex justify-between items-center text-xs">
+                            <label for="takeup" class="font-medium text-slate-300">C-Flute Take-Up Factor</label>
+                            <span id="takeupVal" class="font-mono-custom font-bold text-slate-300 bg-slate-800 px-2 py-0.5 rounded">1.42×</span>
+                        </div>
+                        <input type="range" id="takeup" min="1.30" max="1.55" step="0.01" value="1.42" class="w-full">
+                    </div>
+                </div>
+
+                <!-- Live Regional Cost Adders / Margins -->
+                <div class="bg-[#161822] border border-[#242731] rounded-2xl p-6 shadow-xl space-y-4">
+                    <h3 class="text-sm uppercase tracking-wider font-bold text-white flex items-center gap-2 border-b border-[#242731] pb-3">
+                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+                        Industry-Derived Markups
+                    </h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Backtesting against historical index reports reveals the regional production markups applied above raw paper fiber inputs:
+                    </p>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-1">
+                        <div class="p-3 bg-[#1e212f] rounded-xl border border-[#2a2e3d]">
+                            <div class="font-bold text-slate-200">Northeast Adder</div>
+                            <div class="text-lg font-black text-white mt-1">$22.63<span class="text-xs font-normal text-slate-400">/MSF</span></div>
+                            <div class="text-[10px] text-slate-400 font-semibold mt-0.5">Historical Reports: ~67% margin</div>
+                        </div>
+                        <div class="p-3 bg-[#1e212f] rounded-xl border border-[#2a2e3d]">
+                            <div class="font-bold text-slate-200">Midwest Adder</div>
+                            <div class="text-lg font-black text-white mt-1">$23.27<span class="text-xs font-normal text-slate-400">/MSF</span></div>
+                            <div class="text-[10px] text-slate-400 font-semibold mt-0.5">Historical Reports: ~70% margin</div>
+                        </div>
+                        <div class="p-3 bg-[#1e212f] rounded-xl border border-[#2a2e3d]">
+                            <div class="font-bold text-slate-200">Southern Adder</div>
+                            <div class="text-lg font-black text-white mt-1">$24.27<span class="text-xs font-normal text-slate-400">/MSF</span></div>
+                            <div class="text-[10px] text-slate-400 font-semibold mt-0.5">Historical Reports: ~73% margin</div>
+                        </div>
+                        <div class="p-3 bg-[#1e212f] rounded-xl border border-[#2a2e3d]">
+                            <div class="font-bold text-slate-200">Western Adder</div>
+                            <div class="text-lg font-black text-white mt-1">$30.47<span class="text-xs font-normal text-slate-400">/MSF</span></div>
+                            <div class="text-[10px] text-slate-400 font-semibold mt-0.5">Historical Reports: ~92% margin</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Panel: Grade Results Table & Historical Backtester -->
+            <section class="lg:col-span-7 space-y-6">
+                <!-- Cost Index Matrix -->
+                <div class="bg-[#161822] border border-[#242731] rounded-2xl shadow-xl overflow-hidden">
+                    <div class="bg-[#1e212f] px-6 py-4 border-b border-[#242731] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div>
+                            <h2 class="text-base font-bold text-white tracking-tight">Active Cost Index Matrix</h2>
+                            <p class="text-xs text-slate-400">Comparing raw materials and fully delivered values side-by-side</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-semibold text-slate-400">Shipping Region:</span>
+                            <select id="regionSelector" class="bg-[#111216] border border-[#242731] rounded-lg px-2.5 py-1 text-xs font-semibold text-indigo-400 focus:outline-none focus:border-indigo-500 transition">
+                                <option value="ne">Northeast (+$22.63)</option>
+                                <option value="mw" selected>Midwest (+$23.27)</option>
+                                <option value="so">South (+$24.27)</option>
+                                <option value="we">West (+$30.47)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <!-- Top Grouping Header Row -->
+                                <tr class="border-b border-[#242731] text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                    <th class="py-2.5 px-4 sm:px-6" rowspan="2">Grade Layout</th>
+                                    <th class="py-2.5 px-2 text-right" rowspan="2">Fiber Lbs</th>
+                                    <th class="py-2.5 px-2 text-center border-l border-[#242731]/60" colspan="3">Fiber Components ($/MSF)</th>
+                                    <th class="py-2.5 px-3 text-center border-l border-[#242731]/60 bg-indigo-500/5 text-indigo-400" colspan="2">Raw Materials Floor</th>
+                                    <th class="py-2.5 px-4 sm:px-6 text-center border-l border-[#242731]/60 bg-emerald-500/5 text-emerald-400" colspan="2">Delivered Sale Price</th>
+                                </tr>
+                                <!-- Detailed Column Labels -->
+                                <tr class="border-b border-[#242731] text-[9px] font-bold uppercase tracking-wider text-slate-500">
+                                    <th class="py-2 px-2 text-right border-l border-[#242731]/40">Outer</th>
+                                    <th class="py-2 px-2 text-right">Medium</th>
+                                    <th class="py-2 px-2 text-right">Inner</th>
+                                    <th class="py-2 px-3 text-right border-l border-[#242731]/40 bg-indigo-500/5 text-indigo-400">Current</th>
+                                    <th class="py-2 px-3 text-right bg-indigo-500/5 text-indigo-300">Post-June</th>
+                                    <th class="py-2 px-4 text-right border-l border-[#242731]/40 bg-emerald-500/5 text-emerald-400 font-bold">Current</th>
+                                    <th class="py-2 px-4 sm:px-6 text-right bg-emerald-500/5 text-emerald-300 font-bold">Post-June</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-[#1e212f] text-xs">
+                                <!-- Grade 1: 31/23/31 -->
+                                <tr class="hover:bg-slate-800/10 transition-colors">
+                                    <td class="py-4 px-4 sm:px-6">
+                                        <div class="font-bold text-white text-sm">31 / 23 / 31</div>
+                                        <div class="text-[10px] text-slate-400 mt-0.5">Lightweight Recycled</div>
+                                    </td>
+                                    <td id="g1Weight" class="py-4 px-2 text-right font-mono-custom text-slate-300 font-semibold">94.66 lbs</td>
+                                    <td id="g1Liner1" class="py-4 px-2 text-right font-mono-custom text-slate-400">$13.79</td>
+                                    <td id="g1Medium" class="py-4 px-2 text-right font-mono-custom text-slate-400">$14.45</td>
+                                    <td id="g1Liner2" class="py-4 px-2 text-right font-mono-custom text-slate-400">$13.79</td>
+                                    
+                                    <!-- Raw Materials floor -->
+                                    <td id="g1Current" class="py-4 px-3 text-right font-mono-custom text-indigo-300/90 bg-indigo-500/5">$42.04</td>
+                                    <td id="g1PostJune" class="py-4 px-3 text-right font-mono-custom text-indigo-200/90 bg-indigo-500/5">$44.41</td>
+                                    
+                                    <!-- Delivered sale price -->
+                                    <td id="g1DelCurrent" class="py-4 px-4 text-right font-mono-custom font-extrabold text-white text-sm bg-emerald-500/5">$64.67</td>
+                                    <td id="g1DelPost" class="py-4 px-4 sm:px-6 text-right font-mono-custom font-extrabold text-emerald-400 text-sm bg-emerald-500/5">$67.04</td>
+                                </tr>
+
+                                <!-- Grade 2: 35/23/35 -->
+                                <tr class="hover:bg-slate-800/10 transition-colors relative">
+                                    <td class="py-4 px-4 sm:px-6 border-l-2 border-indigo-500 bg-indigo-500/5">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="font-bold text-white text-sm">35 / 23 / 35</span>
+                                            <span class="px-1.5 py-0.5 rounded bg-indigo-500 text-[8px] font-black text-white uppercase tracking-wider">32 ECT</span>
+                                        </div>
+                                        <div class="text-[10px] text-indigo-300 mt-0.5">Standard Recycled Box</div>
+                                    </td>
+                                    <td id="g2Weight" class="py-4 px-2 text-right font-mono-custom text-indigo-200 font-semibold bg-indigo-500/5">102.66 lbs</td>
+                                    <td id="g2Liner1" class="py-4 px-2 text-right font-mono-custom text-slate-400 bg-indigo-500/5">$15.58</td>
+                                    <td id="g2Medium" class="py-4 px-2 text-right font-mono-custom text-slate-400 bg-indigo-500/5">$14.45</td>
+                                    <td id="g2Liner2" class="py-4 px-2 text-right font-mono-custom text-slate-400 bg-indigo-500/5">$15.58</td>
+                                    
+                                    <!-- Raw Materials floor -->
+                                    <td id="g2Current" class="py-4 px-3 text-right font-mono-custom text-indigo-300 bg-indigo-500/10">$45.60</td>
+                                    <td id="g2PostJune" class="py-4 px-3 text-right font-mono-custom text-indigo-200 bg-indigo-500/10">$48.17</td>
+                                    
+                                    <!-- Delivered sale price -->
+                                    <td id="g2DelCurrent" class="py-4 px-4 text-right font-mono-custom font-extrabold text-white text-sm bg-emerald-500/10">$68.87</td>
+                                    <td id="g2DelPost" class="py-4 px-4 sm:px-6 text-right font-mono-custom font-extrabold text-emerald-400 text-sm bg-emerald-500/10">$71.44</td>
+                                </tr>
+
+                                <!-- Grade 3: 42/26/42 -->
+                                <tr class="hover:bg-slate-800/10 transition-colors">
+                                    <td class="py-4 px-4 sm:px-6">
+                                        <div class="font-bold text-white text-sm">42 / 26 / 42</div>
+                                        <div class="text-[10px] text-slate-400 mt-0.5">Heavy Duty Virgin Kraft</div>
+                                    </td>
+                                    <td id="g3Weight" class="py-4 px-2 text-right font-mono-custom text-slate-300 font-semibold">120.92 lbs</td>
+                                    <td id="g3Liner1" class="py-4 px-2 text-right font-mono-custom text-slate-400">$20.89</td>
+                                    <td id="g3Medium" class="py-4 px-2 text-right font-mono-custom text-slate-400">$16.34</td>
+                                    <td id="g3Liner2" class="py-4 px-2 text-right font-mono-custom text-slate-400">$20.89</td>
+                                    
+                                    <!-- Raw Materials floor -->
+                                    <td id="g3Current" class="py-4 px-3 text-right font-mono-custom text-indigo-300/90 bg-indigo-500/5">$58.13</td>
+                                    <td id="g3PostJune" class="py-4 px-3 text-right font-mono-custom text-indigo-200/90 bg-indigo-500/5">$61.15</td>
+                                    
+                                    <!-- Delivered sale price -->
+                                    <td id="g3DelCurrent" class="py-4 px-4 text-right font-mono-custom font-extrabold text-white text-sm bg-emerald-500/5">$88.60</td>
+                                    <td id="g3DelPost" class="py-4 px-4 sm:px-6 text-right font-mono-custom font-extrabold text-emerald-400 text-sm bg-emerald-500/5">$91.62</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Converted Regional Box Cost Comparison -->
+                <div class="bg-[#161822] border border-[#242731] rounded-2xl shadow-xl p-6 space-y-4">
+                    <div>
+                        <h3 class="text-sm uppercase tracking-wider font-bold text-white flex items-center gap-2">
+                            <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m0 0a2 2 0 002 2h2a2 2 0 002-2v-7a2 2 0 00-2-2h-2a2 2 0 00-2 2v7z"></path></svg>
+                            Delivered Sheet Price Regional Backtest (32 ECT Standard)
+                        </h3>
+                        <p class="text-xs text-slate-400 mt-1">Comparing simulator derived regional costs (Raw Fiber + Reverse-Engineered Markups) with actual quoted prices from industry benchmark reports.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                        <!-- Northeast -->
+                        <div class="p-3 bg-[#1e212f]/40 rounded-xl border border-[#242731] space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-slate-300">Northeast</span>
+                                <span class="text-[9px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-1 rounded">DEL</span>
+                            </div>
+                            <div class="space-y-0.5">
+                                <div id="regNECurrent" class="text-lg font-black text-white">$67.73</div>
+                                <div class="text-[10px] text-slate-500">Jan 2025 Benchmark: <span class="font-bold text-slate-300">$55.10</span></div>
+                                <div class="text-[10px] text-slate-500">Aug 2025 Benchmark: <span class="font-bold text-slate-300">$55.20</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Midwest -->
+                        <div class="p-3 bg-[#1e212f]/40 rounded-xl border border-[#242731] space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-slate-300">Midwest</span>
+                                <span class="text-[9px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-1 rounded">DEL</span>
+                            </div>
+                            <div class="space-y-0.5">
+                                <div id="regMWCurrent" class="text-lg font-black text-white">$68.87</div>
+                                <div class="text-[10px] text-slate-500">Jan 2025 Benchmark: <span class="font-bold text-slate-300">$56.70</span></div>
+                                <div class="text-[10px] text-slate-500">Aug 2025 Benchmark: <span class="font-bold text-slate-300">$56.00</span></div>
+                            </div>
+                        </div>
+
+                        <!-- South -->
+                        <div class="p-3 bg-[#1e212f]/40 rounded-xl border border-[#242731] space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-slate-300">South</span>
+                                <span class="text-[9px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-1 rounded">DEL</span>
+                            </div>
+                            <div class="space-y-0.5">
+                                <div id="regSOCurrent" class="text-lg font-black text-white">$69.87</div>
+                                <div class="text-[10px] text-slate-500">Jan 2025 Benchmark: <span class="font-bold text-slate-300">$58.20</span></div>
+                                <div class="text-[10px] text-slate-500">Aug 2025 Benchmark: <span class="font-bold text-slate-300">$56.50</span></div>
+                            </div>
+                        </div>
+
+                        <!-- West -->
+                        <div class="p-3 bg-[#1e212f]/40 rounded-xl border border-[#242731] space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-slate-300">West</span>
+                                <span class="text-[9px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-1 rounded">DEL</span>
+                            </div>
+                            <div class="space-y-0.5">
+                                <div id="regWECurrent" class="text-lg font-black text-white">$76.07</div>
+                                <div class="text-[10px] text-slate-500">Jan 2025 Benchmark: <span class="font-bold text-slate-300">$63.70</span></div>
+                                <div class="text-[10px] text-slate-500">Aug 2025 Benchmark: <span class="font-bold text-slate-300">$63.40</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Historical Data Source Notes -->
+                <div class="bg-[#161822] border border-[#242731] rounded-2xl p-6 shadow-xl space-y-3">
+                    <h4 class="text-xs uppercase tracking-wider font-extrabold text-white">Benchmark Pulp & Paper Database Source Reference</h4>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Raw market metrics compiled from industry sources trace the compression of the containerboard-to-sheets delta. In late 2025 and 2026, severe capacity shutdowns of roughly 9% (including major mills in Savannah and Riceboro) caused medium costs to spike back to the near-recycled-linerboard levels shown in May 2026.
+                    </p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // DOM Sliders
+        const sliderRecycled = document.getElementById('linerRecycled');
+        const sliderVirgin = document.getElementById('linerVirgin');
+        const sliderMedium = document.getElementById('medium');
+        const sliderJuneIncrease = document.getElementById('juneIncrease');
+        const sliderTakeup = document.getElementById('takeup');
+        const regionSelector = document.getElementById('regionSelector');
+
+        // DOM Display Text Labels
+        const valRecycled = document.getElementById('linerRecycledVal');
+        const valVirgin = document.getElementById('linerVirginVal');
+        const valMedium = document.getElementById('mediumVal');
+        const valJuneIncrease = document.getElementById('juneIncreaseVal');
+        const valTakeup = document.getElementById('takeupVal');
+
+        // DOM KPI Card Display Values
+        const cardRecycled = document.getElementById('lblRecycledCard');
+        const cardVirgin = document.getElementById('lblVirginCard');
+        const cardMedium = document.getElementById('lblMediumCard');
+        const cardTakeup = document.getElementById('lblTakeupCard');
+
+        // Presets derived from raw documents
+        const presets = {
+            may26: { rec: 890, vir: 995, med: 885, takeup: 1.42, increase: 50 },
+            aug25: { rec: 660, vir: 750, med: 580, takeup: 1.42, increase: 0 },
+            jan25: { rec: 680, vir: 760, med: 600, takeup: 1.42, increase: 0 },
+            feb23: { rec: 560, vir: 640, med: 500, takeup: 1.42, increase: 0 }
+        };
+
+        // Static Reverse-Engineered Regional Adders (Delivered Conversion Fees)
+        // Northeast: $22.63, Midwest: $23.27, Southern: $24.27, Western: $30.47
+        const regionalAdders = {
+            ne: 22.63,
+            mw: 23.27,
+            so: 24.27,
+            we: 30.47
+        };
+
+        // Load Preset Values
+        function applyPreset(key) {
+            const data = presets[key];
+            sliderRecycled.value = data.rec;
+            sliderVirgin.value = data.vir;
+            sliderMedium.value = data.med;
+            sliderTakeup.value = data.takeup;
+            sliderJuneIncrease.value = data.increase;
+            calculate();
+        }
+
+        // Reset to original May 2026 baseline
+        document.getElementById('btnReset').addEventListener('click', () => applyPreset('may26'));
+        
+        // Benchmarks button hooks
+        document.getElementById('btnMay26').addEventListener('click', () => applyPreset('may26'));
+        document.getElementById('btnAug25').addEventListener('click', () => applyPreset('aug25'));
+        document.getElementById('btnJan25').addEventListener('click', () => applyPreset('jan25'));
+        document.getElementById('btnFeb23').addEventListener('click', () => applyPreset('feb23'));
+
+        // Event listener for region change
+        regionSelector.addEventListener('change', calculate);
+
+        // Core Mathematical Processing
+        function calculate() {
+            const rLiner = parseFloat(sliderRecycled.value);
+            const vLiner = parseFloat(sliderVirgin.value);
+            const medPrice = parseFloat(sliderMedium.value);
+            const tFactor = parseFloat(sliderTakeup.value);
+            const increaseAmt = parseFloat(sliderJuneIncrease.value);
+            const selectedRegion = regionSelector.value;
+            const activeAdder = regionalAdders[selectedRegion];
+
+            // Update user input display badges
+            valRecycled.innerText = `$${rLiner}`;
+            valVirgin.innerText = `$${vLiner}`;
+            valMedium.innerText = `$${medPrice}`;
+            valJuneIncrease.innerText = `+$${increaseAmt}`;
+            valTakeup.innerText = `${tFactor.toFixed(2)}×`;
+
+            // Update top highlights panel
+            cardRecycled.innerText = `$${rLiner}/ton`;
+            cardVirgin.innerText = `$${vLiner}/ton`;
+            cardMedium.innerText = `$${medPrice}/ton`;
+            cardTakeup.innerText = `${tFactor.toFixed(2)}×`;
+
+            // Helper to process specific board configurations
+            function computeGrade(liner1, medium, liner2, linerPrice, medPriceVal) {
+                const totalWeight = liner1 + (medium * tFactor) + liner2;
+                
+                // Segment costs (Lbs / 2000 * CostPerTon)
+                const cLiner1 = (liner1 / 2000) * linerPrice;
+                const cMedium = ((medium * tFactor) / 2000) * medPriceVal;
+                const cLiner2 = (liner2 / 2000) * linerPrice;
+                
+                const currentTotal = cLiner1 + cMedium + cLiner2;
+
+                // Segment costs post increase
+                const cLiner1Post = (liner1 / 2000) * (linerPrice + increaseAmt);
+                const cMediumPost = ((medium * tFactor) / 2000) * (medPriceVal + increaseAmt);
+                const cLiner2Post = (liner2 / 2000) * (linerPrice + increaseAmt);
+                
+                const postJuneTotal = cLiner1Post + cMediumPost + cLiner2Post;
+
+                return {
+                    weight: totalWeight.toFixed(2),
+                    l1: cLiner1.toFixed(2),
+                    med: cMedium.toFixed(2),
+                    l2: cLiner2.toFixed(2),
+                    totalCurrent: currentTotal.toFixed(2),
+                    totalPost: postJuneTotal.toFixed(2)
+                };
+            }
+
+            // Grade 1: 31/23/31 Recycled
+            const g1 = computeGrade(31, 23, 31, rLiner, medPrice);
+            document.getElementById('g1Weight').innerText = `${g1.weight} lbs`;
+            document.getElementById('g1Liner1').innerText = `$${g1.l1}`;
+            document.getElementById('g1Medium').innerText = `$${g1.med}`;
+            document.getElementById('g1Liner2').innerText = `$${g1.l2}`;
+            document.getElementById('g1Current').innerText = `$${g1.totalCurrent}`;
+            document.getElementById('g1PostJune').innerText = `$${g1.totalPost}`;
+            
+            // Delivered Grade 1 Calculations
+            document.getElementById('g1DelCurrent').innerText = `$${(parseFloat(g1.totalCurrent) + activeAdder).toFixed(2)}`;
+            document.getElementById('g1DelPost').innerText = `$${(parseFloat(g1.totalPost) + activeAdder).toFixed(2)}`;
+
+            // Grade 2: 35/23/35 Recycled (32 ECT Base)
+            const g2 = computeGrade(35, 23, 35, rLiner, medPrice);
+            document.getElementById('g2Weight').innerText = `${g2.weight} lbs`;
+            document.getElementById('g2Liner1').innerText = `$${g2.l1}`;
+            document.getElementById('g2Medium').innerText = `$${g2.med}`;
+            document.getElementById('g2Liner2').innerText = `$${g2.l2}`;
+            document.getElementById('g2Current').innerText = `$${g2.totalCurrent}`;
+            document.getElementById('g2PostJune').innerText = `$${g2.totalPost}`;
+            
+            // Delivered Grade 2 Calculations
+            document.getElementById('g2DelCurrent').innerText = `$${(parseFloat(g2.totalCurrent) + activeAdder).toFixed(2)}`;
+            document.getElementById('g2DelPost').innerText = `$${(parseFloat(g2.totalPost) + activeAdder).toFixed(2)}`;
+
+            // Grade 3: 42/26/42 Virgin Kraft
+            const g3 = computeGrade(42, 26, 42, vLiner, medPrice);
+            document.getElementById('g3Weight').innerText = `${g3.weight} lbs`;
+            document.getElementById('g3Liner1').innerText = `$${g3.l1}`;
+            document.getElementById('g3Medium').innerText = `$${g3.med}`;
+            document.getElementById('g3Liner2').innerText = `$${g3.l2}`;
+            document.getElementById('g3Current').innerText = `$${g3.totalCurrent}`;
+            document.getElementById('g3PostJune').innerText = `$${g3.totalPost}`;
+            
+            // Delivered Grade 3 Calculations
+            document.getElementById('g3DelCurrent').innerText = `$${(parseFloat(g3.totalCurrent) + activeAdder).toFixed(2)}`;
+            document.getElementById('g3DelPost').innerText = `$${(parseFloat(g3.totalPost) + activeAdder).toFixed(2)}`;
+
+            // Calculate Delivered Regional Sheet Prices using backtested Adders (based on Grade 2, 35/23/35)
+            const rawFiber32ECT = parseFloat(g2.totalCurrent);
+            document.getElementById('regNECurrent').innerText = `$${(rawFiber32ECT + regionalAdders.ne).toFixed(2)}`;
+            document.getElementById('regMWCurrent').innerText = `$${(rawFiber32ECT + regionalAdders.mw).toFixed(2)}`;
+            document.getElementById('regSOCurrent').innerText = `$${(rawFiber32ECT + regionalAdders.so).toFixed(2)}`;
+            document.getElementById('regWECurrent').innerText = `$${(rawFiber32ECT + regionalAdders.we).toFixed(2)}`;
+        }
+
+        // Attach state change listeners to form inputs
+        const elements = [sliderRecycled, sliderVirgin, sliderMedium, sliderJuneIncrease, sliderTakeup];
+        elements.forEach(el => {
+            el.addEventListener('input', calculate);
+        });
+
+        // Bootstrap on page mount
+        window.onload = function() {
+            calculate();
+        };
+    </script>
+</body>
+</html>

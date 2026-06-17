@@ -666,6 +666,7 @@
 
         const FEFCOCADApp = () => {
             const [appState, setAppState] = useState({
+                unit: 'in', // Unit Switcher State
                 length: 12, width: 12, height: 12,
                 boardProfile: '32 ECT C', fefcoStyle: '0201',
                 priceMsf: 58, outerLiner: 35, innerLiner: 35,
@@ -682,6 +683,47 @@
             });
 
             const canvasRef = useRef(null);
+
+                        const toggleUnit = (newUnit) => {
+                if (newUnit === appState.unit) return;
+                setAppState(prev => {
+                    let newL = parseFloat(prev.length) || 0;
+                    let newW = parseFloat(prev.width) || 0;
+                    let newH = parseFloat(prev.height) || 0;
+                    let newPrice = parseFloat(prev.priceMsf) || 0;
+                    let newPrint = parseFloat(prev.printUpcharge) || 0;
+                    let newSetup = parseFloat(prev.setupFee) || 0;
+
+                    if (newUnit === 'mm') {
+                        newL = Math.round(newL * 25.4).toString();
+                        newW = Math.round(newW * 25.4).toString();
+                        newH = Math.round(newH * 25.4).toString();
+                        // Convert $/MSF to €/m²
+                        newPrice = newPrice / (1.15 * 92.90304);
+                        newPrint = newPrint / 1.15;
+                        newSetup = newSetup / 1.15;
+                    } else {
+                        // Snap back to nearest 1/16th of an inch to prevent rounding drift
+                        const snap = (v) => (Math.round((v / 25.4) * 16) / 16).toString();
+                        newL = snap(newL);
+                        newW = snap(newW);
+                        newH = snap(newH);
+                        // Convert €/m² to $/MSF
+                        newPrice = newPrice * (1.15 * 92.90304);
+                        newPrint = newPrint * 1.15;
+                        newSetup = newSetup * 1.15;
+                    }
+                    
+                    return { 
+                        ...prev, unit: newUnit, 
+                        length: newL, width: newW, height: newH, 
+                        priceMsf: newUnit === 'mm' ? newPrice.toFixed(4) : newPrice.toFixed(2),
+                        printUpcharge: newPrint.toFixed(2),
+                        setupFee: newSetup.toFixed(2),
+                        topTenSelection: 'custom' 
+                    };
+                });
+            };
 
             const exportToKiwiplan = () => {
                 if (!results.blankDimensions) {
@@ -738,6 +780,7 @@
             const handleStateChange = useCallback((changes) => {
                 setAppState(prevState => {
                     let newState = { ...prevState, ...changes };
+                    const currentUnit = changes.unit || prevState.unit;
 
                     if ('topTenSelection' in changes) {
                         const selectedSkuName = changes.topTenSelection;
@@ -746,9 +789,10 @@
                         } else {
                             const selectedSku = topTenSkus.find(s => s.name === selectedSkuName);
                             if (selectedSku) {
-                                newState.length = selectedSku.l;
-                                newState.width = selectedSku.w;
-                                newState.height = selectedSku.h;
+                                // Respect current unit choice for presets using nearest mm
+                                newState.length = currentUnit === 'mm' ? Math.round(selectedSku.l * 25.4).toString() : selectedSku.l.toString();
+                                newState.width = currentUnit === 'mm' ? Math.round(selectedSku.w * 25.4).toString() : selectedSku.w.toString();
+                                newState.height = currentUnit === 'mm' ? Math.round(selectedSku.h * 25.4).toString() : selectedSku.h.toString();
                             }
                         }
                     }
@@ -762,13 +806,19 @@
                         const board = boardData[newBoardProfile];
                         if (board) {
                             const comps = board.components;
+                            let basePrice = board.priceMsf || 0;
+                            
+                            if (currentUnit === 'mm') {
+                                basePrice = basePrice / (1.15 * 92.90304);
+                            }
+
                             const derivedChanges = {
                                 outerLiner: comps.outerLiner || 0,
                                 innerLiner: comps.innerLiner || 0,
                                 medium1: comps.medium1 || 0,
                                 middleLiner: comps.middleLiner || 0,
                                 medium2: comps.medium2 || 0,
-                                priceMsf: board.priceMsf || 0,
+                                priceMsf: currentUnit === 'mm' ? basePrice.toFixed(4) : basePrice.toFixed(2),
                             };
                             const fluteTakeupFactors = { 'B': '1.32', 'C': '1.42' };
                             if (board.type === 'doublewall' && board.flutes && board.flutes.length === 2) {
@@ -795,14 +845,15 @@
 
             useEffect(() => {
                 const {
-                    length, width, height, boardProfile, fefcoStyle,
+                    unit, length, width, height, boardProfile, fefcoStyle,
                     priceMsf, outerLiner, innerLiner, medium1, middleLiner, medium2,
                     flute1, flute2, margin, printUpcharge, setupFee, quantity
                 } = appState;
 
-                const L_in = parseFloat(length);
-                const W_in = parseFloat(width);
-                const H_in = parseFloat(height);
+                // Engine calculations are STRICTLY in standard inches
+                const L_in = unit === 'mm' ? parseFloat(length) / 25.4 : parseFloat(length);
+                const W_in = unit === 'mm' ? parseFloat(width) / 25.4 : parseFloat(width);
+                const H_in = unit === 'mm' ? parseFloat(height) / 25.4 : parseFloat(height);
 
                 if (isNaN(L_in) || isNaN(W_in) || isNaN(H_in) || L_in <= 0 || W_in <= 0 || H_in <= 0) {
                     setResults(r => ({ ...r, message: 'Please enter valid positive numbers for all CAD dimensions.', quoteResults: null, blankDimensions: null, wastePercentage: null, inchesOfRule: null }));
@@ -903,14 +954,19 @@
                     }
                 });
 
+                // Convert dynamic prices back to USD before running the estimation engine
+                const enginePriceMsf = unit === 'mm' ? parseFloat(priceMsf) * 1.15 * 92.90304 : parseFloat(priceMsf) || 0;
+                const enginePrintUpcharge = unit === 'mm' ? parseFloat(printUpcharge) * 1.15 : parseFloat(printUpcharge) || 0;
+                const engineSetupFee = unit === 'mm' ? parseFloat(setupFee) * 1.15 : parseFloat(setupFee) || 0;
+
                 const pricingInputs = {
                     outerLiner: parseFloat(outerLiner) || 0, innerLiner: parseFloat(innerLiner) || 0,
                     middleLiner: parseFloat(middleLiner) || 0, medium1: parseFloat(medium1) || 0,
                     medium2: parseFloat(medium2) || 0, takeUpFactor1: parseFloat(flute1) || 0,
                     takeUpFactor2: board.type === 'doublewall' ? (parseFloat(flute2) || 0) : 0,
-                    priceMsf: parseFloat(priceMsf) || 0, blankAreaSqFt: blankAreaSqFt,
+                    priceMsf: enginePriceMsf, blankAreaSqFt: blankAreaSqFt,
                     quantity: parseInt(quantity) || 0, marginPercent: parseFloat(margin) || 0,
-                    printUpcharge: parseFloat(printUpcharge) || 0, setupFee: parseFloat(setupFee) || 0,
+                    printUpcharge: enginePrintUpcharge, setupFee: engineSetupFee,
                 };
 
                 const quote = estimatingEngine.calculate(pricingInputs);
@@ -935,15 +991,20 @@
 
             const handleDownload = (type) => {
                 const { blankDimensions } = results;
-                const { length, width, height, fefcoStyle } = appState;
-                const L_in = parseFloat(length);
-                const W_in = parseFloat(width);
-                const H_in = parseFloat(height);
+                const { length, width, height, fefcoStyle, unit } = appState;
+                const L_in = unit === 'mm' ? parseFloat(length) / 25.4 : parseFloat(length);
+                const W_in = unit === 'mm' ? parseFloat(width) / 25.4 : parseFloat(width);
+                const H_in = unit === 'mm' ? parseFloat(height) / 25.4 : parseFloat(height);
 
                 if (!blankDimensions || isNaN(L_in) || isNaN(W_in) || isNaN(H_in)) {
                     setResults(prev => ({...prev, message: 'Cannot generate file. Please check input dimensions.'}));
                     return;
                 }
+
+                const displayL = unit === 'mm' ? Math.round(parseFloat(length)) : parseFloat(length);
+                const displayW = unit === 'mm' ? Math.round(parseFloat(width)) : parseFloat(width);
+                const displayH = unit === 'mm' ? Math.round(parseFloat(height)) : parseFloat(height);
+                const fileNameStr = `FEFCO_${fefcoStyle}_${displayL}x${displayW}x${displayH}${unit}`;
 
                 if (type === 'dxf') {
                     const dxfContent = generateDxfContent(blankDimensions, fefcoStyle, L_in, W_in, H_in);
@@ -962,6 +1023,17 @@
                 }
             };
             const { blankDimensions, outsideDimensions, squareFootage, wastePercentage, quoteResults, message, inchesOfRule } = results;
+           
+            // UI Display Formatting Helpers
+            const formatDim = (val_in) => appState.unit === 'mm' ? Math.round(val_in * 25.4) + ' mm' : val_in.toFixed(3) + ' in';
+            const currencySym = appState.unit === 'mm' ? '€' : '$';
+
+            // Display costs conversion back from the Engine's native USD calculation out to EUR if running in metric mode
+            const displayMaterialCost = quoteResults ? (appState.unit === 'mm' ? quoteResults.baseMaterialCost / 1.15 : quoteResults.baseMaterialCost) : 0;
+            const displayMargin = quoteResults ? (appState.unit === 'mm' ? quoteResults.marginAmount / 1.15 : quoteResults.marginAmount) : 0;
+            const displayPrint = parseFloat(appState.printUpcharge) || 0;
+            const displayCostPerBox = quoteResults ? (appState.unit === 'mm' ? quoteResults.costPerBox / 1.15 : quoteResults.costPerBox) : 0;
+            const displayTotalCost = quoteResults ? (appState.unit === 'mm' ? quoteResults.totalCost / 1.15 : quoteResults.totalCost) : 0;
 
             return (
                 <div className="max-w-7xl mx-auto p-4 md:p-8">
@@ -969,12 +1041,25 @@
                          <h1 className="text-4xl md:text-5xl font-extrabold text-slate-800 flex items-baseline justify-center">
                             <span>corru</span><span className="text-orange-500 text-5xl md:text-6xl font-normal mx-1" style={{ transform: 'translateY(2px)' }}>~</span><span className="font-black">CAD</span>
                         </h1>
-                        <p className="text-md text-gray-600">v2.5 - Precision Engine with Presets</p>
+                        <p className="text-md text-gray-600">v2.6.5 - Precision Engine with Presets</p>
                     </div>
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-sm space-y-6">
                             <div>
-                                <h2 className="section-title">CAD Inputs</h2>
+                                <div className="flex justify-between items-center mb-4 border-b border-gray-200 pb-2">
+                                    <h2 className="section-title border-none mb-0 pb-0">CAD Inputs</h2>
+                                    <div className="flex bg-gray-200 rounded-md p-1">
+                                        <button
+                                            className={`px-3 py-1 text-sm font-medium rounded-sm transition-colors ${appState.unit === 'in' ? 'bg-white shadow-sm text-indigo-700' : 'text-gray-500 hover:text-gray-700'}`}
+                                            onClick={() => toggleUnit('in')}
+                                        >Standard (in)</button>
+                                        <button
+                                            className={`px-3 py-1 text-sm font-medium rounded-sm transition-colors ${appState.unit === 'mm' ? 'bg-white shadow-sm text-indigo-700' : 'text-gray-500 hover:text-gray-700'}`}
+                                            onClick={() => toggleUnit('mm')}
+                                        >Metric (mm)</button>
+                                    </div>
+                                </div>
+                                
                                 <div className="mb-4">
                                      <label className="block text-sm font-medium text-gray-700">Top 10 SKU Presets</label>
                                      <select value={appState.topTenSelection} onChange={e => handleStateChange({ topTenSelection: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md bg-yellow-50">
@@ -984,15 +1069,15 @@
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700">Length (L) (in)</label>
+                                        <label className="block text-sm font-medium text-gray-700">Length (L) ({appState.unit})</label>
                                         <input type="number" value={appState.length} onChange={e => handleStateChange({ length: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700">Width (W) (in)</label>
+                                        <label className="block text-sm font-medium text-gray-700">Width (W) ({appState.unit})</label>
                                         <input type="number" value={appState.width} onChange={e => handleStateChange({ width: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700">Height (H) (in)</label>
+                                        <label className="block text-sm font-medium text-gray-700">Height (H) ({appState.unit})</label>
                                         <input type="number" value={appState.height} onChange={e => handleStateChange({ height: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
                                     </div>
                                     <div className="md:col-span-2">
@@ -1015,7 +1100,7 @@
                                     <div className="space-y-4 p-4 border rounded-md bg-gray-50">
                                         <h3 className="font-semibold text-gray-700">Material Definition</h3>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700">Market Price ($/msf)</label>
+                                            <label className="block text-sm font-medium text-gray-700">Market Price ({appState.unit === 'mm' ? '€/m²' : '$/msf'})</label>
                                             <input type="number" value={appState.priceMsf} onChange={e => handleStateChange({ priceMsf: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
                                         </div>
                                         <div className="grid grid-cols-2 gap-2">
@@ -1066,11 +1151,11 @@
                                             <input type="number" value={appState.margin} onChange={e => handleStateChange({ margin: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700">Printing ($/box)</label>
+                                            <label className="block text-sm font-medium text-gray-700">Printing ({appState.unit === 'mm' ? '€/box' : '$/box'})</label>
                                             <input type="number" step="0.01" value={appState.printUpcharge} onChange={e => handleStateChange({ printUpcharge: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700">Setup Fee ($)</label>
+                                            <label className="block text-sm font-medium text-gray-700">Setup Fee ({currencySym})</label>
                                             <input type="number" value={appState.setupFee} onChange={e => handleStateChange({ setupFee: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
                                         </div>
                                     </div>
@@ -1093,25 +1178,33 @@
                                     <div className="bg-white p-4 rounded-md shadow-inner text-sm space-y-1 mb-4">
                                         <h3 className="font-semibold text-gray-800 mb-2">Calculated Dimensions:</h3>
                                         <div className="grid grid-cols-2 gap-x-4">
-                                            <span>Internal L:</span><span className="font-medium text-right">{parseFloat(appState.length).toFixed(3)} in</span>
-                                            <span>Internal W:</span><span className="font-medium text-right">{parseFloat(appState.width).toFixed(3)} in</span>
-                                            <span>Internal H:</span><span className="font-medium text-right">{parseFloat(appState.height).toFixed(3)} in</span>
+                                            <span>Internal L:</span><span className="font-medium text-right">{appState.unit === 'mm' ? Math.round(parseFloat(appState.length)) + ' mm' : parseFloat(appState.length).toFixed(3) + ' in'}</span>
+                                            <span>Internal W:</span><span className="font-medium text-right">{appState.unit === 'mm' ? Math.round(parseFloat(appState.width)) + ' mm' : parseFloat(appState.width).toFixed(3) + ' in'}</span>
+                                            <span>Internal H:</span><span className="font-medium text-right">{appState.unit === 'mm' ? Math.round(parseFloat(appState.height)) + ' mm' : parseFloat(appState.height).toFixed(3) + ' in'}</span>
                                         </div>
                                         <div className="border-t my-2"></div>
                                         <div className="grid grid-cols-2 gap-x-4">
-                                            <span>Outside L:</span><span className="font-medium text-right">{outsideDimensions.length.toFixed(3)} in</span>
-                                            <span>Outside W:</span><span className="font-medium text-right">{outsideDimensions.width.toFixed(3)} in</span>
-                                            <span>Outside H:</span><span className="font-medium text-right">{outsideDimensions.height.toFixed(3)} in</span>
+                                            <span>Outside L:</span><span className="font-medium text-right">{formatDim(outsideDimensions.length)}</span>
+                                            <span>Outside W:</span><span className="font-medium text-right">{formatDim(outsideDimensions.width)}</span>
+                                            <span>Outside H:</span><span className="font-medium text-right">{formatDim(outsideDimensions.height)}</span>
                                         </div>
                                         <div className="border-t my-2"></div>
                                         <div className="grid grid-cols-2 gap-x-4">
-                                            <span>Blank W:</span><span className="font-medium text-right">{blankDimensions.blankWidth.toFixed(3)} in</span>
-                                            <span>Blank H:</span><span className="font-medium text-right">{blankDimensions.blankHeight.toFixed(3)} in</span>
+                                            <span>Blank W:</span><span className="font-medium text-right">{formatDim(blankDimensions.blankWidth)}</span>
+                                            <span>Blank H:</span><span className="font-medium text-right">{formatDim(blankDimensions.blankHeight)}</span>
                                         </div>
                                         <div className="border-t my-2"></div>
                                         <div className="grid grid-cols-2 gap-x-4 text-base">
-                                            <span className="font-bold">Sq. Footage:</span><span className="font-bold text-right">{squareFootage ? squareFootage.toFixed(4) : 'N/A'} ft²</span>
-                                            <span className="font-bold">Inches of Rule:</span><span className="font-bold text-right">{inchesOfRule ? inchesOfRule.toFixed(2) : 'N/A'} in</span>
+                                            <span className="font-bold">Sq. Footage:</span>
+                                            <span className="font-bold text-right">
+                                                {squareFootage ? squareFootage.toFixed(4) : 'N/A'} ft²
+                                                {appState.unit === 'mm' && squareFootage && <span className="block text-xs font-normal text-gray-500">({(squareFootage * 0.092903).toFixed(4)} m²)</span>}
+                                            </span>
+                                            <span className="font-bold">Inches of Rule:</span>
+                                            <span className="font-bold text-right">
+                                                {inchesOfRule ? inchesOfRule.toFixed(2) : 'N/A'} in
+                                                {appState.unit === 'mm' && inchesOfRule && <span className="block text-xs font-normal text-gray-500">({(inchesOfRule * 25.4).toFixed(0)} mm)</span>}
+                                            </span>
                                             <span className="font-bold">Est. Waste:</span><span className="font-bold text-right">{wastePercentage ? wastePercentage.toFixed(2) : 'N/A'}%</span>
                                         </div>
                                     </div>
@@ -1130,18 +1223,18 @@
                                 {quoteResults ? (
                                     <>
                                         <div className="space-y-2 text-sm text-indigo-900">
-                                            <div className="flex justify-between"><span>Material Cost / Box:</span><span className="font-medium">${quoteResults.baseMaterialCost.toFixed(4)}</span></div>
-                                            <div className="flex justify-between"><span>Margin / Box:</span><span className="font-medium">${quoteResults.marginAmount.toFixed(4)}</span></div>
-                                            <div className="flex justify-between"><span>Printing / Box:</span><span className="font-medium">${parseFloat(appState.printUpcharge).toFixed(4)}</span></div>
+                                            <div className="flex justify-between"><span>Material Cost / Box:</span><span className="font-medium">{currencySym}{displayMaterialCost.toFixed(4)}</span></div>
+                                            <div className="flex justify-between"><span>Margin / Box:</span><span className="font-medium">{currencySym}{displayMargin.toFixed(4)}</span></div>
+                                            <div className="flex justify-between"><span>Printing / Box:</span><span className="font-medium">{currencySym}{displayPrint.toFixed(4)}</span></div>
                                             <div className="border-t border-indigo-200 my-1"></div>
-                                            <div className="flex justify-between font-bold text-base"><span>Cost per Box:</span><span>${quoteResults.costPerBox.toFixed(4)}</span></div>
+                                            <div className="flex justify-between font-bold text-base"><span>Cost per Box:</span><span>{currencySym}{displayCostPerBox.toFixed(4)}</span></div>
                                         </div>
                                         <div className="mt-4 text-center">
                                             <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
                                             <input type="number" value={appState.quantity} onChange={e => handleStateChange({ quantity: e.target.value })} className="w-full p-2 rounded-md mb-2 border-gray-300"/>
                                             <div className="bg-white p-3 rounded-md">
                                                 <span className="text-gray-600">Total Cost:</span>
-                                                <span className="final-quote-value text-2xl font-bold ml-2">${quoteResults.totalCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                <span className="final-quote-value text-2xl font-bold ml-2">{currencySym}{displayTotalCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                             </div>
                                         </div>
                                     </>

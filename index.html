@@ -10,14 +10,13 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CorruCAD | Precision Corrugated CAD & Pricing Engine v2.6.5</title>
-    <meta name="description" content="Professional engineering tool for corrugated packaging. Generate FEFCO geometry, calculate €/m² and $/ton fiber costs, and export production-ready DXF & Kiwiplan CSV files.">
+    <title>CorruCAD | Precision Corrugated CAD & Pricing Engine</title>
+    <meta name="description" content="Professional engineering tool for corrugated packaging. Generate FEFCO geometry, calculate $/ton fiber costs, and export production-ready DXF & Kiwiplan CSV files.">
     <link rel="canonical" href="https://www.corrucad.com/" />
     <link rel="icon" href="/favicon.png" type="image/png" sizes="192x192">
     <script src="https://cdn.tailwindcss.com"></script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="[https://unpkg.com/@babel/standalone](https://unpkg.com/@babel/standalone)@^7.0.0/babel.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone@7.29.7/babel.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script type="application/ld+json">
@@ -54,14 +53,14 @@
 
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://www.corrucad.com/">
-    <meta property="og:title" content="CorruCAD | Precision Corrugated CAD & Pricing Engine v2.6.5">
-    <meta property="og:description" content="Industrial engineering tool for corrugated design. Generate FEFCO geometry, calculate fiber costs, and export DXF/Kiwiplan files.">
+    <meta property="og:title" content="CorruCAD | Precision Corrugated CAD & Pricing Engine">
+    <meta property="og:description" content="Industrial engineering tool for corrugated design. Generate FEFCO geometry, calculate $/ton fiber costs, and export DXF/Kiwiplan files.">
     <meta property="og:image" content="https://www.corrucad.com/social-preview.png">
 
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://www.corrucad.com/">
-    <meta property="twitter:title" content="CorruCAD | Precision Corrugated CAD & Pricing Engine v2.6.5">
-    <meta property="twitter:description" content="Professional corrugated engineering: cost math, FEFCO designs, and industrial CAD exports.">
+    <meta property="twitter:title" content="CorruCAD | Precision Corrugated CAD & Pricing Engine">
+    <meta property="twitter:description" content="Professional corrugated engineering: $/ton math, FEFCO designs, and industrial CAD exports.">
     <meta property="twitter:image" content="https://www.corrucad.com/social-preview.png">
     
     <script src="/_vercel/insights/script.js" defer></script>
@@ -77,11 +76,11 @@
 
     <div id="root">
         <div style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0;">
-            <h1>CorruCAD: Industrial Corrugated Design & CAD Engine v2.6.5</h1>
+            <h1>CorruCAD: Industrial Corrugated Design & CAD Engine</h1>
             <p>
                 Generate production-ready FEFCO geometry for RSC, FOL, and 0401 folders. 
                 Our precision estimating engine converts $/ton paper market assumptions into 
-                instant quotes for 32 ECT and 200# Mullen board. 
+                instant $/MSF quotes for 32 ECT and 200# Mullen board. 
                 Export DXF CAD files and Kiwiplan-ready CSVs directly to production.
             </p>
             <nav>
@@ -113,17 +112,15 @@
             </svg>
         );
 
-        // --- CorruCAD Precision Estimating Engine v2.6.5 ---
+        // --- CorruCAD Precision Estimating Engine v2.5 ---
         const estimatingEngine = (() => {
             const calculateQuote = (inputs) => {
                 const defaults = {
                     outerLiner: 0, innerLiner: 0, middleLiner: 0, medium1: 0, medium2: 0,
                     takeUpFactor1: 0, takeUpFactor2: 0, priceMsf: 0, blankAreaSqFt: 0,
-                    quantity: 0, marginPercent: 0, convertingCostPerM: 0, printUpcharge: 0, setupFee: 0
+                    quantity: 0, marginPercent: 0, printUpcharge: 0, setupFee: 0
                 };
                 const data = { ...defaults, ...inputs };
-                
-                // Fiber Weight & Cost Math
                 const mediumWeight = (data.medium1 * data.takeUpFactor1) + (data.medium2 * data.takeUpFactor2);
                 const totalFiberWeightLbsMsf = data.outerLiner + data.innerLiner + data.middleLiner + mediumWeight;
                 const totalTonsPerMsf = totalFiberWeightLbsMsf / 2000;
@@ -131,21 +128,12 @@
                 const boxWeightLbs = (data.blankAreaSqFt / 1000) * totalFiberWeightLbsMsf;
                 const boxWeightTons = boxWeightLbs / 2000;
                 const baseMaterialCost = boxWeightTons * pricePerTon;
-                
-                // Converting Overhead Cost
-                const convertingCostPerBox = data.convertingCostPerM / 1000;
-                
-                // True Gross Margin Calculation: Price = Cost / (1 - Margin%)
-                const totalCostBeforeMargin = baseMaterialCost + convertingCostPerBox + data.printUpcharge;
-                const safeMargin = Math.min(data.marginPercent, 99.99); // Prevent division by zero
-                const finalCostPerBox = totalCostBeforeMargin / (1 - (safeMargin / 100));
-                
-                const marginAmount = finalCostPerBox - totalCostBeforeMargin;
+                const marginAmount = baseMaterialCost * (data.marginPercent / 100);
+                const finalCostPerBox = baseMaterialCost + marginAmount + data.printUpcharge;
                 const totalCost = (finalCostPerBox * data.quantity) + data.setupFee;
-                
                 return {
                     pricePerTon, totalFiberWeightLbsMsf, boxWeightLbs, baseMaterialCost,
-                    convertingCostPerBox, marginAmount, costPerBox: finalCostPerBox, totalCost
+                    marginAmount, costPerBox: finalCostPerBox, totalCost
                 };
             };
             return { calculate: calculateQuote };
@@ -216,7 +204,7 @@
                     const glueTabScoreLine = { x1: x_inner_glue_tab, y1: y_top_body_crease, x2: x_inner_glue_tab, y2: y_bottom_body_crease };
                     const outsideDimensions = { length: L_in + (2 * thickness), width: W_in + (2 * thickness), height: H_in + (4 * thickness) };
                     const slots = [ { x: panel1_width - (slotWidth_full_in / 2), y: 0, w: slotWidth_full_in, h: majorFlapLength_inches, type: 'full' }, { x: (panel1_width + panel2_width) - (slotWidth_full_in / 2), y: 0, w: slotWidth_full_in, h: majorFlapLength_inches, type: 'full' }, { x: (panel1_width + panel2_width + panel3_width) - (slotWidth_full_in / 2), y: 0, w: slotWidth_full_in, h: majorFlapLength_inches, type: 'full' }, { x: x_inner_glue_tab - slotWidth_half_in, y: 0, w: slotWidth_half_in, h: majorFlapLength_inches, type: 'half_right_open' }, { x: panel1_width - (slotWidth_full_in / 2), y: internalH_for_blank + majorFlapLength_inches, w: slotWidth_full_in, h: majorFlapLength_inches, type: 'full' }, { x: (panel1_width + panel2_width) - (slotWidth_full_in / 2), y: internalH_for_blank + majorFlapLength_inches, w: slotWidth_full_in, h: majorFlapLength_inches, type: 'full' }, { x: (panel1_width + panel2_width + panel3_width) - (slotWidth_full_in / 2), y: internalH_for_blank + majorFlapLength_inches, w: slotWidth_full_in, h: majorFlapLength_inches, type: 'full' }, { x: x_inner_glue_tab - slotWidth_half_in, y: internalH_for_blank + majorFlapLength_inches, w: slotWidth_half_in, h: majorFlapLength_inches, type: 'half_right_open' } ];
-                    return { blankWidth, blankHeight, outsideDimensions, layout: [ { x: 0, y: majorFlapLength_inches, w: panel1_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width, y: majorFlapLength_inches, w: panel2_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width + panel2_width, y: majorFlapLength_inches, w: panel3_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width + panel2_width + panel3_width, y: majorFlapLength_inches, w: panel4_width, h: internalH_for_blank, type: 'panel' }, { points: glueTabPoints, type: 'polygon_cut' }, { x: 0, y: 0, w: panel1_width, h: majorFlapLength_inches, type: 'flap' }, { x: panel1_width, y: 0, w: panel2_width, h: majorFlapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width, y: 0, w: panel3_width, h: majorFlapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width + panel3_width, y: 0, w: panel4_width, h: majorFlapLength_inches, type: 'flap' }, { x: 0, y: internalH_for_blank + majorFlapLength_inches, w: panel1_width, h: majorFlapLength_inches, type: 'flap' }, { x: panel1_width, y: internalH_for_blank + majorFlapLength_inches, w: panel2_width, h: majorFlapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width, y: internalH_for_blank + majorFlapLength_inches, w: panel3_width, h: majorFlapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width + panel3_width, y: internalH_for_blank + majorFlapLength_inches, w: panel4_width, h: majorFlapLength_inches, type: 'flap' }, ], scoreLines: [ { x1: panel1_width, y1: 0, x2: panel1_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width, y1: 0, x2: panel1_width + panel2_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width + panel3_width, y1: 0, x2: panel1_width + panel2_width + panel3_width, y2: blankHeight, type: 'vertical' }, { x1: glueTabScoreLine.x1, y1: glueTabScoreLine.y1, x2: glueTabScoreLine.x2, y2: glueTabScoreLine.y2, type: 'vertical_glue_tab' }, { x1: 0, y: majorFlapLength_inches, x2: blankWidth, y2: majorFlapLength_inches, type: 'horizontal' }, { x1: 0, y: internalH_for_blank + majorFlapLength_inches, x2: blankWidth, y2: internalH_for_blank + majorFlapLength_inches, type: 'horizontal' }, ], dxfGlueTabPerimeterPoints, slots };
+                    return { blankWidth, blankHeight, outsideDimensions, layout: [ { x: 0, y: majorFlapLength_inches, w: panel1_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width, y: majorFlapLength_inches, w: panel2_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width + panel2_width, y: majorFlapLength_inches, w: panel3_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width + panel2_width + panel3_width, y: majorFlapLength_inches, w: panel4_width, h: internalH_for_blank, type: 'panel' }, { points: glueTabPoints, type: 'polygon_cut' }, { x: 0, y: 0, w: panel1_width, h: majorFlapLength_inches, type: 'flap' }, { x: panel1_width, y: 0, w: panel2_width, h: majorFlapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width, y: 0, w: panel3_width, h: majorFlapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width + panel3_width, y: 0, w: panel4_width, h: majorFlapLength_inches, type: 'flap' }, { x: 0, y: internalH_for_blank + majorFlapLength_inches, w: panel1_width, h: majorFlapLength_inches, type: 'flap' }, { x: panel1_width, y: internalH_for_blank + majorFlapLength_inches, w: panel2_width, h: majorFlapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width, y: internalH_for_blank + majorFlapLength_inches, w: panel3_width, h: majorFlapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width + panel3_width, y: internalH_for_blank + majorFlapLength_inches, w: panel4_width, h: majorFlapLength_inches, type: 'flap' }, ], scoreLines: [ { x1: panel1_width, y1: 0, x2: panel1_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width, y1: 0, x2: panel1_width + panel2_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width + panel3_width, y1: 0, x2: panel1_width + panel2_width + panel3_width, y2: blankHeight, type: 'vertical' }, { x1: glueTabScoreLine.x1, y1: glueTabScoreLine.y1, x2: glueTabScoreLine.x2, y2: glueTabScoreLine.y2, type: 'vertical_glue_tab' }, { x1: 0, y1: majorFlapLength_inches, x2: blankWidth, y2: majorFlapLength_inches, type: 'horizontal' }, { x1: 0, y1: internalH_for_blank + majorFlapLength_inches, x2: blankWidth, y2: internalH_for_blank + majorFlapLength_inches, type: 'horizontal' }, ], dxfGlueTabPerimeterPoints, slots };
                 }
             },
             '0200_HSC': {
@@ -236,7 +224,7 @@
                     const glueTabScoreLine = { x1: x_inner_glue_tab, y1: y_top_body_crease, x2: x_inner_glue_tab, y2: y_bottom_body_crease };
                     const outsideDimensions = { length: L_in + (2 * thickness), width: W_in + (2 * thickness), height: H_in + (2 * thickness) };
                     const slots = [ { x: panel1_width - (slotWidth_full_in / 2), y: internalH_for_blank, w: slotWidth_full_in, h: flapLength_inches, type: 'full' }, { x: (panel1_width + panel2_width) - (slotWidth_full_in / 2), y: internalH_for_blank, w: slotWidth_full_in, h: flapLength_inches, type: 'full' }, { x: (panel1_width + panel2_width + panel3_width) - (slotWidth_full_in / 2), y: internalH_for_blank, w: slotWidth_full_in, h: flapLength_inches, type: 'full' }, { x: x_inner_glue_tab - slotWidth_half_in, y: internalH_for_blank, w: slotWidth_half_in, h: flapLength_inches, type: 'half_right_open' } ];
-                    return { blankWidth, blankHeight, outsideDimensions, layout: [ { x: 0, y: 0, w: panel1_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width, y: 0, w: panel2_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width + panel2_width, y: 0, w: panel3_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width + panel2_width + panel3_width, y: 0, w: panel4_width, h: internalH_for_blank, type: 'panel' }, { points: glueTabPoints, type: 'polygon_cut' }, { x: 0, y: internalH_for_blank, w: panel1_width, h: flapLength_inches, type: 'flap' }, { x: panel1_width, y: internalH_for_blank, w: panel2_width, h: flapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width, y: internalH_for_blank, w: panel3_width, h: flapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width + panel3_width, y: internalH_for_blank, w: panel4_width, h: flapLength_inches, type: 'flap' }, ], scoreLines: [ { x1: panel1_width, y1: 0, x2: panel1_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width, y1: 0, x2: panel1_width + panel2_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width + panel3_width, y1: 0, x2: panel1_width + panel2_width + panel3_width, y2: blankHeight, type: 'vertical' }, { x1: glueTabScoreLine.x1, y1: glueTabScoreLine.y1, x2: glueTabScoreLine.x2, y2: glueTabScoreLine.y2, type: 'vertical_glue_tab' }, { x1: 0, y: internalH_for_blank, x2: blankWidth, y2: internalH_for_blank, type: 'horizontal' }, ], slots, dxfGlueTabPerimeterPoints };
+                    return { blankWidth, blankHeight, outsideDimensions, layout: [ { x: 0, y: 0, w: panel1_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width, y: 0, w: panel2_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width + panel2_width, y: 0, w: panel3_width, h: internalH_for_blank, type: 'panel' }, { x: panel1_width + panel2_width + panel3_width, y: 0, w: panel4_width, h: internalH_for_blank, type: 'panel' }, { points: glueTabPoints, type: 'polygon_cut' }, { x: 0, y: internalH_for_blank, w: panel1_width, h: flapLength_inches, type: 'flap' }, { x: panel1_width, y: internalH_for_blank, w: panel2_width, h: flapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width, y: internalH_for_blank, w: panel3_width, h: flapLength_inches, type: 'flap' }, { x: panel1_width + panel2_width + panel3_width, y: internalH_for_blank, w: panel4_width, h: flapLength_inches, type: 'flap' }, ], scoreLines: [ { x1: panel1_width, y1: 0, x2: panel1_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width, y1: 0, x2: panel1_width + panel2_width, y2: blankHeight, type: 'vertical' }, { x1: panel1_width + panel2_width + panel3_width, y1: 0, x2: panel1_width + panel2_width + panel3_width, y2: blankHeight, type: 'vertical' }, { x1: glueTabScoreLine.x1, y1: glueTabScoreLine.y1, x2: glueTabScoreLine.x2, y2: glueTabScoreLine.y2, type: 'vertical_glue_tab' }, { x1: 0, y1: internalH_for_blank, x2: blankWidth, y2: internalH_for_blank, type: 'horizontal' }, ], slots, dxfGlueTabPerimeterPoints };
                 }
             },
             '0301_TRAY': {
@@ -478,17 +466,12 @@
             }).filter(l => (Math.abs(l.x1 - l.x2) > xTolerance || Math.abs(l.y1 - l.y2) > xTolerance));
         };
 
-        const generateDxfContent = (blankData, fefcoStyle, L_in, W_in, H_in, unit) => {
-            const xTolerance = 1e-6;
-            const scale = unit === 'mm' ? 25.4 : 1; // Metric multiplier for DXF export dimensions
-            
-            // Minimal DXFs must use AutoCAD R12 (AC1009). 
-            // Illustrator throws Error 2067 for newer AC1015 headers if they are missing TABLES/BLOCKS sections.
+        const generateDxfContent = (blankData, fefcoStyle, L_in, W_in, H_in) => {
             let dxf = `0\nSECTION\n2\nHEADER\n9\n$ACADVER\n1\nAC1009\n0\nENDSEC\n0\nSECTION\n2\nENTITIES\n`;
-            
+            const xTolerance = 1e-6;
             const addLine = (color, x1, y1, x2, y2) => {
                 if (Math.abs(x1 - x2) > xTolerance || Math.abs(y1 - y2) > xTolerance) {
-                    dxf += `0\nLINE\n8\n0\n62\n${color}\n10\n${(x1 * scale).toFixed(6)}\n20\n${((blankData.blankHeight - y1) * scale).toFixed(6)}\n30\n0\n11\n${(x2 * scale).toFixed(6)}\n21\n${((blankData.blankHeight - y2) * scale).toFixed(6)}\n31\n0\n`;
+                    dxf += `0\nLINE\n8\n0\n62\n${color}\n10\n${x1.toFixed(6)}\n20\n${(blankData.blankHeight - y1).toFixed(6)}\n30\n0\n11\n${x2.toFixed(6)}\n21\n${(blankData.blankHeight - y2).toFixed(6)}\n31\n0\n`;
                 }
             };
             const y_top_edge = 0; const y_bottom_edge = blankData.blankHeight; const x_left_edge = 0; const x_right_edge = blankData.blankWidth;
@@ -542,15 +525,13 @@
                 const cleanedSegments = getCleanedLineSegments(line, cutRects, glueTabInternalPoints);
                 cleanedSegments.forEach(seg => { addLine(3, seg.x1, seg.y1, seg.x2, seg.y2); });
             });
-            
-            // Illustrator strictly requires a trailing newline character (\n) after the EOF marker
-            dxf += `0\nENDSEC\n0\nEOF\n`;
+            dxf += `0\nENDSEC\n0\nEOF`;
             return dxf;
         };
 
-        const generatePdf = (blankData, fefcoStyle, rawL, rawW, rawH, unit, setMessage, fileNameStr) => {
+        const generatePdf = (blankData, fefcoStyle, L_in, W_in, H_in, unit, setMessage) => {
             const { jsPDF } = window.jspdf;
-            const pdfUnit = 'in'; // Internal PDF gen unit remains 'in'
+            const pdfUnit = 'in';
             const margin = 0.5;
             const pdfPageWidth = blankData.blankWidth + (2 * margin);
             const pdfPageHeight = blankData.blankHeight + (2 * margin);
@@ -559,14 +540,8 @@
             const addLineToPdf = (x1, y1, x2, y2) => { doc.line(x1 + margin, y1 + margin, x2 + margin, y2 + margin); };
             
             doc.setTextColor(0, 0, 0); doc.setFontSize(10);
-            const displayL = unit === 'mm' ? Math.round(parseFloat(rawL)) : parseFloat(rawL).toFixed(3);
-            const displayW = unit === 'mm' ? Math.round(parseFloat(rawW)) : parseFloat(rawW).toFixed(3);
-            const displayH = unit === 'mm' ? Math.round(parseFloat(rawH)) : parseFloat(rawH).toFixed(3);
-            const displayBlankW = unit === 'mm' ? Math.round(blankData.blankWidth * 25.4) : blankData.blankWidth.toFixed(3);
-            const displayBlankH = unit === 'mm' ? Math.round(blankData.blankHeight * 25.4) : blankData.blankHeight.toFixed(3);
-
-            doc.text(`FEFCO ${fefcoStyle} - L:${displayL} W:${displayW} H:${displayH} (${unit})`, margin, margin / 2);
-            doc.text(`Blank: ${displayBlankW} x ${displayBlankH} ${unit}`, margin, margin/2 + 0.2);
+            doc.text(`FEFCO ${fefcoStyle} - L:${L_in.toFixed(3)} W:${W_in.toFixed(3)} H:${H_in.toFixed(3)} (${pdfUnit})`, margin, margin / 2);
+            doc.text(`Blank: ${blankData.blankWidth.toFixed(3)} x ${blankData.blankHeight.toFixed(3)} ${pdfUnit}`, margin, margin/2 + 0.2);
             doc.setDrawColor(255, 0, 0); doc.setLineDashPattern([], 0); doc.setLineWidth(0.02);
             
             const y_top_edge = 0; const y_bottom_edge = blankData.blankHeight; const x_left_edge = 0; const x_right_edge = blankData.blankWidth;
@@ -631,7 +606,7 @@
                 const cleanedSegments = getCleanedLineSegments(line, cutRects, glueTabInternalPoints);
                 cleanedSegments.forEach(seg => { addLineToPdf(seg.x1, seg.y1, seg.x2, seg.y2); });
             });
-            doc.save(`${fileNameStr}.pdf`);
+            doc.save(`FEFCO_${fefcoStyle}_${L_in.toFixed(2)}x${W_in.toFixed(2)}x${H_in.toFixed(2)}.pdf`);
             setMessage('PDF file downloaded successfully!');
         };
 
@@ -691,13 +666,12 @@
 
         const FEFCOCADApp = () => {
             const [appState, setAppState] = useState({
-                unit: 'in', // Unit Switcher State
                 length: 12, width: 12, height: 12,
                 boardProfile: '32 ECT C', fefcoStyle: '0201',
                 priceMsf: 58, outerLiner: 35, innerLiner: 35,
                 medium1: 23, middleLiner: 0, medium2: 0,
                 flute1: '1.42', flute2: '1.32',
-                margin: 0, convertingCostPerM: 0.00, printUpcharge: 0.00, setupFee: 0, quantity: 1000,
+                margin: 0, printUpcharge: 0.00, setupFee: 0, quantity: 1000,
                 topTenSelection: '12 x 12 x 12 (S-4125)',
             });
 
@@ -708,51 +682,6 @@
             });
 
             const canvasRef = useRef(null);
-
-            const toggleUnit = (newUnit) => {
-                if (newUnit === appState.unit) return;
-                setAppState(prev => {
-                    let newL = parseFloat(prev.length) || 0;
-                    let newW = parseFloat(prev.width) || 0;
-                    let newH = parseFloat(prev.height) || 0;
-                    let newPrice = parseFloat(prev.priceMsf) || 0;
-                    let newConverting = parseFloat(prev.convertingCostPerM) || 0;
-                    let newPrint = parseFloat(prev.printUpcharge) || 0;
-                    let newSetup = parseFloat(prev.setupFee) || 0;
-
-                    if (newUnit === 'mm') {
-                        newL = Math.round(newL * 25.4).toString();
-                        newW = Math.round(newW * 25.4).toString();
-                        newH = Math.round(newH * 25.4).toString();
-                        // Convert $/MSF to €/m² and USD to EUR
-                        newPrice = newPrice / (1.15 * 92.90304);
-                        newConverting = newConverting / 1.15;
-                        newPrint = newPrint / 1.15;
-                        newSetup = newSetup / 1.15;
-                    } else {
-                        // Snap back to nearest 1/16th of an inch to prevent rounding drift
-                        const snap = (v) => (Math.round((v / 25.4) * 16) / 16).toString();
-                        newL = snap(newL);
-                        newW = snap(newW);
-                        newH = snap(newH);
-                        // Convert €/m² to $/MSF and EUR to USD
-                        newPrice = newPrice * (1.15 * 92.90304);
-                        newConverting = newConverting * 1.15;
-                        newPrint = newPrint * 1.15;
-                        newSetup = newSetup * 1.15;
-                    }
-                    
-                    return { 
-                        ...prev, unit: newUnit, 
-                        length: newL, width: newW, height: newH, 
-                        priceMsf: newUnit === 'mm' ? newPrice.toFixed(4) : newPrice.toFixed(2),
-                        convertingCostPerM: newConverting.toFixed(2),
-                        printUpcharge: newPrint.toFixed(2),
-                        setupFee: newSetup.toFixed(2),
-                        topTenSelection: 'custom' 
-                    };
-                });
-            };
 
             const exportToKiwiplan = () => {
                 if (!results.blankDimensions) {
@@ -767,13 +696,9 @@
                     "Score1_mm", "Score2_mm", "Score3_mm", "Score4_mm", "Score5_mm", "Notes"
                 ];
                 
-                const L_in_val = appState.unit === 'mm' ? parseFloat(appState.length) / 25.4 : parseFloat(appState.length);
-                const W_in_val = appState.unit === 'mm' ? parseFloat(appState.width) / 25.4 : parseFloat(appState.width);
-                const H_in_val = appState.unit === 'mm' ? parseFloat(appState.height) / 25.4 : parseFloat(appState.height);
-
-                const L_mm = Math.round(L_in_val * 25.4);
-                const W_mm = Math.round(W_in_val * 25.4);
-                const D_mm = Math.round(H_in_val * 25.4);
+                const L_mm = Math.round(parseFloat(appState.length) * 25.4);
+                const W_mm = Math.round(parseFloat(appState.width) * 25.4);
+                const D_mm = Math.round(parseFloat(appState.height) * 25.4);
                 
                 const BlankW_mm = Math.round(results.blankDimensions.blankWidth * 25.4);
                 const BlankL_mm = Math.round(results.blankDimensions.blankHeight * 25.4);
@@ -797,7 +722,7 @@
                     new Date().toISOString().slice(0,10).replace(/-/g,""),
                     appState.boardProfile, appState.flute1,
                     L_mm, W_mm, D_mm, BlankW_mm, BlankL_mm,
-                    Score1_mm, Score2_mm, Score3_mm, Score4_mm, Score5_mm, "Generated by corru~CAD v2.6.5"
+                    Score1_mm, Score2_mm, Score3_mm, Score4_mm, Score5_mm, "Generated by corru~CAD v2.5"
                 ];
 
                 const csvContent = "data:text/csv;charset=utf-8," + headers.join(",") + "\n" + row.join(",");
@@ -813,7 +738,6 @@
             const handleStateChange = useCallback((changes) => {
                 setAppState(prevState => {
                     let newState = { ...prevState, ...changes };
-                    const currentUnit = changes.unit || prevState.unit;
 
                     if ('topTenSelection' in changes) {
                         const selectedSkuName = changes.topTenSelection;
@@ -822,10 +746,9 @@
                         } else {
                             const selectedSku = topTenSkus.find(s => s.name === selectedSkuName);
                             if (selectedSku) {
-                                // Respect current unit choice for presets using nearest mm
-                                newState.length = currentUnit === 'mm' ? Math.round(selectedSku.l * 25.4).toString() : selectedSku.l.toString();
-                                newState.width = currentUnit === 'mm' ? Math.round(selectedSku.w * 25.4).toString() : selectedSku.w.toString();
-                                newState.height = currentUnit === 'mm' ? Math.round(selectedSku.h * 25.4).toString() : selectedSku.h.toString();
+                                newState.length = selectedSku.l;
+                                newState.width = selectedSku.w;
+                                newState.height = selectedSku.h;
                             }
                         }
                     }
@@ -839,19 +762,13 @@
                         const board = boardData[newBoardProfile];
                         if (board) {
                             const comps = board.components;
-                            let basePrice = board.priceMsf || 0;
-                            
-                            if (currentUnit === 'mm') {
-                                basePrice = basePrice / (1.15 * 92.90304);
-                            }
-
                             const derivedChanges = {
                                 outerLiner: comps.outerLiner || 0,
                                 innerLiner: comps.innerLiner || 0,
                                 medium1: comps.medium1 || 0,
                                 middleLiner: comps.middleLiner || 0,
                                 medium2: comps.medium2 || 0,
-                                priceMsf: currentUnit === 'mm' ? basePrice.toFixed(4) : basePrice.toFixed(2),
+                                priceMsf: board.priceMsf || 0,
                             };
                             const fluteTakeupFactors = { 'B': '1.32', 'C': '1.42' };
                             if (board.type === 'doublewall' && board.flutes && board.flutes.length === 2) {
@@ -878,15 +795,14 @@
 
             useEffect(() => {
                 const {
-                    length, width, height, boardProfile, fefcoStyle, unit,
+                    length, width, height, boardProfile, fefcoStyle,
                     priceMsf, outerLiner, innerLiner, medium1, middleLiner, medium2,
-                    flute1, flute2, margin, convertingCostPerM, printUpcharge, setupFee, quantity
+                    flute1, flute2, margin, printUpcharge, setupFee, quantity
                 } = appState;
 
-                // Engine calculations are STRICTLY in standard inches
-                const L_in = unit === 'mm' ? parseFloat(length) / 25.4 : parseFloat(length);
-                const W_in = unit === 'mm' ? parseFloat(width) / 25.4 : parseFloat(width);
-                const H_in = unit === 'mm' ? parseFloat(height) / 25.4 : parseFloat(height);
+                const L_in = parseFloat(length);
+                const W_in = parseFloat(width);
+                const H_in = parseFloat(height);
 
                 if (isNaN(L_in) || isNaN(W_in) || isNaN(H_in) || L_in <= 0 || W_in <= 0 || H_in <= 0) {
                     setResults(r => ({ ...r, message: 'Please enter valid positive numbers for all CAD dimensions.', quoteResults: null, blankDimensions: null, wastePercentage: null, inchesOfRule: null }));
@@ -987,20 +903,14 @@
                     }
                 });
 
-                // Convert dynamic prices back to USD before running the estimation engine
-                const enginePriceMsf = unit === 'mm' ? parseFloat(priceMsf) * 1.15 * 92.90304 : parseFloat(priceMsf) || 0;
-                const engineConverting = unit === 'mm' ? parseFloat(convertingCostPerM) * 1.15 : parseFloat(convertingCostPerM) || 0;
-                const enginePrintUpcharge = unit === 'mm' ? parseFloat(printUpcharge) * 1.15 : parseFloat(printUpcharge) || 0;
-                const engineSetupFee = unit === 'mm' ? parseFloat(setupFee) * 1.15 : parseFloat(setupFee) || 0;
-
                 const pricingInputs = {
                     outerLiner: parseFloat(outerLiner) || 0, innerLiner: parseFloat(innerLiner) || 0,
                     middleLiner: parseFloat(middleLiner) || 0, medium1: parseFloat(medium1) || 0,
                     medium2: parseFloat(medium2) || 0, takeUpFactor1: parseFloat(flute1) || 0,
                     takeUpFactor2: board.type === 'doublewall' ? (parseFloat(flute2) || 0) : 0,
-                    priceMsf: enginePriceMsf, blankAreaSqFt: blankAreaSqFt,
+                    priceMsf: parseFloat(priceMsf) || 0, blankAreaSqFt: blankAreaSqFt,
                     quantity: parseInt(quantity) || 0, marginPercent: parseFloat(margin) || 0,
-                    convertingCostPerM: engineConverting, printUpcharge: enginePrintUpcharge, setupFee: engineSetupFee,
+                    printUpcharge: parseFloat(printUpcharge) || 0, setupFee: parseFloat(setupFee) || 0,
                 };
 
                 const quote = estimatingEngine.calculate(pricingInputs);
@@ -1025,51 +935,33 @@
 
             const handleDownload = (type) => {
                 const { blankDimensions } = results;
-                const { length, width, height, fefcoStyle, unit } = appState;
-                const L_in = unit === 'mm' ? parseFloat(length) / 25.4 : parseFloat(length);
-                const W_in = unit === 'mm' ? parseFloat(width) / 25.4 : parseFloat(width);
-                const H_in = unit === 'mm' ? parseFloat(height) / 25.4 : parseFloat(height);
+                const { length, width, height, fefcoStyle } = appState;
+                const L_in = parseFloat(length);
+                const W_in = parseFloat(width);
+                const H_in = parseFloat(height);
 
                 if (!blankDimensions || isNaN(L_in) || isNaN(W_in) || isNaN(H_in)) {
                     setResults(prev => ({...prev, message: 'Cannot generate file. Please check input dimensions.'}));
                     return;
                 }
 
-                const displayL = unit === 'mm' ? Math.round(parseFloat(length)) : parseFloat(length);
-                const displayW = unit === 'mm' ? Math.round(parseFloat(width)) : parseFloat(width);
-                const displayH = unit === 'mm' ? Math.round(parseFloat(height)) : parseFloat(height);
-                const fileNameStr = `FEFCO_${fefcoStyle}_${displayL}x${displayW}x${displayH}${unit}`;
-
                 if (type === 'dxf') {
-                    const dxfContent = generateDxfContent(blankDimensions, fefcoStyle, L_in, W_in, H_in, unit);
+                    const dxfContent = generateDxfContent(blankDimensions, fefcoStyle, L_in, W_in, H_in);
                     const blob = new Blob([dxfContent], { type: 'application/dxf' });
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = `${fileNameStr}.dxf`;
+                    a.download = `FEFCO_${fefcoStyle}_${L_in.toFixed(2)}x${W_in.toFixed(2)}x${H_in.toFixed(2)}.dxf`;
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
                     URL.revokeObjectURL(url);
                     setResults(prev => ({...prev, message: 'DXF file downloaded successfully!'}));
                 } else if (type === 'pdf') {
-                    generatePdf(blankDimensions, fefcoStyle, length, width, height, unit, (msg) => setResults(prev => ({...prev, message: msg})), fileNameStr);
+                    generatePdf(blankDimensions, fefcoStyle, L_in, W_in, H_in, 'in', (msg) => setResults(prev => ({...prev, message: msg})));
                 }
             };
-            
             const { blankDimensions, outsideDimensions, squareFootage, wastePercentage, quoteResults, message, inchesOfRule } = results;
-
-            // UI Display Formatting Helpers
-            const formatDim = (val_in) => appState.unit === 'mm' ? Math.round(val_in * 25.4) + ' mm' : val_in.toFixed(3) + ' in';
-            const currencySym = appState.unit === 'mm' ? '€' : '$';
-
-            // Display costs conversion back from the Engine's native USD calculation out to EUR if running in metric mode
-            const displayMaterialCost = quoteResults ? (appState.unit === 'mm' ? quoteResults.baseMaterialCost / 1.15 : quoteResults.baseMaterialCost) : 0;
-            const displayConvertingCost = quoteResults ? (appState.unit === 'mm' ? quoteResults.convertingCostPerBox / 1.15 : quoteResults.convertingCostPerBox) : 0;
-            const displayMargin = quoteResults ? (appState.unit === 'mm' ? quoteResults.marginAmount / 1.15 : quoteResults.marginAmount) : 0;
-            const displayPrint = parseFloat(appState.printUpcharge) || 0;
-            const displayCostPerBox = quoteResults ? (appState.unit === 'mm' ? quoteResults.costPerBox / 1.15 : quoteResults.costPerBox) : 0;
-            const displayTotalCost = quoteResults ? (appState.unit === 'mm' ? quoteResults.totalCost / 1.15 : quoteResults.totalCost) : 0;
 
             return (
                 <div className="max-w-7xl mx-auto p-4 md:p-8">
@@ -1077,25 +969,12 @@
                          <h1 className="text-4xl md:text-5xl font-extrabold text-slate-800 flex items-baseline justify-center">
                             <span>corru</span><span className="text-orange-500 text-5xl md:text-6xl font-normal mx-1" style={{ transform: 'translateY(2px)' }}>~</span><span className="font-black">CAD</span>
                         </h1>
-                        <p className="text-md text-gray-600">v2.6.5 - Precision Engine with Presets</p>
+                        <p className="text-md text-gray-600">v2.5 - Precision Engine with Presets</p>
                     </div>
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-sm space-y-6">
                             <div>
-                                <div className="flex justify-between items-center mb-4 border-b border-gray-200 pb-2">
-                                    <h2 className="section-title border-none mb-0 pb-0">CAD Inputs</h2>
-                                    <div className="flex bg-gray-200 rounded-md p-1">
-                                        <button
-                                            className={`px-3 py-1 text-sm font-medium rounded-sm transition-colors ${appState.unit === 'in' ? 'bg-white shadow-sm text-indigo-700' : 'text-gray-500 hover:text-gray-700'}`}
-                                            onClick={() => toggleUnit('in')}
-                                        >Standard (in)</button>
-                                        <button
-                                            className={`px-3 py-1 text-sm font-medium rounded-sm transition-colors ${appState.unit === 'mm' ? 'bg-white shadow-sm text-indigo-700' : 'text-gray-500 hover:text-gray-700'}`}
-                                            onClick={() => toggleUnit('mm')}
-                                        >Metric (mm)</button>
-                                    </div>
-                                </div>
-                                
+                                <h2 className="section-title">CAD Inputs</h2>
                                 <div className="mb-4">
                                      <label className="block text-sm font-medium text-gray-700">Top 10 SKU Presets</label>
                                      <select value={appState.topTenSelection} onChange={e => handleStateChange({ topTenSelection: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md bg-yellow-50">
@@ -1105,15 +984,15 @@
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700">Length (L) ({appState.unit})</label>
+                                        <label className="block text-sm font-medium text-gray-700">Length (L) (in)</label>
                                         <input type="number" value={appState.length} onChange={e => handleStateChange({ length: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700">Width (W) ({appState.unit})</label>
+                                        <label className="block text-sm font-medium text-gray-700">Width (W) (in)</label>
                                         <input type="number" value={appState.width} onChange={e => handleStateChange({ width: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700">Height (H) ({appState.unit})</label>
+                                        <label className="block text-sm font-medium text-gray-700">Height (H) (in)</label>
                                         <input type="number" value={appState.height} onChange={e => handleStateChange({ height: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
                                     </div>
                                     <div className="md:col-span-2">
@@ -1136,7 +1015,7 @@
                                     <div className="space-y-4 p-4 border rounded-md bg-gray-50">
                                         <h3 className="font-semibold text-gray-700">Material Definition</h3>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700">Market Price ({appState.unit === 'mm' ? '€/m²' : '$/msf'})</label>
+                                            <label className="block text-sm font-medium text-gray-700">Market Price ($/msf)</label>
                                             <input type="number" value={appState.priceMsf} onChange={e => handleStateChange({ priceMsf: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
                                         </div>
                                         <div className="grid grid-cols-2 gap-2">
@@ -1187,15 +1066,11 @@
                                             <input type="number" value={appState.margin} onChange={e => handleStateChange({ margin: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700">Converting Overhead ({appState.unit === 'mm' ? '€/M' : '$/M'})</label>
-                                            <input type="number" step="0.01" value={appState.convertingCostPerM} onChange={e => handleStateChange({ convertingCostPerM: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">Printing ({appState.unit === 'mm' ? '€/box' : '$/box'})</label>
+                                            <label className="block text-sm font-medium text-gray-700">Printing ($/box)</label>
                                             <input type="number" step="0.01" value={appState.printUpcharge} onChange={e => handleStateChange({ printUpcharge: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700">Setup Fee ({currencySym})</label>
+                                            <label className="block text-sm font-medium text-gray-700">Setup Fee ($)</label>
                                             <input type="number" value={appState.setupFee} onChange={e => handleStateChange({ setupFee: e.target.value })} className="mt-1 block w-full p-2 border border-gray-300 rounded-md"/>
                                         </div>
                                     </div>
@@ -1218,33 +1093,25 @@
                                     <div className="bg-white p-4 rounded-md shadow-inner text-sm space-y-1 mb-4">
                                         <h3 className="font-semibold text-gray-800 mb-2">Calculated Dimensions:</h3>
                                         <div className="grid grid-cols-2 gap-x-4">
-                                            <span>Internal L:</span><span className="font-medium text-right">{appState.unit === 'mm' ? Math.round(parseFloat(appState.length)) + ' mm' : parseFloat(appState.length).toFixed(3) + ' in'}</span>
-                                            <span>Internal W:</span><span className="font-medium text-right">{appState.unit === 'mm' ? Math.round(parseFloat(appState.width)) + ' mm' : parseFloat(appState.width).toFixed(3) + ' in'}</span>
-                                            <span>Internal H:</span><span className="font-medium text-right">{appState.unit === 'mm' ? Math.round(parseFloat(appState.height)) + ' mm' : parseFloat(appState.height).toFixed(3) + ' in'}</span>
+                                            <span>Internal L:</span><span className="font-medium text-right">{parseFloat(appState.length).toFixed(3)} in</span>
+                                            <span>Internal W:</span><span className="font-medium text-right">{parseFloat(appState.width).toFixed(3)} in</span>
+                                            <span>Internal H:</span><span className="font-medium text-right">{parseFloat(appState.height).toFixed(3)} in</span>
                                         </div>
                                         <div className="border-t my-2"></div>
                                         <div className="grid grid-cols-2 gap-x-4">
-                                            <span>Outside L:</span><span className="font-medium text-right">{formatDim(outsideDimensions.length)}</span>
-                                            <span>Outside W:</span><span className="font-medium text-right">{formatDim(outsideDimensions.width)}</span>
-                                            <span>Outside H:</span><span className="font-medium text-right">{formatDim(outsideDimensions.height)}</span>
+                                            <span>Outside L:</span><span className="font-medium text-right">{outsideDimensions.length.toFixed(3)} in</span>
+                                            <span>Outside W:</span><span className="font-medium text-right">{outsideDimensions.width.toFixed(3)} in</span>
+                                            <span>Outside H:</span><span className="font-medium text-right">{outsideDimensions.height.toFixed(3)} in</span>
                                         </div>
                                         <div className="border-t my-2"></div>
                                         <div className="grid grid-cols-2 gap-x-4">
-                                            <span>Blank W:</span><span className="font-medium text-right">{formatDim(blankDimensions.blankWidth)}</span>
-                                            <span>Blank H:</span><span className="font-medium text-right">{formatDim(blankDimensions.blankHeight)}</span>
+                                            <span>Blank W:</span><span className="font-medium text-right">{blankDimensions.blankWidth.toFixed(3)} in</span>
+                                            <span>Blank H:</span><span className="font-medium text-right">{blankDimensions.blankHeight.toFixed(3)} in</span>
                                         </div>
                                         <div className="border-t my-2"></div>
                                         <div className="grid grid-cols-2 gap-x-4 text-base">
-                                            <span className="font-bold">Sq. Footage:</span>
-                                            <span className="font-bold text-right">
-                                                {squareFootage ? squareFootage.toFixed(4) : 'N/A'} ft²
-                                                {appState.unit === 'mm' && squareFootage && <span className="block text-xs font-normal text-gray-500">({(squareFootage * 0.092903).toFixed(4)} m²)</span>}
-                                            </span>
-                                            <span className="font-bold">Inches of Rule:</span>
-                                            <span className="font-bold text-right">
-                                                {inchesOfRule ? inchesOfRule.toFixed(2) : 'N/A'} in
-                                                {appState.unit === 'mm' && inchesOfRule && <span className="block text-xs font-normal text-gray-500">({(inchesOfRule * 25.4).toFixed(0)} mm)</span>}
-                                            </span>
+                                            <span className="font-bold">Sq. Footage:</span><span className="font-bold text-right">{squareFootage ? squareFootage.toFixed(4) : 'N/A'} ft²</span>
+                                            <span className="font-bold">Inches of Rule:</span><span className="font-bold text-right">{inchesOfRule ? inchesOfRule.toFixed(2) : 'N/A'} in</span>
                                             <span className="font-bold">Est. Waste:</span><span className="font-bold text-right">{wastePercentage ? wastePercentage.toFixed(2) : 'N/A'}%</span>
                                         </div>
                                     </div>
@@ -1263,19 +1130,18 @@
                                 {quoteResults ? (
                                     <>
                                         <div className="space-y-2 text-sm text-indigo-900">
-                                            <div className="flex justify-between"><span>Material Cost / Box:</span><span className="font-medium">{currencySym}{displayMaterialCost.toFixed(4)}</span></div>
-                                            <div className="flex justify-between"><span>Converting / Box:</span><span className="font-medium">{currencySym}{displayConvertingCost.toFixed(4)}</span></div>
-                                            <div className="flex justify-between"><span>Printing / Box:</span><span className="font-medium">{currencySym}{displayPrint.toFixed(4)}</span></div>
-                                            <div className="flex justify-between"><span>Margin / Box:</span><span className="font-medium">{currencySym}{displayMargin.toFixed(4)}</span></div>
+                                            <div className="flex justify-between"><span>Material Cost / Box:</span><span className="font-medium">${quoteResults.baseMaterialCost.toFixed(4)}</span></div>
+                                            <div className="flex justify-between"><span>Margin / Box:</span><span className="font-medium">${quoteResults.marginAmount.toFixed(4)}</span></div>
+                                            <div className="flex justify-between"><span>Printing / Box:</span><span className="font-medium">${parseFloat(appState.printUpcharge).toFixed(4)}</span></div>
                                             <div className="border-t border-indigo-200 my-1"></div>
-                                            <div className="flex justify-between font-bold text-base"><span>Cost per Box:</span><span>{currencySym}{displayCostPerBox.toFixed(4)}</span></div>
+                                            <div className="flex justify-between font-bold text-base"><span>Cost per Box:</span><span>${quoteResults.costPerBox.toFixed(4)}</span></div>
                                         </div>
                                         <div className="mt-4 text-center">
                                             <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
                                             <input type="number" value={appState.quantity} onChange={e => handleStateChange({ quantity: e.target.value })} className="w-full p-2 rounded-md mb-2 border-gray-300"/>
                                             <div className="bg-white p-3 rounded-md">
                                                 <span className="text-gray-600">Total Cost:</span>
-                                                <span className="final-quote-value text-2xl font-bold ml-2">{currencySym}{displayTotalCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                <span className="final-quote-value text-2xl font-bold ml-2">${quoteResults.totalCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                             </div>
                                         </div>
                                     </>

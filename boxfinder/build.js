@@ -34,8 +34,8 @@ const indexSchema = {
 
 // 1. Generate the main index.html
 const indexHtml = template
-    .replace('{{TITLE}}', 'Compare Box Prices: Uline vs. Grainger vs. PackagingPrice | BoxFinder')
-    .replace('{{DESC}}', 'Stop overpaying for corrugated boxes. BoxFinder shows you real prices from Uline, Grainger, and PackagingPrice side-by-side — enter your dimensions and find the lowest price instantly.')
+    .replace('{{TITLE}}', 'Shipping box price comparison: 2026')
+    .replace('{{DESC}}', 'Shop for corrugated shipping boxes. BoxFinder shows you real prices from Papermart, Uline, Grainger, PackagingPrice, and more side-by-side — enter your dimensions and find the lowest price instantly.')
     .replace('{{CANONICAL}}', 'https://www.corrucad.com/boxfinder/') // Clean URL
     .replace('{{SCHEMA_MARKUP}}', JSON.stringify(indexSchema, null, 2))
     .replace('{{INJECTED_DIMS}}', 'null')

@@ -45,11 +45,7 @@ rawData.forEach(b => {
 });
 masterStaticSummaryTable += `</tbody></table>`;
 
-// 2. GENERATE THE MAIN INDEX.HTML
-// Old Main Index HTML Generation
-// .replace('{{TITLE}}', 'Compare Box Prices: Uline vs. Grainger vs. PackagingPrice | BoxFinder')
-
-// NEW OPTIMIZED MAIN INDEX FOR "BOX PRICE CHECK"
+// 2. GENERATE THE MAIN INDEX.HTML FOR PLURAL "SHIPPING BOX PRICES"
 const indexHtml = template
     .replace('{{TITLE}}', 'Shipping Box Prices: Free Independent Cost Comparison Tool')
     .replace('{{DESC}}', 'Compare current shipping box prices across Uline, Grainger, The Boxery, and PaperMart instantly. Run a free price check to lock in the lowest volume tiers.')
@@ -97,9 +93,9 @@ rawData.forEach(box => {
         }
     };
 
-  const boxHtml = template
-    .replace('{{TITLE}}', `${dim} Shipping Box Price Check | Moving Box Cost Calculator`)
-    .replace('{{DESC}}', `Run a fast ${dim} box price check across top industrial vendors. Compare real-time prices side-by-side. Lowest current match: $${bestPrice.toFixed(2)}/box.`)
+    const boxHtml = template
+        .replace('{{TITLE}}', `${dim} Shipping Box Price Check | Moving Box Cost Calculator`)
+        .replace('{{DESC}}', `Run a fast ${dim} box price check across top industrial vendors. Compare real-time prices side-by-side. Lowest current match: $${bestPrice.toFixed(2)}/box.`)
         .replace('{{CANONICAL}}', `https://www.corrucad.com/boxfinder/${cleanSlug}`) 
         .replace('{{SCHEMA_MARKUP}}', JSON.stringify(schemaMarkup, null, 2))
         .replace('{{INJECTED_DIMS}}', JSON.stringify({ l: box.l.toString(), w: box.w.toString(), h: box.h.toString() }))

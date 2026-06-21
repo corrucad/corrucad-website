@@ -24,8 +24,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    
     <script src="https://unpkg.com/@babel/standalone@7.29.7/babel.min.js"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
@@ -34,7 +34,7 @@
     <script src="/_vercel/insights/script.js" defer></script>
     
     <script>
-        // SAFE PARSING: Removed eval() in favor of JSON.parse()
+        // SAFE PARSING: Client-side dimension injection for React hydration
         let dims = { l: '', w: '', h: '' };
         const dimsStr = `{{INJECTED_DIMS}}`;
         if (!dimsStr.startsWith('{{')) {
@@ -49,30 +49,27 @@
 </head>
 <body class="bg-slate-100 flex flex-col min-h-screen">
 
-    <div id="root" class="flex-grow"></div>
-<!-- CRAWLABLE SEO INTERNAL LINK MATRIX -->
-<div class="max-w-7xl mx-auto px-4 py-12 border-t border-slate-200 mt-12 bg-white rounded-2xl shadow-sm">
-    <h3 class="text-sm font-extrabold text-slate-800 uppercase tracking-wider mb-4">Popular Box Price Comparisons</h3>
-    <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3 text-sm">
-        <a href="/boxfinder/4x4x4-corrugated-boxes" class="text-orange-600 hover:underline font-medium">4x4x4 Boxes</a>
-        <a href="/boxfinder/5x5x5-corrugated-boxes" class="text-orange-600 hover:underline font-medium">5x5x5 Boxes</a>
-        <a href="/boxfinder/6x4x4-corrugated-boxes" class="text-orange-600 hover:underline font-medium">6x4x4 Boxes</a>
-        <a href="/boxfinder/6x6x4-corrugated-boxes" class="text-orange-600 hover:underline font-medium">6x6x4 Boxes</a>
-        <a href="/boxfinder/6x6x6-corrugated-boxes" class="text-orange-600 hover:underline font-medium">6x6x6 Boxes</a>
-        <a href="/boxfinder/8x6x4-corrugated-boxes" class="text-orange-600 hover:underline font-medium">8x6x4 Boxes</a>
-        <a href="/boxfinder/8x8x4-corrugated-boxes" class="text-orange-600 hover:underline font-medium">8x8x4 Boxes</a>
-        <a href="/boxfinder/8x8x8-corrugated-boxes" class="text-orange-600 hover:underline font-medium">8x8x8 Boxes</a>
-        <a href="/boxfinder/10x8x6-corrugated-boxes" class="text-orange-600 hover:underline font-medium">10x8x6 Boxes</a>
-        <a href="/boxfinder/10x10x10-corrugated-boxes" class="text-orange-600 hover:underline font-medium">10x10x10 Boxes</a>
-        <a href="/boxfinder/12x6x6-corrugated-boxes" class="text-orange-600 hover:underline font-medium">12x6x6 Boxes</a>
-        <a href="/boxfinder/12x12x12-corrugated-boxes" class="text-orange-600 hover:underline font-medium">12x12x12 Boxes</a>
+    <!-- STATIC PAYLOAD FOR GOOGLEBOT (WAVE 1 HTTP FETCH) -->
+    <div class="sr-only">
+        {{STATIC_SEO_TABLE}}
     </div>
-</div>
 
+    <!-- DYNAMIC REACT APPLICATION CONTAINER -->
     <div id="root" class="flex-grow"></div>
-<!-- STATIC PAYLOAD FOR GOOGLEBOT -->
-<div class="sr-only">{{STATIC_SEO_TABLE}}</div>
-    
+
+    <!-- CRAWLABLE SEO INTERNAL LINK MATRIX (ELIMINATES ORPHAN PAGES) -->
+    <div class="max-w-7xl mx-auto px-4 py-10 border-t border-slate-200 mt-12 bg-white rounded-2xl shadow-sm w-full mb-8">
+        <div class="flex items-center gap-2 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-orange-500 flex-shrink-0"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+            <h3 class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">
+                BoxFinder Corrugated Shipping Box Catalog &amp; Price Checker
+            </h3>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2.5 text-xs">
+            {{INTERNAL_LINK_MATRIX}}
+        </div>
+    </div>
+
     <script type="text/babel">
         const { useState, useMemo } = React;
 
@@ -147,7 +144,6 @@
 
                 // Paper Mart CJ Affiliate Deep Linking
                 if (vendor === 'PaperMart') {
-                    // Pad SKU to 6 digits (e.g., '16040' becomes '016040') as required by Paper Mart
                     const formattedSku = sku.padStart(6, '0');
                     const targetUrl = `https://www.papermart.com/p/standard-rsc-corrugated-cartons/1001?SearchItemNumber=${formattedSku}`;
                     return `https://www.kqzyfj.com/click-101732774-13236874?url=${encodeURIComponent(targetUrl)}&cjsku=${formattedSku}`;
@@ -155,7 +151,6 @@
             }
 
             // --- FALLBACK GENERIC VENDOR LINKS ---
-            // Updated PaperMart generic link from the links.csv file
             if (vendor === 'PaperMart') return 'https://www.anrdoezrs.net/click-101732774-12336139';
             if (vendor === 'Wagner Supply') return 'https://www.wagnersupply.com/Items/JMTBCO/Industrial-Packaging/Boxes/';
             if (vendor === 'Staples') return 'https://www.staples.com/Shipping-Boxes/cat_CL213835';
@@ -310,7 +305,7 @@
                 }
             };
 
-            // Hardcoded exchange rate as of May 11, 2026
+            // Hardcoded exchange rate
             const GBP_TO_USD = 1.364; 
 
             const filteredBoxes = useMemo(() => {
@@ -324,14 +319,11 @@
                             
                             return {
                                 ...o,
-                                // Keep original price for UI rendering
                                 displayPrice: basePrice, 
-                                // Calculate USD equivalent for accurate sorting
                                 sortPrice: isGBP ? (basePrice * GBP_TO_USD) : basePrice 
                             };
                         });
                         
-                        // Sort the vendor offers inside the box by their USD equivalent
                         return { ...box, offers: pricedOffers.sort((a, b) => a.sortPrice - b.sortPrice) };
                     })
                     .filter(box => {
@@ -342,7 +334,6 @@
                         return true;
                     })
                     .sort((a, b) => {
-                        // Sort the overall box cards by the absolute lowest USD equivalent
                         if (sortBy === 'price-asc') return (a.offers[0]?.sortPrice || 999) - (b.offers[0]?.sortPrice || 999);
                         if (sortBy === 'size-desc') return (b.l * b.w * b.h) - (a.l * a.w * a.h);
                         return (a.l * a.w * a.h) - (b.l * b.w * b.h);
@@ -350,20 +341,20 @@
             }, [l, w, h, selectedVendors, qtyMode, sortBy]);
 
             return (
-                <div className="min-h-screen bg-slate-100 font-sans text-slate-900">
+                <div className="min-h-screen bg-slate-100 font-sans text-slate-900 pb-12">
                     <header className="bg-gradient-to-r from-orange-500 to-orange-600 shadow-md relative">
                         <div className="bg-orange-700 text-orange-100 px-4 py-2 text-sm flex items-center justify-between">
-                            <a href="/" className="flex items-center gap-1 hover:text-white transition-colors">
+                            <a href="/" className="flex items-center gap-1 hover:text-white transition-colors font-medium">
                                 <ArrowLeft size={16} /> Back to corru~CAD Estimator
                             </a>
                         </div>
                         
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-28">
                             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
-                                <div className="flex items-center gap-3 text-white">
+                                <a href="/boxfinder/" className="flex items-center gap-3 text-white hover:opacity-90 transition-opacity">
                                     <Package size={32} />
                                     <h1 className="text-3xl font-extrabold tracking-tight">BoxFinder</h1>
-                                </div>
+                                </a>
                                 <div className="bg-white/10 p-1 rounded-xl flex items-center backdrop-blur-sm border border-white/20">
                                     <button onClick={() => setQtyMode('standard')} className={`px-5 py-2 rounded-lg text-sm font-bold transition-all ${qtyMode === 'standard' ? 'bg-white text-orange-600 shadow-md' : 'text-white/90 hover:text-white hover:bg-white/10'}`}>
                                         Standard (&lt; 100)
@@ -374,7 +365,7 @@
                                 </div>
                             </div>
                             
-                            <h2 className="text-white text-xl font-medium mb-6">Compare shipping supplies across top vendors and save.</h2>
+                            <h2 className="text-white text-xl font-medium mb-6">Compare shipping supplies across top industrial vendors and save instantly.</h2>
                             
                             <div className="mb-8">
                                 <a href="https://www.producthunt.com/products/boxfinder?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-boxfinder" target="_blank" rel="noopener noreferrer" className="inline-block hover:opacity-90 transition-opacity">
@@ -389,7 +380,7 @@
                                     <SizeInput label="Height (in)" value={h} onChange={setH} />
                                 </div>
                                 <div className="w-full md:w-auto flex flex-col sm:flex-row gap-3 flex-shrink-0">
-                                    <button onClick={() => { setL(''); setW(''); setH(''); clearSearchUrl(); }} className="h-[54px] bg-slate-100 hover:bg-slate-200 text-slate-600 px-8 rounded-xl font-bold text-base flex items-center justify-center gap-2 transition-colors whitespace-nowrap">
+                                    <button onClick={() => { setL(''); setW(''); setH(''); clearSearchUrl(); }} className="h-[54px] bg-slate-100 hover:bg-slate-200 text-slate-600 px-8 rounded-xl font-bold text-base flex items-center justify-center gap-2 transition-colors whitespace-nowrap cursor-pointer">
                                         Clear Search
                                     </button>
                                 </div>
@@ -397,7 +388,7 @@
                         </div>
                     </header>
 
-                    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 relative">
+                    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 relative">
                         <div className="flex flex-col lg:flex-row gap-8">
                             <div className="w-full lg:w-64 flex-shrink-0 space-y-6">
                                 <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
@@ -472,7 +463,7 @@
                                         </div>
                                         <h3 className="text-2xl font-bold text-slate-800 mb-2">No boxes found</h3>
                                         <p className="text-slate-500 max-w-md mx-auto">We couldn't find any exact matches for those dimensions with the selected suppliers.</p>
-                                        <button onClick={() => { setL(''); setW(''); setH(''); setSelectedVendors(ALL_VENDORS); clearSearchUrl(); }} className="mt-6 inline-flex items-center gap-2 text-orange-600 font-bold hover:text-orange-700">
+                                        <button onClick={() => { setL(''); setW(''); setH(''); setSelectedVendors(ALL_VENDORS); clearSearchUrl(); }} className="mt-6 inline-flex items-center gap-2 text-orange-600 font-bold hover:text-orange-700 cursor-pointer">
                                             Clear all filters
                                         </button>
                                     </div>

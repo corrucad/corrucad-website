@@ -46,9 +46,13 @@ rawData.forEach(b => {
 masterStaticSummaryTable += `</tbody></table>`;
 
 // 2. GENERATE THE MAIN INDEX.HTML
+// Old Main Index HTML Generation
+// .replace('{{TITLE}}', 'Compare Box Prices: Uline vs. Grainger vs. PackagingPrice | BoxFinder')
+
+// NEW OPTIMIZED MAIN INDEX FOR "BOX PRICE CHECK"
 const indexHtml = template
-    .replace('{{TITLE}}', 'Compare Box Prices: Uline vs. Grainger vs. PackagingPrice | BoxFinder')
-    .replace('{{DESC}}', 'Stop overpaying for corrugated boxes. BoxFinder shows you real prices from Uline, Grainger, and PackagingPrice side-by-side — enter your dimensions and find the lowest price instantly.')
+    .replace('{{TITLE}}', 'Free Box Price Check Tool: Compare Shipping Supplies Instantly')
+    .replace('{{DESC}}', 'Run an instant box price check across Uline, Grainger, PaperMart, and more. Enter your cardboard box dimensions to find the absolute lowest market cost.')
     .replace('{{CANONICAL}}', 'https://www.corrucad.com/boxfinder/') 
     .replace('{{SCHEMA_MARKUP}}', JSON.stringify(indexSchema, null, 2))
     .replace('{{INJECTED_DIMS}}', 'null')

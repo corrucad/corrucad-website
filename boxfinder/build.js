@@ -51,8 +51,8 @@ masterStaticSummaryTable += `</tbody></table>`;
 
 // NEW OPTIMIZED MAIN INDEX FOR "BOX PRICE CHECK"
 const indexHtml = template
-    .replace('{{TITLE}}', 'Shipping Box Price Check | Compare Corrugated & Moving Box Costs')
-    .replace('{{DESC}}', 'Run an instant box price check across Uline, Grainger, PaperMart, and more. Enter your cardboard box dimensions to find the absolute lowest market cost.')
+    .replace('{{TITLE}}', 'Shipping Box Prices: Free Independent Cost Comparison Tool')
+    .replace('{{DESC}}', 'Compare current shipping box prices across Uline, Grainger, The Boxery, and PaperMart instantly. Run a free price check to lock in the lowest volume tiers.')
     .replace('{{CANONICAL}}', 'https://www.corrucad.com/boxfinder/') 
     .replace('{{SCHEMA_MARKUP}}', JSON.stringify(indexSchema, null, 2))
     .replace('{{INJECTED_DIMS}}', 'null')

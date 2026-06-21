@@ -97,9 +97,9 @@ rawData.forEach(box => {
         }
     };
 
-    const boxHtml = template
-        .replace('{{TITLE}}', `Cheapest ${dim} Shipping Boxes | Cost Calculator & Price Checker`)
-        .replace('{{DESC}}', `Stop overpaying. Use our BoxFinder tool to compare prices for ${dim} corrugated boxes across top vendors. Top pick: $${bestPrice.toFixed(2)}/box.`)
+  const boxHtml = template
+    .replace('{{TITLE}}', `${dim} Box Price Check | Cheapest Shipping Box Costs`)
+    .replace('{{DESC}}', `Run a fast ${dim} box price check across top industrial vendors. Compare real-time prices side-by-side. Lowest current match: $${bestPrice.toFixed(2)}/box.`)
         .replace('{{CANONICAL}}', `https://www.corrucad.com/boxfinder/${cleanSlug}`) 
         .replace('{{SCHEMA_MARKUP}}', JSON.stringify(schemaMarkup, null, 2))
         .replace('{{INJECTED_DIMS}}', JSON.stringify({ l: box.l.toString(), w: box.w.toString(), h: box.h.toString() }))

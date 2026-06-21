@@ -51,7 +51,7 @@ masterStaticSummaryTable += `</tbody></table>`;
 
 // NEW OPTIMIZED MAIN INDEX FOR "BOX PRICE CHECK"
 const indexHtml = template
-    .replace('{{TITLE}}', 'Free Box Price Check Tool: Compare Shipping Supplies Instantly')
+    .replace('{{TITLE}}', 'Shipping Box Price Check | Compare Corrugated & Moving Box Costs')
     .replace('{{DESC}}', 'Run an instant box price check across Uline, Grainger, PaperMart, and more. Enter your cardboard box dimensions to find the absolute lowest market cost.')
     .replace('{{CANONICAL}}', 'https://www.corrucad.com/boxfinder/') 
     .replace('{{SCHEMA_MARKUP}}', JSON.stringify(indexSchema, null, 2))
@@ -98,7 +98,7 @@ rawData.forEach(box => {
     };
 
   const boxHtml = template
-    .replace('{{TITLE}}', `${dim} Box Price Check | Cheapest Shipping Box Costs`)
+    .replace('{{TITLE}}', `${dim} Shipping Box Price Check | Moving Box Cost Calculator`)
     .replace('{{DESC}}', `Run a fast ${dim} box price check across top industrial vendors. Compare real-time prices side-by-side. Lowest current match: $${bestPrice.toFixed(2)}/box.`)
         .replace('{{CANONICAL}}', `https://www.corrucad.com/boxfinder/${cleanSlug}`) 
         .replace('{{SCHEMA_MARKUP}}', JSON.stringify(schemaMarkup, null, 2))

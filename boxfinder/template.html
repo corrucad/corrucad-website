@@ -142,8 +142,8 @@
                 // Paper Mart CJ Affiliate Deep Linking
                 if (vendor === 'PaperMart') {
     const formattedSku = sku.padStart(6, '0');
-    const targetUrl = `https://www.papermart.com/p/standard-rsc-corrugated-cartons/1001?SearchItemNumber=${formattedSku}`;
-    return `https://www.kqzyfj.com/click-101732774-13236874?url=${encodeURIComponent(targetUrl)}&cjsku=${formattedSku}&sid=boxfinder`;
+    // Send the user to our Vercel mask instead of the raw CJ link
+    return `/api/papermart?sku=${formattedSku}`;
 }
             }
 

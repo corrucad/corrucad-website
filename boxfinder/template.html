@@ -111,14 +111,14 @@
 
         const getVendorLink = (vendor, l, w, h, sku) => {
             if (vendor === 'Arka') {
-                let arkaPath = `${l}x${w}x${h}-box`;
-                if (sku && sku !== 'n/a' && sku.trim() !== '') {
-                    arkaPath = sku;
-                }
-                const arkaUrl = `https://www.arka.com/products/${arkaPath}`;
-                const encodedUrl = encodeURIComponent(arkaUrl);
-                return `https://www.anrdoezrs.net/click-101732774-15600472?url=${encodedUrl}`;
-            }
+    let arkaPath = `${l}x${w}x${h}-box`;
+    if (sku && sku !== 'n/a' && sku.trim() !== '') {
+        arkaPath = sku;
+    }
+    const arkaUrl = `https://www.arka.com/products/${arkaPath}`;
+    const encodedUrl = encodeURIComponent(arkaUrl);
+    return `https://www.anrdoezrs.net/click-101732774-15600472?url=${encodedUrl}&sid=boxfinder`;
+    }
 
             // --- DIRECT SKU / EXACT SLUG ROUTING ---
             if (sku && sku !== 'n/a' && sku.trim() !== '') {
@@ -141,10 +141,10 @@
 
                 // Paper Mart CJ Affiliate Deep Linking
                 if (vendor === 'PaperMart') {
-                    const formattedSku = sku.padStart(6, '0');
-                    const targetUrl = `https://www.papermart.com/p/standard-rsc-corrugated-cartons/1001?SearchItemNumber=${formattedSku}`;
-                    return `https://www.kqzyfj.com/click-101732774-13236874?url=${encodeURIComponent(targetUrl)}&cjsku=${formattedSku}`;
-                }
+    const formattedSku = sku.padStart(6, '0');
+    const targetUrl = `https://www.papermart.com/p/standard-rsc-corrugated-cartons/1001?SearchItemNumber=${formattedSku}`;
+    return `https://www.kqzyfj.com/click-101732774-13236874?url=${encodeURIComponent(targetUrl)}&cjsku=${formattedSku}&sid=boxfinder`;
+}
             }
 
             // --- FALLBACK GENERIC VENDOR LINKS ---
@@ -261,7 +261,7 @@
                                                         {getCurrency(offer.v)}{offer.displayPrice.toFixed(2)}
                                                     </td>
                                                     <td className="py-4 px-4 whitespace-nowrap text-right">
-                                                        <a href={getVendorLink(offer.v, box.l, box.w, box.h, offer.s)} target="_blank" rel="noopener noreferrer" className="text-orange-600 hover:text-orange-700 font-medium text-sm flex items-center justify-end gap-1 w-full group-hover:underline">
+                                                       <a href={getVendorLink(offer.v, box.l, box.w, box.h, offer.s)} target="_blank" rel="noopener noreferrer sponsored" className="text-orange-600 hover:text-orange-700 font-medium text-sm flex items-center justify-end gap-1 w-full group-hover:underline">
                                                             View Site <ExternalLink size={14} />
                                                         </a>
                                                     </td>
@@ -416,12 +416,7 @@
                                         <p className="text-emerald-50 text-sm mb-4">
                                             Ready to ship these boxes? Get discounted USPS, UPS, and FedEx rates with our partner, Shippo.
                                         </p>
-                                        <a 
-                                            href="https://try.shippo.com/rbv7iu7x8361" 
-                                            target="_blank" 
-                                            rel="noopener noreferrer" 
-                                            className="block w-full text-center bg-white text-emerald-700 font-bold py-2 px-4 rounded-lg hover:bg-emerald-50 transition-colors text-sm shadow-sm"
-                                        >
+                                        <a href="https://try.shippo.com/rbv7iu7x8361" target="_blank" rel="noopener noreferrer sponsored" className="block w-full text-center bg-white text-emerald-700 font-bold py-2 px-4 rounded-lg hover:bg-emerald-50 transition-colors text-sm shadow-sm">
                                             Try Shippo for Free
                                         </a>
                                     </div>

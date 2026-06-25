@@ -139,12 +139,17 @@
                     return `https://www.packagingprice.com/${sku.replace(/^\//, '')}`;
                 }
 
-                // Paper Mart CJ Affiliate Deep Linking
+              // Paper Mart CJ Affiliate Deep Linking
                 if (vendor === 'PaperMart') {
-    const formattedSku = sku.padStart(6, '0');
-    // Send the user to our Vercel mask instead of the raw CJ link
-    return `/api/papermart?sku=${formattedSku}`;
-}
+                    // Safely cast to string to prevent .padStart crashes if sku is a number
+                    const safeSku = String(sku);
+                    const formattedSku = safeSku.padStart(6, '0');
+                    
+                    // Route to global search to avoid 404s on mismatched category paths
+                    const targetUrl = `https://www.papermart.com/search?searchstr=${formattedSku}`;
+                    
+                    return `https://www.kqzyfj.com/click-101732774-13236874?url=${encodeURIComponent(targetUrl)}&cjsku=${formattedSku}&sid=boxfinder`;
+                }
             }
 
             // --- FALLBACK GENERIC VENDOR LINKS ---

@@ -16,8 +16,13 @@ rawData.forEach(b => {
 
 // Start building the sitemap XML string
 let sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
-sitemapXml += `  <url>\n    <loc>https://www.corrucad.com/boxfinder/</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>1.0</priority>\n  </url>\n`;
 
+// 1. INJECT THE TRIFECTA CORE PAGES FIRST
+sitemapXml += `  <url>\n    <loc>https://www.corrucad.com/</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>1.0</priority>\n  </url>\n`;
+sitemapXml += `  <url>\n    <loc>https://www.corrucad.com/linerboard</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>daily</changefreq>\n    <priority>0.9</priority>\n  </url>\n`;
+sitemapXml += `  <url>\n    <loc>https://www.corrucad.com/pricing</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.7</priority>\n  </url>\n`;
+sitemapXml += `  <url>\n    <loc>https://www.corrucad.com/sheet_calc</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.7</priority>\n  </url>\n`;
+sitemapXml += `  <url>\n    <loc>https://www.corrucad.com/boxfinder/</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.9</priority>\n  </url>\n`;
 // Read your optimized template
 const template = fs.readFileSync(path.join(__dirname, 'template.html'), 'utf8');
 
@@ -112,6 +117,9 @@ rawData.forEach(box => {
 });
 
 sitemapXml += `</urlset>`;
-fs.writeFileSync(path.join(outputDir, 'sitemap.xml'), sitemapXml);
 
-console.log('Build complete! 100% crawlable internal links and static pricing payloads successfully generated across all files.');
+// Deposit sitemap.xml one directory up (domain root) instead of inside /boxfinder
+const rootDir = path.join(__dirname, '..');
+fs.writeFileSync(path.join(rootDir, 'sitemap.xml'), sitemapXml);
+
+console.log('Build complete! Master trifecta sitemap deposited at domain root.');

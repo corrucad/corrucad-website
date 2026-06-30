@@ -532,7 +532,7 @@
             return dxf;
         };
 
-        const generatePdf = (blankData, fefcoStyle, L_in, W_in, H_in, unit, setMessage) => {
+        const generatePdf = (blankData, fefcoStyle, L_in, W_in, H_in, unit, setMessage, fileNameStr) => {
             const { jsPDF } = window.jspdf;
             const pdfUnit = 'in';
             const margin = 0.5;
@@ -609,9 +609,11 @@
                 const cleanedSegments = getCleanedLineSegments(line, cutRects, glueTabInternalPoints);
                 cleanedSegments.forEach(seg => { addLineToPdf(seg.x1, seg.y1, seg.x2, seg.y2); });
             });
-            doc.save(`FEFCO_${fefcoStyle}_${L_in.toFixed(2)}x${W_in.toFixed(2)}x${H_in.toFixed(2)}.pdf`);
-            setMessage('PDF file downloaded successfully!');
-        };
+            // Use the custom filename if provided, otherwise fallback to the old default
+    const finalFileName = fileNameStr ? `${fileNameStr}.pdf` : `FEFCO_${fefcoStyle}_${L_in.toFixed(2)}x${W_in.toFixed(2)}x${H_in.toFixed(2)}.pdf`;
+    doc.save(finalFileName);
+    setMessage('PDF file downloaded successfully!');
+};
 
         const drawBlank = (blank, canvas, ctx) => {
             if (!ctx || !blank) return;
@@ -993,38 +995,45 @@
             }, [results.blankDimensions]);
 
             const handleDownload = (type) => {
-                const { blankDimensions } = results;
-                const { length, width, height, fefcoStyle, unit } = appState;
-                const L_in = unit === 'mm' ? parseFloat(length) / 25.4 : parseFloat(length);
-                const W_in = unit === 'mm' ? parseFloat(width) / 25.4 : parseFloat(width);
-                const H_in = unit === 'mm' ? parseFloat(height) / 25.4 : parseFloat(height);
+    const { blankDimensions } = results;
+    const { length, width, height, fefcoStyle, unit } = appState;
+    const L_in = unit === 'mm' ? parseFloat(length) / 25.4 : parseFloat(length);
+    const W_in = unit === 'mm' ? parseFloat(width) / 25.4 : parseFloat(width);
+    const H_in = unit === 'mm' ? parseFloat(height) / 25.4 : parseFloat(height);
 
-                if (!blankDimensions || isNaN(L_in) || isNaN(W_in) || isNaN(H_in)) {
-                    setResults(prev => ({...prev, message: 'Cannot generate file. Please check input dimensions.'}));
-                    return;
-                }
+    if (!blankDimensions || isNaN(L_in) || isNaN(W_in) || isNaN(H_in)) {
+        setResults(prev => ({...prev, message: 'Cannot generate file. Please check input dimensions.'}));
+        return;
+    }
 
-                const displayL = unit === 'mm' ? Math.round(parseFloat(length)) : parseFloat(length);
-                const displayW = unit === 'mm' ? Math.round(parseFloat(width)) : parseFloat(width);
-                const displayH = unit === 'mm' ? Math.round(parseFloat(height)) : parseFloat(height);
-                const fileNameStr = `FEFCO_${fefcoStyle}_${displayL}x${displayW}x${displayH}${unit}`;
+    // Use .toFixed(2) for inches so it matches the previous formatting cleanly
+    const displayL = unit === 'mm' ? Math.round(parseFloat(length)) : parseFloat(length).toFixed(2);
+    const displayW = unit === 'mm' ? Math.round(parseFloat(width)) : parseFloat(width).toFixed(2);
+    const displayH = unit === 'mm' ? Math.round(parseFloat(height)) : parseFloat(height).toFixed(2);
+    
+    // This dynamically applies 'mm' or 'in' to the filename
+    const fileNameStr = `FEFCO_${fefcoStyle}_${displayL}x${displayW}x${displayH}${unit}`;
 
-                if (type === 'dxf') {
-                    const dxfContent = generateDxfContent(blankDimensions, fefcoStyle, L_in, W_in, H_in);
-                    const blob = new Blob([dxfContent], { type: 'application/dxf' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `FEFCO_${fefcoStyle}_${L_in.toFixed(2)}x${W_in.toFixed(2)}x${H_in.toFixed(2)}.dxf`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                    setResults(prev => ({...prev, message: 'DXF file downloaded successfully!'}));
-                } else if (type === 'pdf') {
-                    generatePdf(blankDimensions, fefcoStyle, L_in, W_in, H_in, 'in', (msg) => setResults(prev => ({...prev, message: msg})));
-                }
-            };
+    if (type === 'dxf') {
+        const dxfContent = generateDxfContent(blankDimensions, fefcoStyle, L_in, W_in, H_in);
+        const blob = new Blob([dxfContent], { type: 'application/dxf' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        
+        // Fix applied here for DXF
+        a.download = `${fileNameStr}.dxf`; 
+        
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        setResults(prev => ({...prev, message: 'DXF file downloaded successfully!'}));
+    } else if (type === 'pdf') {
+        // Fix applied here: pass fileNameStr to generatePdf
+        generatePdf(blankDimensions, fefcoStyle, L_in, W_in, H_in, 'in', (msg) => setResults(prev => ({...prev, message: msg})), fileNameStr);
+    }
+};
             const { blankDimensions, outsideDimensions, squareFootage, wastePercentage, quoteResults, message, inchesOfRule } = results;
            
             // UI Display Formatting Helpers

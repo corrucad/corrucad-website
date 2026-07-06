@@ -647,7 +647,7 @@ const rawData = [
     { l: 20, w: 16, h: 14, offers: [
         { v: 'Uline', g: '200#', p: 2.50, b: 2.50, s: 'S-4200' },
         { v: 'Uline', g: '32 ECT', p: 2.08, b: 2.08, s: 'S-18357' },
-        { v: 'PackagingPrice', g: '32 ECT', p: 1.66, b: 1.46, s: '201614' },
+        { v: 'PackagingPrice', g: '32 ECT', p: 2.08, b: 1.83, s: '201614' },
         { v: 'MSC Direct', g: '32 ECT', p: 4.91, b: 4.91, s: '39544580' },
         { v: 'PaperMart', g: '32 ECT', p: 2.48, b: 2.23, s: '15240' },
         { v: 'Packaging Hero', g: '32 ECT', p: 2.44, b: 2.20, s: 'PH-102091' },

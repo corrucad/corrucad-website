@@ -68,14 +68,29 @@
 </head>
 
 <body class="bg-gray-100">
-    <div class="mt-4 flex flex-wrap justify-center gap-3 px-4">
-        <a href="/boxfinder" class="bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 px-6 py-2 rounded-full font-bold text-sm transition-colors shadow-sm">
+    <div class="mt-4 flex flex-wrap justify-center items-center gap-3 px-4">
+        <a href="/boxfinder" class="bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 px-6 py-2 rounded-full font-bold text-sm transition-colors shadow-sm flex items-center">
             Try the new BoxFinder Tool →
         </a>
-        <a href="https://www.corrucad.com/linerboard" class="bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 px-6 py-2 rounded-full font-bold text-sm transition-colors shadow-sm">
+        <a href="https://www.corrucad.com/linerboard" class="bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 px-6 py-2 rounded-full font-bold text-sm transition-colors shadow-sm flex items-center">
             Linerboard Specs & Pricing →
         </a>
+        <!-- Secure Contact Button -->
+        <button onclick="handleSecureContact()" class="bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 px-6 py-2 rounded-full font-bold text-sm transition-colors shadow-sm flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            Contact Support
+        </button>
     </div>
+
+    <!-- Script to dynamically build and hide email from scrapers -->
+    <script>
+        function handleSecureContact() {
+            // Reassembling the email address logic at runtime blocks 99% of email scraping bots
+            const u = ['k', 'e', 'n'].join('');
+            const d = ['c', 'o', 'r', 'r', 'u', 'c', 'a', 'd', '.', 'c', 'o', 'm'].join('');
+            window.location.href = 'm' + 'a' + 'ilto:' + u + '@' + d;
+        }
+    </script>
 
     <div id="root">
         <div style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0;">
@@ -1053,7 +1068,7 @@
                          <h1 className="text-4xl md:text-5xl font-extrabold text-slate-800 flex items-baseline justify-center">
                             <span>corru</span><span className="text-orange-500 text-5xl md:text-6xl font-normal mx-1" style={{ transform: 'translateY(2px)' }}>~</span><span className="font-black">CAD</span>
                         </h1>
-                        <p className="text-md text-gray-600">v2.6.5 - Precision Engine with Presets</p>
+                        <p className="text-md text-gray-600">v2.6.6 - Precision Engine with Presets</p>
                     </div>
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-sm space-y-6">

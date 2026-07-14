@@ -111,6 +111,28 @@
         const { useState, useEffect, useRef, useCallback } = React;
         const createRoot = ReactDOM.createRoot;
 
+        // Track custom analytics helper
+        function trackEvent(action, label, val) {
+            console.log(`[Analytics Event] Action: ${action} | Label: ${label} | Value: ${val}`);
+            
+            // Send to Google Analytics (gtag.js)
+            if (typeof gtag === 'function') {
+                gtag('event', action, {
+                    'event_category': 'Engagement',
+                    'event_label': label,
+                    'value': val
+                });
+            }
+            
+            // Send to Vercel Analytics (window.va)
+            if (typeof window.va === 'function') {
+                window.va('event', { 
+                    name: action, 
+                    data: { label: label, value: val } 
+                });
+            }
+        };
+
         // --- Icons ---
         const Package = ({ size = 24 }) => (
             <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

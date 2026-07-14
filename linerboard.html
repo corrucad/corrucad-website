@@ -54,7 +54,7 @@
         }
     </script>
 
-    <div id="root">
+    <div id="root-seo" style="display:none;">
         <div style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0;">
             <h1>CorruCAD: Industrial Corrugated Design & CAD Engine</h1>
             <p>
@@ -72,6 +72,31 @@
 
     <script type="text/babel">
         const { useState, useEffect } = React;
+
+        // --- ANALYTICS TRACKER ---
+        const trackEvent = (action, label, val) => {
+            // Convert to a number if possible to ensure GA registers it as a metric
+            const numericVal = !isNaN(parseFloat(val)) ? parseFloat(val) : 1;
+            
+            console.log(`[Analytics Event] Action: ${action} | Label: ${label} | Value: ${numericVal}`);
+            
+            // Send to Google Analytics
+            if (typeof window.gtag === 'function') {
+                window.gtag('event', action, {
+                    'event_category': 'Engagement',
+                    'event_label': String(label),
+                    'value': numericVal
+                });
+            }
+            
+            // Send to Vercel Analytics
+            if (typeof window.va === 'function') {
+                window.va('event', { 
+                    name: action, 
+                    data: { label: String(label), value: numericVal } 
+                });
+            }
+        };
 
         // --- INLINE ICONS ---
         const IconCalculator = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16.01" y1="10" y2="10"/><line x1="12" x2="12.01" y1="10" y2="10"/><line x1="8" x2="8.01" y1="10" y2="10"/><line x1="8" x2="8.01" y1="14" y2="14"/><line x1="12" x2="12.01" y1="14" y2="14"/><line x1="16" x2="16.01" y1="14" y2="14"/><line x1="8" x2="8.01" y1="18" y2="18"/><line x1="12" x2="12.01" y1="18" y2="18"/><line x1="16" x2="16.01" y1="18" y2="18"/></svg>;
@@ -185,11 +210,19 @@
                             <span className="text-slate-500"><IconPackage /></span>
                             <h2 className="text-lg font-semibold">Board Construction (Single Wall)</h2>
                         </div>
+                        
+                        {}
                         <div className="p-6 grid grid-cols-1 sm:grid-cols-3 gap-6">
                             <div>
                             <label className="block text-sm font-medium text-slate-700 mb-1">Outside Liner</label>
                             <div className="relative">
-                                <input type="number" value={liner1Weight} onChange={e => setLiner1Weight(e.target.value)} className="w-full pl-3 pr-12 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                                <input 
+                                    type="number" 
+                                    value={liner1Weight} 
+                                    onChange={e => setLiner1Weight(e.target.value)} 
+                                    onBlur={e => trackEvent('update_input', 'outside_liner_weight', e.target.value)}
+                                    className="w-full pl-3 pr-12 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" 
+                                />
                                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                 <span className="text-slate-400 text-sm">lbs</span>
                                 </div>
@@ -198,7 +231,13 @@
                             <div>
                             <label className="block text-sm font-medium text-slate-700 mb-1">Medium</label>
                             <div className="relative">
-                                <input type="number" value={mediumWeight} onChange={e => setMediumWeight(e.target.value)} className="w-full pl-3 pr-12 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                                <input 
+                                    type="number" 
+                                    value={mediumWeight} 
+                                    onChange={e => setMediumWeight(e.target.value)}
+                                    onBlur={e => trackEvent('update_input', 'medium_weight', e.target.value)} 
+                                    className="w-full pl-3 pr-12 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" 
+                                />
                                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                 <span className="text-slate-400 text-sm">lbs</span>
                                 </div>
@@ -207,17 +246,31 @@
                             <div>
                             <label className="block text-sm font-medium text-slate-700 mb-1">Inside Liner</label>
                             <div className="relative">
-                                <input type="number" value={liner2Weight} onChange={e => setLiner2Weight(e.target.value)} className="w-full pl-3 pr-12 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                                <input 
+                                    type="number" 
+                                    value={liner2Weight} 
+                                    onChange={e => setLiner2Weight(e.target.value)} 
+                                    onBlur={e => trackEvent('update_input', 'inside_liner_weight', e.target.value)}
+                                    className="w-full pl-3 pr-12 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" 
+                                />
                                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                 <span className="text-slate-400 text-sm">lbs</span>
                                 </div>
                             </div>
                             </div>
 
+                            {}
                             <div className="sm:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t border-slate-100">
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">Flute Profile</label>
-                                <select value={fluteProfile} onChange={e => setFluteProfile(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white">
+                                <select 
+                                    value={fluteProfile} 
+                                    onChange={e => {
+                                        setFluteProfile(e.target.value);
+                                        trackEvent('change_setting', 'flute_profile', e.target.value);
+                                    }} 
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white"
+                                >
                                 {Object.keys(FluteFactors).map(flute => (
                                     <option key={flute} value={flute}>{flute} (Take-up: {FluteFactors[flute]})</option>
                                 ))}
@@ -226,13 +279,21 @@
                             {fluteProfile === 'Custom' && (
                                 <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">Custom Take-up Factor</label>
-                                <input type="number" step="0.01" value={customFluteFactor} onChange={e => setCustomFluteFactor(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                                <input 
+                                    type="number" 
+                                    step="0.01" 
+                                    value={customFluteFactor} 
+                                    onChange={e => setCustomFluteFactor(e.target.value)}
+                                    onBlur={e => trackEvent('update_input', 'custom_flute_factor', e.target.value)}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" 
+                                />
                                 </div>
                             )}
                             </div>
                         </div>
                         </div>
 
+                        {}
                         {/* Paper Market Pricing */}
                         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                         <div className="bg-slate-50 px-6 py-4 border-b border-slate-200 flex items-center gap-2">
@@ -246,7 +307,13 @@
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <span className="text-slate-500 sm:text-sm">$</span>
                                 </div>
-                                <input type="number" value={linerPriceTon} onChange={e => setLinerPriceTon(e.target.value)} className="w-full pl-7 pr-12 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                                <input 
+                                    type="number" 
+                                    value={linerPriceTon} 
+                                    onChange={e => setLinerPriceTon(e.target.value)} 
+                                    onBlur={e => trackEvent('update_input', 'liner_price_ton', e.target.value)}
+                                    className="w-full pl-7 pr-12 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" 
+                                />
                                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                 <span className="text-slate-400 text-sm">/ ton</span>
                                 </div>
@@ -258,7 +325,13 @@
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <span className="text-slate-500 sm:text-sm">$</span>
                                 </div>
-                                <input type="number" value={mediumPriceTon} onChange={e => setMediumPriceTon(e.target.value)} className="w-full pl-7 pr-12 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                                <input 
+                                    type="number" 
+                                    value={mediumPriceTon} 
+                                    onChange={e => setMediumPriceTon(e.target.value)} 
+                                    onBlur={e => trackEvent('update_input', 'medium_price_ton', e.target.value)}
+                                    className="w-full pl-7 pr-12 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" 
+                                />
                                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                 <span className="text-slate-400 text-sm">/ ton</span>
                                 </div>
@@ -273,11 +346,20 @@
                             <span className="text-slate-500"><IconSettings /></span>
                             <h2 className="text-lg font-semibold">Manufacturing Adders & Margin</h2>
                         </div>
+                        
+                        {}
                         <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div>
                             <label className="block text-sm font-medium text-slate-700 mb-1">Waste Factor</label>
                             <div className="relative">
-                                <input type="number" step="0.1" value={wastePercent} onChange={e => setWastePercent(e.target.value)} className="w-full pl-3 pr-8 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                                <input 
+                                    type="number" 
+                                    step="0.1" 
+                                    value={wastePercent} 
+                                    onChange={e => setWastePercent(e.target.value)} 
+                                    onBlur={e => trackEvent('update_input', 'waste_percent', e.target.value)}
+                                    className="w-full pl-3 pr-8 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" 
+                                />
                                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                 <span className="text-slate-500 sm:text-sm">%</span>
                                 </div>
@@ -287,7 +369,14 @@
                             <label className="block text-sm font-medium text-slate-700 mb-1">Starch & Adhesive</label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><span className="text-slate-500 sm:text-sm">$</span></div>
-                                <input type="number" step="0.01" value={starchCostMsf} onChange={e => setStarchCostMsf(e.target.value)} className="w-full pl-7 pr-12 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                                <input 
+                                    type="number" 
+                                    step="0.01" 
+                                    value={starchCostMsf} 
+                                    onChange={e => setStarchCostMsf(e.target.value)} 
+                                    onBlur={e => trackEvent('update_input', 'starch_cost_msf', e.target.value)}
+                                    className="w-full pl-7 pr-12 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" 
+                                />
                                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"><span className="text-slate-400 text-sm">/ MSF</span></div>
                             </div>
                             </div>
@@ -295,7 +384,14 @@
                             <label className="block text-sm font-medium text-slate-700 mb-1 flex items-center gap-1">Converting Cost <span className="text-slate-400" title="Includes corrugator running costs, labor, and overhead"><IconInfo /></span></label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><span className="text-slate-500 sm:text-sm">$</span></div>
-                                <input type="number" step="0.01" value={convertingCostMsf} onChange={e => setConvertingCostMsf(e.target.value)} className="w-full pl-7 pr-12 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                                <input 
+                                    type="number" 
+                                    step="0.01" 
+                                    value={convertingCostMsf} 
+                                    onChange={e => setConvertingCostMsf(e.target.value)} 
+                                    onBlur={e => trackEvent('update_input', 'converting_cost_msf', e.target.value)}
+                                    className="w-full pl-7 pr-12 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" 
+                                />
                                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"><span className="text-slate-400 text-sm">/ MSF</span></div>
                             </div>
                             </div>
@@ -303,14 +399,28 @@
                             <label className="block text-sm font-medium text-slate-700 mb-1">Freight / Shipping</label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><span className="text-slate-500 sm:text-sm">$</span></div>
-                                <input type="number" step="0.01" value={freightCostMsf} onChange={e => setFreightCostMsf(e.target.value)} className="w-full pl-7 pr-12 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                                <input 
+                                    type="number" 
+                                    step="0.01" 
+                                    value={freightCostMsf} 
+                                    onChange={e => setFreightCostMsf(e.target.value)} 
+                                    onBlur={e => trackEvent('update_input', 'freight_cost_msf', e.target.value)}
+                                    className="w-full pl-7 pr-12 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" 
+                                />
                                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"><span className="text-slate-400 text-sm">/ MSF</span></div>
                             </div>
                             </div>
                             <div className="sm:col-span-2 pt-4 border-t border-slate-100">
                             <label className="block text-sm font-medium text-slate-700 mb-1">Target Margin</label>
                             <div className="relative w-full sm:w-1/2">
-                                <input type="number" step="0.1" value={marginPercent} onChange={e => setMarginPercent(e.target.value)} className="w-full pl-3 pr-8 py-2 font-bold text-blue-700 bg-blue-50 border border-blue-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                                <input 
+                                    type="number" 
+                                    step="0.1" 
+                                    value={marginPercent} 
+                                    onChange={e => setMarginPercent(e.target.value)} 
+                                    onBlur={e => trackEvent('update_input', 'target_margin_percent', e.target.value)}
+                                    className="w-full pl-3 pr-8 py-2 font-bold text-blue-700 bg-blue-50 border border-blue-300 rounded-md focus:ring-blue-500 focus:border-blue-500" 
+                                />
                                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                 <span className="text-blue-700 font-bold sm:text-sm">%</span>
                                 </div>
@@ -322,6 +432,7 @@
 
                     </div>
 
+                    {}
                     {/* RIGHT COLUMN: RESULTS */}
                     <div className="lg:col-span-5 space-y-6">
                         
@@ -378,6 +489,7 @@
 
                             <div className="h-px bg-slate-800 my-4"></div>
 
+                            {}
                             {/* Margin & Final Price */}
                             <div className="bg-slate-800 rounded-lg p-4">
                                 <div className="flex justify-between text-sm mb-2">

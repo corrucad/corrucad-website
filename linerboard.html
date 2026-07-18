@@ -75,28 +75,24 @@
 
         // --- ANALYTICS TRACKER ---
         const trackEvent = (action, label, val) => {
-            // Convert to a number if possible to ensure GA registers it as a metric
-            const numericVal = !isNaN(parseFloat(val)) ? parseFloat(val) : 1;
-            
-            console.log(`[Analytics Event] Action: ${action} | Label: ${label} | Value: ${numericVal}`);
-            
-            // Send to Google Analytics
-            if (typeof window.gtag === 'function') {
-                window.gtag('event', action, {
-                    'event_category': 'Engagement',
-                    'event_label': String(label),
-                    'value': numericVal
-                });
-            }
-            
-            // Send to Vercel Analytics
-            if (typeof window.va === 'function') {
-                window.va('event', { 
-                    name: action, 
-                    data: { label: String(label), value: numericVal } 
-                });
-            }
-        };
+    console.log(`[Analytics Event] Action: ${action} | Label: ${label} | Value: ${val}`);
+    
+    // Send to Google Analytics
+    if (typeof window.gtag === 'function') {
+        window.gtag('event', action, {
+            'event_label': String(label),
+            'input_value': String(val) // <-- Changed from 'value' to a custom string parameter
+        });
+    }
+    
+    // Send to Vercel Analytics
+    if (typeof window.va === 'function') {
+        window.va('event', { 
+            name: action, 
+            data: { label: String(label), value: val } // Vercel is fine with 'value'
+        });
+    }
+};
 
         // --- INLINE ICONS ---
         const IconCalculator = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16.01" y1="10" y2="10"/><line x1="12" x2="12.01" y1="10" y2="10"/><line x1="8" x2="8.01" y1="10" y2="10"/><line x1="8" x2="8.01" y1="14" y2="14"/><line x1="12" x2="12.01" y1="14" y2="14"/><line x1="16" x2="16.01" y1="14" y2="14"/><line x1="8" x2="8.01" y1="18" y2="18"/><line x1="12" x2="12.01" y1="18" y2="18"/><line x1="16" x2="16.01" y1="18" y2="18"/></svg>;

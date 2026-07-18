@@ -1,1 +1,0 @@
-{"cleanUrls": true,"redirects": [{"source": "/boxfinder/:dim(\d+x\d+x\d+)\.html","destination": "/boxfinder/:dim-corrugated-boxes","permanent": true},{"source": "/boxfinder/:dim(\d+x\d+x\d+)","destination": "/boxfinder/:dim-corrugated-boxes","permanent": true}]}

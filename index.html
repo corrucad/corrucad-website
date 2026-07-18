@@ -727,6 +727,10 @@
 
             const toggleUnit = (newUnit) => {
                 if (newUnit === appState.unit) return;
+                
+                // Track the intentional switch between Metric and Standard unit settings
+                trackEvent('change_setting', 'unit_system', newUnit);
+
                 setAppState(prev => {
                     let newL = parseFloat(prev.length) || 0;
                     let newW = parseFloat(prev.width) || 0;
@@ -1299,9 +1303,9 @@
                                     <canvas ref={canvasRef}></canvas>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4 mt-4">
-                                <button onClick={() => { handleDownload('dxf'); trackEvent('click_button', 'download_dxf', appState.fefcoStyle); }} disabled={!blankDimensions} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md disabled:bg-gray-400">Download DXF</button>
-                                <button onClick={() => { handleDownload('pdf'); trackEvent('click_button', 'download_pdf', appState.fefcoStyle); }} disabled={!blankDimensions} className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md disabled:bg-gray-400">Download PDF</button>
-                                <button onClick={() => { exportToKiwiplan(); trackEvent('click_button', 'export_kiwiplan_csv', appState.fefcoStyle); }} disabled={!blankDimensions} className="col-span-2 w-full flex justify-center items-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md disabled:bg-gray-400">Export to Kiwiplan (.CSV)</button>
+                                <button onClick={() => { handleDownload('dxf'); trackEvent('click_button', 'download_dxf', `${appState.fefcoStyle}_${appState.unit}`); }} disabled={!blankDimensions} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md disabled:bg-gray-400">Download DXF</button>
+                                <button onClick={() => { handleDownload('pdf'); trackEvent('click_button', 'download_pdf', `${appState.fefcoStyle}_${appState.unit}`); }} disabled={!blankDimensions} className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md disabled:bg-gray-400">Download PDF</button>
+                                <button onClick={() => { exportToKiwiplan(); trackEvent('click_button', 'export_kiwiplan_csv', `${appState.fefcoStyle}_${appState.unit}`); }} disabled={!blankDimensions} className="col-span-2 w-full flex justify-center items-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md disabled:bg-gray-400">Export to Kiwiplan (.CSV)</button>
                                 </div>
                             </div>
                             <div className="bg-indigo-50 p-4 rounded-md">

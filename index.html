@@ -111,27 +111,26 @@
         const { useState, useEffect, useRef, useCallback } = React;
         const createRoot = ReactDOM.createRoot;
 
-        // Track custom analytics helper
-        function trackEvent(action, label, val) {
-            console.log(`[Analytics Event] Action: ${action} | Label: ${label} | Value: ${val}`);
-            
-            // Send to Google Analytics (gtag.js)
-            if (typeof gtag === 'function') {
-                gtag('event', action, {
-                    'event_category': 'Engagement',
-                    'event_label': label,
-                    'value': val
-                });
-            }
-            
-            // Send to Vercel Analytics (window.va)
-            if (typeof window.va === 'function') {
-                window.va('event', { 
-                    name: action, 
-                    data: { label: label, value: val } 
-                });
-            }
-        };
+        // --- ANALYTICS TRACKER ---
+        const trackEvent = (action, label, val) => {
+    console.log(`[Analytics Event] Action: ${action} | Label: ${label} | Value: ${val}`);
+    
+    // Send to Google Analytics
+    if (typeof window.gtag === 'function') {
+        window.gtag('event', action, {
+            'event_label': String(label),
+            'input_value': String(val) // <-- Changed from 'value' to a custom string parameter
+        });
+    }
+    
+    // Send to Vercel Analytics
+    if (typeof window.va === 'function') {
+        window.va('event', { 
+            name: action, 
+            data: { label: String(label), value: val } // Vercel is fine with 'value'
+        });
+    }
+};
 
         // --- Icons ---
         const Package = ({ size = 24 }) => (

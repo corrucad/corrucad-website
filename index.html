@@ -827,6 +827,23 @@
             };
 
             const handleStateChange = useCallback((changes) => {
+                // Intercept and track the raw human inputs for our audit log
+                Object.keys(changes).forEach(key => {
+                    // Filter out internal background logic triggers so we only track active human intent
+                    const noisyKeys = ['outerLiner', 'innerLiner', 'medium1', 'middleLiner', 'medium2', 'priceMsf', 'flute1', 'flute2'];
+                    
+                    // If they selected a board preset, let that log natively instead of splitting into its components
+                    if (changes.topTenSelection && changes.topTenSelection !== 'custom' && noisyKeys.includes(key)) {
+                        return; 
+                    }
+                    if (changes.boardProfile && noisyKeys.includes(key)) {
+                        return;
+                    }
+
+                    // Push the user event to GA4 & Vercel
+                    trackEvent('update_input', key, changes[key]);
+                });
+
                 setAppState(prevState => {
                     let newState = { ...prevState, ...changes };
                     const currentUnit = changes.unit || prevState.unit;
@@ -838,7 +855,6 @@
                         } else {
                             const selectedSku = topTenSkus.find(s => s.name === selectedSkuName);
                             if (selectedSku) {
-                                // Respect current unit choice for presets using nearest mm
                                 newState.length = currentUnit === 'mm' ? Math.round(selectedSku.l * 25.4).toString() : selectedSku.l.toString();
                                 newState.width = currentUnit === 'mm' ? Math.round(selectedSku.w * 25.4).toString() : selectedSku.w.toString();
                                 newState.height = currentUnit === 'mm' ? Math.round(selectedSku.h * 25.4).toString() : selectedSku.h.toString();

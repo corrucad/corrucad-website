@@ -279,8 +279,14 @@
                                                         {getCurrency(offer.v)}{offer.displayPrice.toFixed(2)}
                                                     </td>
                                                     <td className="py-4 px-4 whitespace-nowrap text-right">
-                                                       <a href={getVendorLink(offer.v, box.l, box.w, box.h, offer.s)} target="_blank" rel="noopener noreferrer sponsored" className="text-orange-600 hover:text-orange-700 font-medium text-sm flex items-center justify-end gap-1 w-full group-hover:underline">
-                                                            View Site <ExternalLink size={14} />
+                                                        <a 
+                                                          href={getVendorLink(offer.v, box.l, box.w, box.h, offer.s)} 
+                                                          onClick={() => window.trackEvent('click_button', offer.v, `${box.l}x${box.w}x${box.h}`)}
+                                                          target="_blank" 
+                                                          rel="noopener noreferrer sponsored"
+                                                          className="..."
+                                                        >
+                                                        View Site <ExternalLink size={14} />
                                                         </a>
                                                     </td>
                                                 </tr>

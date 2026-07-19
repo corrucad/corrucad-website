@@ -242,10 +242,26 @@
                                 <p className="text-xs text-slate-500 mt-1">via {bestOffer.v}</p>
                             </div>
                             
-                            <button className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-medium transition-colors text-sm">
-                                {expanded ? 'Hide Offers' : 'Compare All Options'}
-                                {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                            </button>
+                            <button 
+                                onClick={(e) => {
+                                    // Prevent clicking the button from double-firing if the parent div also has a click handler
+                                    e.stopPropagation(); 
+        
+                                    const nextState = !expanded;
+                                    setExpanded(nextState);
+        
+                                    // Track the action
+                                    window.trackEvent(
+                                        nextState ? 'expand_card' : 'hide_card', 
+                                        'box_dimensions', 
+                                        `${box.l}x${box.w}x${box.h}`
+                                     );
+                                    }}
+                                    className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-medium transition-colors text-sm"
+                                >
+                                    {expanded ? 'Hide Offers' : 'Compare All Options'}
+                                    {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                </button>
                         </div>
                     </div>
 

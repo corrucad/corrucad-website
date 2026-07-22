@@ -17,7 +17,6 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
       gtag('config', 'G-S6H2RNY5QM');
     </script>
 
@@ -29,6 +28,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
+        .tab-content-enter { opacity: 0; transform: translateY(5px); }
+        .tab-content-enter-active { opacity: 1; transform: translateY(0); transition: all 300ms ease-in-out; }
     </style>
 
     <script src="/_vercel/insights/script.js" defer></script>
@@ -68,20 +69,18 @@
     </div>
 
     <script type="text/babel">
-        const { useState, useMemo } = React;
+        const { useState, useMemo, useEffect } = React;
 
         // --- ANALYTICS TRACKER ---
         window.trackEvent = (action, label, val) => {
-        console.log(`[Analytics Event] Action: ${action} | Label: ${label} | Value: ${val}`);
-    
-        // Send to Google Analytics (configured in your template header)
+            console.log(`[Analytics Event] Action: ${action} | Label: ${label} | Value: ${val}`);
             if (typeof window.gtag === 'function') {
-            window.gtag('event', action, {
-            'event_label': String(label),
-            'input_value': String(val)
-            });
+                window.gtag('event', action, {
+                    'event_label': String(label),
+                    'input_value': String(val)
+                });
             }
-            };
+        };
 
         // INJECTED DATA FROM BUILD SCRIPT
         let rawData = [];
@@ -104,7 +103,6 @@
             }
         }
 
-        // --- NATIVE SVG ICONS ---
         const IconBase = ({ size = 24, className = "", children, ...props }) => (
             <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>{children}</svg>
         );
@@ -122,18 +120,37 @@
 
         const getCurrency = (vendor) => vendor === 'RAJA Pack' ? '£' : '$';
 
+        const BUNDLE_DATA = {
+            "4x4x4": { b: 25, w: 3 }, "5x5x5": { b: 25, w: 5 }, "6x4x4": { b: 25, w: 4 },
+            "6x6x4": { b: 25, w: 5 }, "6x6x6": { b: 25, w: 7 }, "8x6x4": { b: 25, w: 7 },
+            "8x8x4": { b: 25, w: 9 }, "8x8x8": { b: 25, w: 12 }, "9x9x9": { b: 25, w: 16 },
+            "10x8x6": { b: 25, w: 12 }, "10x10x10": { b: 25, w: 19 }, "12x6x6": { b: 25, w: 12 },
+            "12x9x4": { b: 25, w: 13 }, "12x9x6": { b: 25, w: 15 }, "12x10x6": { b: 25, w: 17 },
+            "12x10x8": { b: 25, w: 19 }, "12x12x4": { b: 25, w: 18 }, "12x12x6": { b: 25, w: 20 },
+            "12x12x8": { b: 25, w: 23 }, "12x12x10": { b: 25, w: 25 }, "12x12x12": { b: 25, w: 27 },
+            "14x10x6": { b: 25, w: 18 }, "14x10x10": { b: 25, w: 26 }, "14x14x14": { b: 25, w: 38 },
+            "15x15x15": { b: 25, w: 41 }, "16x12x8": { b: 25, w: 25 }, "16x12x10": { b: 25, w: 29 },
+            "16x12x12": { b: 25, w: 31 }, "16x16x8": { b: 25, w: 35 }, "16x16x16": { b: 25, w: 47 },
+            "18x12x6": { b: 25, w: 25 }, "18x12x8": { b: 25, w: 28 }, "18x12x10": { b: 25, w: 31 },
+            "18x12x12": { b: 25, w: 33 }, "18x14x12": { b: 20, w: 31 }, "18x18x12": { b: 20, w: 39 },
+            "18x18x18": { b: 20, w: 48 }, "20x12x12": { b: 20, w: 35 }, "20x14x6": { b: 25, w: 28 },
+            "20x14x12": { b: 20, w: 35 }, "20x16x14": { b: 20, w: 40 }, "20x20x12": { b: 20, w: 45 },
+            "20x20x20": { b: 10, w: 29 }, "24x12x12": { b: 20, w: 32 }, "24x16x16": { b: 10, w: 24 },
+            "24x18x12": { b: 10, w: 23 }, "24x18x18": { b: 15, w: 40 }, "24x24x12": { b: 15, w: 35 },
+            "24x24x24": { b: 10, w: 42 }, "36x36x36": { b: 5, w: 46 }
+        };
+
         const getVendorLink = (vendor, l, w, h, sku) => {
             if (vendor === 'Arka') {
-    let arkaPath = `${l}x${w}x${h}-box`;
-    if (sku && sku !== 'n/a' && sku.trim() !== '') {
-        arkaPath = sku;
-    }
-    const arkaUrl = `https://www.arka.com/products/${arkaPath}`;
-    const encodedUrl = encodeURIComponent(arkaUrl);
-    return `https://www.anrdoezrs.net/click-101732774-15600472?url=${encodedUrl}&sid=boxfinder`;
-    }
+                let arkaPath = `${l}x${w}x${h}-box`;
+                if (sku && sku !== 'n/a' && sku.trim() !== '') {
+                    arkaPath = sku;
+                }
+                const arkaUrl = `https://www.arka.com/products/${arkaPath}`;
+                const encodedUrl = encodeURIComponent(arkaUrl);
+                return `https://www.anrdoezrs.net/click-101732774-15600472?url=${encodedUrl}&sid=boxfinder`;
+            }
 
-            // --- DIRECT SKU / EXACT SLUG ROUTING ---
             if (sku && sku !== 'n/a' && sku.trim() !== '') {
                 if (vendor === 'Uline') return `https://www.uline.com/Product/Detail/${sku}`;
                 if (vendor === 'Boxery') return `https://www.theboxery.com/Product.asp?Product=${sku.replace('*', '').trim()}`;
@@ -144,7 +161,6 @@
                 if (vendor === 'RAJA Pack') return `https://www.rajapack.co.uk/?query=${sku}`;
                 if (vendor === 'Packaging Hero') return `https://www.packaginghero.com/${l}-x-${w}-x-${h}-corrugated-boxes-${sku.toLowerCase()}`;
                 
-                // PackagingPrice Smart Routing
                 if (vendor === 'PackagingPrice') {
                     if (/^\d+$/.test(sku)) {
                         return `https://www.packagingprice.com/search.php?search_query=${sku}`;
@@ -152,25 +168,18 @@
                     return `https://www.packagingprice.com/${sku.replace(/^\//, '')}`;
                 }
 
-              // Paper Mart CJ Affiliate Deep Linking
                 if (vendor === 'PaperMart') {
-                    // Safely cast to string to prevent .padStart crashes if sku is a number
                     const safeSku = String(sku);
                     const formattedSku = safeSku.padStart(6, '0');
-                    
-                    // Route to global search to avoid 404s on mismatched category paths
                     const targetUrl = `https://www.papermart.com/search?searchstr=${formattedSku}`;
-                    
                     return `https://www.kqzyfj.com/click-101732774-13236874?url=${encodeURIComponent(targetUrl)}&cjsku=${formattedSku}&sid=boxfinder`;
                 }
             }
 
-            // --- FALLBACK GENERIC VENDOR LINKS ---
             if (vendor === 'PaperMart') return 'https://www.anrdoezrs.net/click-101732774-12336139';
             if (vendor === 'Wagner Supply') return 'https://www.wagnersupply.com/Items/JMTBCO/Industrial-Packaging/Boxes/';
             if (vendor === 'Staples') return 'https://www.staples.com/Shipping-Boxes/cat_CL213835';
 
-            // --- FALLBACK DIMENSIONAL SEARCH ROUTING ---
             const dim = `${l}x${w}x${h}`;
             switch(vendor) {
                 case 'Uline': return `https://www.uline.com/Product/AdvSearchResult?keywords=${dim}`;
@@ -192,26 +201,66 @@
                     {label}
                 </label>
                 <div className="flex border-2 border-slate-200 rounded-xl overflow-hidden bg-white focus-within:border-orange-500 transition-colors h-[54px]">
-                <button type="button" onClick={() => onChange(value ? String(Math.max(1, Number(value) - 1)) : '')} className="w-14 flex items-center justify-center bg-slate-50 hover:bg-slate-200 text-slate-500 hover:text-orange-600 font-bold text-2xl border-r-2 border-slate-200 transition-colors select-none focus:outline-none">−</button>
-                <input 
-                    type="text" 
-                    placeholder="—" 
-                    value={value} 
-                    onChange={(e) => onChange(e.target.value.replace(/\D/g, ''))} 
-                    onBlur={onBlur}
-                    className="flex-1 w-full text-center font-bold text-2xl text-slate-800 focus:outline-none placeholder:text-slate-300" 
-                 />
-                 <button type="button" onClick={() => onChange(value ? String(Number(value) + 1) : '1')} className="w-14 flex items-center justify-center bg-slate-50 hover:bg-slate-200 text-slate-500 hover:text-orange-600 font-bold text-2xl border-l-2 border-slate-200 transition-colors select-none focus:outline-none">+</button>
+                    <button type="button" onClick={() => onChange(value ? String(Math.max(1, Number(value) - 1)) : '')} className="w-14 flex items-center justify-center bg-slate-50 hover:bg-slate-200 text-slate-500 hover:text-orange-600 font-bold text-2xl border-r-2 border-slate-200 transition-colors select-none focus:outline-none">−</button>
+                    <input 
+                        type="text" 
+                        placeholder="—" 
+                        value={value} 
+                        onChange={(e) => onChange(e.target.value.replace(/\D/g, ''))} 
+                        onBlur={onBlur}
+                        className="flex-1 w-full text-center font-bold text-2xl text-slate-800 focus:outline-none placeholder:text-slate-300" 
+                    />
+                    <button type="button" onClick={() => onChange(value ? String(Number(value) + 1) : '1')} className="w-14 flex items-center justify-center bg-slate-50 hover:bg-slate-200 text-slate-500 hover:text-orange-600 font-bold text-2xl border-l-2 border-slate-200 transition-colors select-none focus:outline-none">+</button>
+                </div>
             </div>
-        </div>
-    );
+        );
 
-        function BoxCard({ box, qtyMode, autoExpand }) {
+        function BoxCard({ box, globalQty, globalZip, globalTax, autoExpand }) {
             const [expanded, setExpanded] = useState(autoExpand);
             
             if (!box || !box.offers || box.offers.length === 0) return null;
-            const bestOffer = box.offers[0]; 
+            
             const volume = box.l * box.w * box.h;
+            const dimKey = `${box.l}x${box.w}x${box.h}`;
+            
+            const bData = BUNDLE_DATA[dimKey] || { b: 25, w: (box.l+box.w+box.h)*0.5 };
+            const qty = Number(globalQty) || 25;
+            const bundles = Math.ceil(qty / bData.b);
+            const totalWt = bundles * bData.w;
+            
+            const kdLength = Math.ceil(box.l + box.w);
+            const kdWidth = Math.ceil(box.w + box.h);
+            const bundleThickness = Math.ceil(bData.b * 0.30); 
+            
+            const dimWtPerBundle = Math.ceil((kdLength * kdWidth * bundleThickness) / 139); 
+            const totalDimWt = dimWtPerBundle * bundles;
+            
+            const billableWt = Math.max(totalWt, totalDimWt);
+            
+            let shippingPerBox = 0;
+            const hasShipping = Boolean(globalZip && globalZip.length >= 3);
+            
+            if (hasShipping) {
+                const destZone = Math.ceil(Math.abs(606 - parseInt(globalZip.padEnd(5, '0').substring(0,3))) / 100) || 1;
+                const zoneFactor = Math.min(Math.max(destZone, 1), 8);
+                
+                let shippingTotal = 0;
+                
+                if (billableWt <= 150) {
+                    shippingTotal = 10.00 + (bundles * 3.00) + (billableWt * 0.06 * zoneFactor);
+                } else if (billableWt <= 400) {
+                    shippingTotal = 60.00 + (billableWt * 0.21 * zoneFactor);
+                } else {
+                    const estimatedPallets = Math.ceil(billableWt / 1000); 
+                    shippingTotal = (125.00 * estimatedPallets) + (billableWt * 0.22 * zoneFactor);
+                }
+                
+                shippingPerBox = shippingTotal / qty;
+            }
+
+            const bestOffer = box.offers[0];
+            const localShippingBest = bestOffer.v === 'RAJA Pack' ? shippingPerBox / 1.364 : shippingPerBox;
+            const bestLanded = bestOffer.displayPrice + localShippingBest;
 
             return (
                 <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-5 hover:shadow-md transition-shadow duration-200">
@@ -234,9 +283,13 @@
                         
                         <div className="text-left md:text-right w-full md:w-auto flex flex-row md:flex-col items-center md:items-end justify-between md:justify-start">
                             <div className="mb-0 md:mb-2 text-left md:text-right">
-                                <p className="text-xs text-slate-500 uppercase font-semibold tracking-wider mb-1">Our Top Pick</p>
+                                <p className={`text-xs uppercase font-semibold tracking-wider mb-1 ${hasShipping ? 'text-green-600' : 'text-slate-500'}`}>
+                                    {hasShipping ? 'Top Landed Pick' : 'Top Box Pick'}
+                                </p>
                                 <div className="flex items-baseline md:justify-end gap-1">
-                                    <span className="text-3xl font-extrabold text-green-600">{getCurrency(bestOffer.v)}{bestOffer.displayPrice.toFixed(2)}</span>
+                                    <span className="text-3xl font-extrabold text-green-600">
+                                        {getCurrency(bestOffer.v)}{hasShipping ? bestLanded.toFixed(2) : bestOffer.displayPrice.toFixed(2)}
+                                    </span>
                                     <span className="text-slate-500 text-sm">/box</span>
                                 </div>
                                 <p className="text-xs text-slate-500 mt-1">via {bestOffer.v}</p>
@@ -244,24 +297,16 @@
                             
                             <button 
                                 onClick={(e) => {
-                                    // Prevent clicking the button from double-firing if the parent div also has a click handler
                                     e.stopPropagation(); 
-        
                                     const nextState = !expanded;
                                     setExpanded(nextState);
-        
-                                    // Track the action
-                                    window.trackEvent(
-                                        nextState ? 'expand_card' : 'hide_card', 
-                                        'box_dimensions', 
-                                        `${box.l}x${box.w}x${box.h}`
-                                     );
-                                    }}
-                                    className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-medium transition-colors text-sm"
-                                >
-                                    {expanded ? 'Hide Offers' : 'Compare All Options'}
-                                    {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                                </button>
+                                    window.trackEvent(nextState ? 'expand_card' : 'hide_card', 'box_dimensions', `${box.l}x${box.w}x${box.h}`);
+                                }}
+                                className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-medium transition-colors text-sm"
+                            >
+                                {expanded ? 'Hide Offers' : 'Compare All Options'}
+                                {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                            </button>
                         </div>
                     </div>
 
@@ -274,52 +319,87 @@
                                             <tr>
                                                 <th className="pb-3 pt-1 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Vendor</th>
                                                 <th className="pb-3 pt-1 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Grade</th>
-                                                <th className="pb-3 pt-1 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Price per Box</th>
+                                                <th className="pb-3 pt-1 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Box Price</th>
+                                                <th className="pb-3 pt-1 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider text-right">Est. Ship/Ea*</th>
+                                                <th className="pb-3 pt-1 px-4 text-xs font-semibold text-green-700 uppercase tracking-wider text-right">Landed/Ea</th>
+                                                <th className="pb-3 pt-1 px-4 text-xs font-semibold text-slate-900 uppercase tracking-wider text-right">Total Cost</th>
                                                 <th className="pb-3 pt-1 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-200">
-                                            {box.offers.map((offer, idx) => (
-                                                <tr key={offer.v} className={`hover:bg-white transition-colors ${idx === 0 ? 'bg-green-50/50 hover:bg-green-50' : ''}`}>
-                                                    <td className="py-4 px-4 whitespace-nowrap">
-                                                        <div className="flex items-center gap-2">
-                                                            <span className={`font-semibold ${idx === 0 ? 'text-green-700' : 'text-slate-800'}`}>
-                                                                {offer.v}
-                                                            </span>
-                                                            {idx === 0 && (
-                                                                <span className="bg-green-100 text-green-700 text-[10px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
-                                                                    <Star size={10} className="fill-current" /> BEST DEAL
+                                            {box.offers.map((offer, idx) => {
+                                                const localShipping = offer.v === 'RAJA Pack' ? shippingPerBox / 1.364 : shippingPerBox;
+                                                const offerLanded = offer.displayPrice + localShipping;
+                                                const totalRowCost = hasShipping ? (offerLanded * qty) : (offer.displayPrice * qty);
+                                                const taxRate = Number(globalTax) || 0;
+                                                const grandTotal = totalRowCost * (1 + (taxRate / 100));
+                                                
+                                                return (
+                                                    <tr key={offer.v} className={`hover:bg-white transition-colors ${idx === 0 ? 'bg-green-50/50 hover:bg-green-50' : ''}`}>
+                                                        <td className="py-4 px-4 whitespace-nowrap">
+                                                            <div className="flex items-center gap-2">
+                                                                <span className={`font-semibold ${idx === 0 ? 'text-green-700' : 'text-slate-800'}`}>
+                                                                    {offer.v}
                                                                 </span>
-                                                            )}
-                                                        </div>
-                                                    </td>
-                                                    <td className="py-4 px-4 whitespace-nowrap">
-                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200">
-                                                            {offer.g}
-                                                        </span>
-                                                    </td>
-                                                    <td className="py-4 px-4 whitespace-nowrap text-right font-medium">
-                                                        {getCurrency(offer.v)}{offer.displayPrice.toFixed(2)}
-                                                    </td>
-                                                    <td className="py-4 px-4 whitespace-nowrap text-right">
-                                                        <a 
-                                                          href={getVendorLink(offer.v, box.l, box.w, box.h, offer.s)} 
-                                                          onClick={() => window.trackEvent('click_button', offer.v, `${box.l}x${box.w}x${box.h}`)}
-                                                          target="_blank" 
-                                                          rel="noopener noreferrer sponsored"
-                                                          className="..."
-                                                        >
-                                                        View Site <ExternalLink size={14} />
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                            ))}
+                                                                {idx === 0 && (
+                                                                    <span className="bg-green-100 text-green-700 text-[10px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
+                                                                        <Star size={10} className="fill-current" /> BEST DEAL
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </td>
+                                                        <td className="py-4 px-4 whitespace-nowrap">
+                                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200">
+                                                                {offer.g}
+                                                            </span>
+                                                        </td>
+                                                        <td className="py-4 px-4 whitespace-nowrap text-right font-medium text-slate-500">
+                                                            {getCurrency(offer.v)}{offer.displayPrice.toFixed(2)}
+                                                        </td>
+                                                        <td className="py-4 px-4 whitespace-nowrap text-right text-sm font-medium text-blue-500/80">
+                                                            {hasShipping ? `+${getCurrency(offer.v)}${localShipping.toFixed(2)}` : <span className="text-slate-400 italic font-normal text-xs">Enter ZIP</span>}
+                                                        </td>
+                                                        <td className="py-4 px-4 whitespace-nowrap text-right font-bold text-green-700 text-lg">
+                                                            {hasShipping ? `${getCurrency(offer.v)}${offerLanded.toFixed(2)}` : '---'}
+                                                        </td>
+                                                        <td className="py-4 px-4 whitespace-nowrap text-right">
+                                                            <div className="font-bold text-slate-800 text-lg">
+                                                                {getCurrency(offer.v)}{grandTotal.toFixed(2)}
+                                                            </div>
+                                                            <div className="text-[10px] text-slate-400 uppercase tracking-wide mt-0.5">
+                                                                {hasShipping ? `w/ ${taxRate}% Tax` : `Base + ${taxRate}% Tax`}
+                                                            </div>
+                                                        </td>
+                                                        <td className="py-4 px-4 whitespace-nowrap text-right">
+                                                            <a 
+                                                              href={getVendorLink(offer.v, box.l, box.w, box.h, offer.s)} 
+                                                              onClick={() => window.trackEvent('click_button', offer.v, `${box.l}x${box.w}x${box.h}`)}
+                                                              target="_blank" 
+                                                              rel="noopener noreferrer sponsored"
+                                                              className="inline-flex items-center gap-1 text-orange-600 hover:text-orange-700 font-semibold text-sm"
+                                                            >
+                                                            View Site <ExternalLink size={14} />
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
                                         </tbody>
                                     </table>
                                 </div>
-                                <div className="mt-4 flex items-center gap-2 text-xs text-slate-500 bg-blue-50 text-blue-800 p-3 rounded-lg border border-blue-100 mx-5 mb-5">
-                                    <Info size={16} className="flex-shrink-0" />
-                                    <p>Prices strictly reflect standard ({'<'}100) and bulk/bale (800+) prices as listed in the matrix.</p>
+                                <div className="mt-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs bg-blue-50 text-blue-800 p-3 rounded-lg border border-blue-100 mx-5 mb-5">
+                                    <div className="flex flex-col gap-1">
+                                        <div className="flex items-center gap-2">
+                                            <Info size={16} className="flex-shrink-0" />
+                                            <p>Prices strictly reflect base prices as listed in the matrix.</p>
+                                        </div>
+                                        <p className="ml-6 text-blue-700/80">* Shipping costs are algorithmic estimates only based on standard carrier DIM rules and are not live quotes.</p>
+                                    </div>
+                                    {hasShipping && (
+                                        <div className="bg-white/60 px-3 py-1.5 rounded border border-blue-200/50 font-medium text-right">
+                                            Calc Specs: <span className="font-bold">{bundles} bundle{bundles > 1 ? 's' : ''}</span> ({bData.b} box/bdl). Actual: {totalWt} lbs | DIM: {Math.round(totalDimWt)} lbs. Billing at <span className="font-bold">{Math.round(billableWt)} lbs</span>.
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -333,8 +413,10 @@
             const [l, setL] = useState(initDims.l);
             const [w, setW] = useState(initDims.w);
             const [h, setH] = useState(initDims.h);
+            const [globalZip, setGlobalZip] = useState('');
+            const [globalQty, setGlobalQty] = useState('');
+            const [globalTax, setGlobalTax] = useState('7');
             const [selectedVendors, setSelectedVendors] = useState(ALL_VENDORS);
-            const [qtyMode, setQtyMode] = useState('standard');
             const [sortBy, setSortBy] = useState('price-asc');
 
             const handleVendorToggle = (vendor) => {
@@ -349,8 +431,9 @@
                 }
             };
 
-            // Hardcoded exchange rate
             const GBP_TO_USD = 1.364; 
+            const effectiveQty = Number(globalQty) || 25;
+            const isBulk = effectiveQty >= 800;
 
             const filteredBoxes = useMemo(() => {
                 return rawData
@@ -358,7 +441,7 @@
                         const validOffers = box.offers.filter(o => selectedVendors.includes(o.v));
                         
                         const pricedOffers = validOffers.map(o => {
-                            const basePrice = qtyMode === 'bulk' ? o.b : o.p;
+                            const basePrice = isBulk ? o.b : o.p;
                             const isGBP = o.v === 'RAJA Pack';
                             
                             return {
@@ -382,7 +465,9 @@
                         if (sortBy === 'size-desc') return (b.l * b.w * b.h) - (a.l * a.w * a.h);
                         return (a.l * a.w * a.h) - (b.l * b.w * b.h);
                     });
-            }, [l, w, h, selectedVendors, qtyMode, sortBy]);
+            }, [l, w, h, selectedVendors, globalQty, sortBy]);
+
+            const currentDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
             return (
                 <div className="min-h-screen bg-slate-100 font-sans text-slate-900 pb-12">
@@ -393,23 +478,19 @@
                             </a>
                         </div>
                         
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-28">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-32">
                             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
                                 <a href="/boxfinder/" className="flex items-center gap-3 text-white hover:opacity-90 transition-opacity">
                                     <Package size={32} />
                                     <h1 className="text-3xl font-extrabold tracking-tight">BoxFinder</h1>
                                 </a>
-                                <div className="bg-white/10 p-1 rounded-xl flex items-center backdrop-blur-sm border border-white/20">
-                                    <button onClick={() => setQtyMode('standard')} className={`px-5 py-2 rounded-lg text-sm font-bold transition-all ${qtyMode === 'standard' ? 'bg-white text-orange-600 shadow-md' : 'text-white/90 hover:text-white hover:bg-white/10'}`}>
-                                        Standard (&lt; 100)
-                                    </button>
-                                    <button onClick={() => setQtyMode('bulk')} className={`px-5 py-2 rounded-lg text-sm font-bold transition-all ${qtyMode === 'bulk' ? 'bg-white text-orange-600 shadow-md' : 'text-white/90 hover:text-white hover:bg-white/10'}`}>
-                                        Pallet / Bulk (800+)
-                                    </button>
-                                </div>
                             </div>
                             
-                            <h2 className="text-white text-xl font-medium mb-6">The Web's only Independent Box Price Check Engine. Compare shipping supplies and save instantly.</h2>
+                            <h2 className="text-white text-xl font-medium mb-2">The Web's only Independent Box Price Check Engine. Compare shipping supplies and save instantly.</h2>
+                            <p className="text-orange-200 text-sm font-medium mb-6 flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                                Last updated: {currentDate}
+                            </p>
                             
                             <div className="mb-8">
                                 <a href="https://www.producthunt.com/products/boxfinder?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-boxfinder" target="_blank" rel="noopener noreferrer" className="inline-block hover:opacity-90 transition-opacity">
@@ -417,22 +498,45 @@
                                 </a>
                             </div>
                             
-                            <div className="bg-white p-6 rounded-2xl shadow-xl flex flex-col md:flex-row items-end gap-6 relative z-10 translate-y-12 border border-slate-100">
-                               <div className="flex-1 w-full grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-4">
-                                    <SizeInput label="Length (in)" value={l} onChange={setL} onBlur={() => l && window.trackEvent('update_input', 'length', l)} />
-                                    <SizeInput label="Width (in)" value={w} onChange={setW} onBlur={() => w && window.trackEvent('update_input', 'width', w)} />
-                                    <SizeInput label="Height (in)" value={h} onChange={setH} onBlur={() => h && window.trackEvent('update_input', 'height', h)} />
+                            <div className="bg-white p-6 rounded-2xl shadow-xl relative z-10 translate-y-16 border border-slate-100">
+                               <div className="flex flex-col md:flex-row items-end gap-6 mb-6">
+                                    <div className="flex-1 w-full grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-4">
+                                        <SizeInput label="Length (in)" value={l} onChange={setL} onBlur={() => l && window.trackEvent('update_input', 'length', l)} />
+                                        <SizeInput label="Width (in)" value={w} onChange={setW} onBlur={() => w && window.trackEvent('update_input', 'width', w)} />
+                                        <SizeInput label="Height (in)" value={h} onChange={setH} onBlur={() => h && window.trackEvent('update_input', 'height', h)} />
+                                    </div>
+                                    <div className="w-full md:w-auto flex-shrink-0">
+                                        <button onClick={() => { setL(''); setW(''); setH(''); clearSearchUrl(); }} className="h-[54px] w-full bg-slate-100 hover:bg-slate-200 text-slate-600 px-8 rounded-xl font-bold text-base flex items-center justify-center gap-2 transition-colors">
+                                            Clear Dims
+                                        </button>
+                                    </div>
                                 </div>
-                                <div className="w-full md:w-auto flex flex-col sm:flex-row gap-3 flex-shrink-0">
-                                    <button onClick={() => { setL(''); setW(''); setH(''); clearSearchUrl(); }} className="h-[54px] bg-slate-100 hover:bg-slate-200 text-slate-600 px-8 rounded-xl font-bold text-base flex items-center justify-center gap-2 transition-colors whitespace-nowrap cursor-pointer">
-                                        Clear Search
-                                    </button>
+                                <div className="pt-6 border-t border-slate-100 flex flex-col md:flex-row items-end gap-6">
+                                    <div className="flex-1 w-full grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-4">
+                                        <div className="relative pt-3 w-full">
+                                            <label className="absolute top-0 left-3 bg-white px-2 text-[10px] font-extrabold text-blue-500 uppercase tracking-wider z-10 rounded-full border border-slate-100">Order Qty</label>
+                                            <input type="number" placeholder="Default: 25" value={globalQty} onChange={e => setGlobalQty(e.target.value)} className="w-full h-[54px] border-2 border-slate-200 rounded-xl px-4 font-bold text-lg text-slate-800 focus:outline-none focus:border-blue-500 transition-colors" />
+                                        </div>
+                                        <div className="relative pt-3 w-full">
+                                            <label className="absolute top-0 left-3 bg-white px-2 text-[10px] font-extrabold text-blue-500 uppercase tracking-wider z-10 rounded-full border border-slate-100">Dest. ZIP</label>
+                                            <input type="text" maxLength="5" placeholder="e.g. 90210" value={globalZip} onChange={e => setGlobalZip(e.target.value.replace(/\D/g, ''))} className="w-full h-[54px] border-2 border-slate-200 rounded-xl px-4 font-bold text-lg text-slate-800 focus:outline-none focus:border-blue-500 transition-colors" />
+                                        </div>
+                                        <div className="relative pt-3 w-full">
+                                            <label className="absolute top-0 left-3 bg-white px-2 text-[10px] font-extrabold text-blue-500 uppercase tracking-wider z-10 rounded-full border border-slate-100">Est. Tax %</label>
+                                            <input type="number" min="0" max="20" step="0.1" placeholder="e.g. 7" value={globalTax} onChange={e => setGlobalTax(e.target.value)} className="w-full h-[54px] border-2 border-slate-200 rounded-xl px-4 font-bold text-lg text-slate-800 focus:outline-none focus:border-blue-500 transition-colors" />
+                                        </div>
+                                    </div>
+                                    <div className="w-full md:w-auto flex-shrink-0 hidden lg:block">
+                                        <div className="h-[54px] px-6 flex items-center text-sm font-semibold text-slate-500 bg-blue-50 rounded-xl border border-blue-100 text-blue-800">
+                                            <Truck size={18} className="mr-2"/> ZIP entry auto-calculates Landed Cost
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </header>
 
-                    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 relative">
+                    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 relative">
                         <div className="flex flex-col lg:flex-row gap-8">
                             <div className="w-full lg:w-64 flex-shrink-0 space-y-6">
                                 <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
@@ -492,7 +596,7 @@
                                 {filteredBoxes.length > 0 ? (
                                     <div className="space-y-4">
                                         {filteredBoxes.map((box, idx) => (
-                                            <BoxCard key={`${box.l}-${box.w}-${box.h}-${idx}`} box={box} qtyMode={qtyMode} autoExpand={filteredBoxes.length === 1} />
+                                            <BoxCard key={`${box.l}-${box.w}-${box.h}-${idx}`} box={box} globalQty={globalQty} globalZip={globalZip} globalTax={globalTax} autoExpand={filteredBoxes.length === 1} />
                                         ))}
                                     </div>
                                 ) : (

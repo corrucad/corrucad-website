@@ -171,12 +171,13 @@
                 if (vendor === 'PaperMart') {
                     const safeSku = String(sku);
                     const formattedSku = safeSku.padStart(6, '0');
-                    const targetUrl = `https://www.papermart.com/search?searchstr=${formattedSku}`;
-                    return `https://www.kqzyfj.com/click-101732774-13236874?url=${encodeURIComponent(targetUrl)}&cjsku=${formattedSku}&sid=boxfinder`;
+                    // Removed CJ affiliate routing per termination
+                    return `https://www.papermart.com/search?searchstr=${formattedSku}`;
                 }
             }
 
-            if (vendor === 'PaperMart') return 'https://www.anrdoezrs.net/click-101732774-12336139';
+            // Removed default fallback CJ affiliate url
+            if (vendor === 'PaperMart') return 'https://www.papermart.com/';
             if (vendor === 'Wagner Supply') return 'https://www.wagnersupply.com/Items/JMTBCO/Industrial-Packaging/Boxes/';
             if (vendor === 'Staples') return 'https://www.staples.com/Shipping-Boxes/cat_CL213835';
 
@@ -310,6 +311,7 @@
                         </div>
                     </div>
 
+                    {}
                     {expanded && (
                         <div className="bg-slate-50 border-t border-slate-200">
                             <div className="p-5">
@@ -471,6 +473,7 @@
 
             return (
                 <div className="min-h-screen bg-slate-100 font-sans text-slate-900 pb-12">
+                    {}
                     <header className="bg-gradient-to-r from-orange-500 to-orange-600 shadow-md relative">
                         <div className="bg-orange-700 text-orange-100 px-4 py-2 text-sm flex items-center justify-between">
                             <a href="/" className="flex items-center gap-1 hover:text-white transition-colors font-medium">
@@ -536,6 +539,7 @@
                         </div>
                     </header>
 
+                    {}
                     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 relative">
                         <div className="flex flex-col lg:flex-row gap-8">
                             <div className="w-full lg:w-64 flex-shrink-0 space-y-6">

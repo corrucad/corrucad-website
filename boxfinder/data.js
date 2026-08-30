@@ -577,7 +577,7 @@ const rawData = [
         { v: 'PackagingPrice', g: '32 ECT', p: 2.26, b: 1.99, s: '181818' },
         { v: 'MSC Direct', g: '32 ECT', p: 8.08, b: 8.08, s: '89819577' },
         { v: 'RAJA Pack', g: 'Standard', p: 4.78, b: 2.24, s: 'SW13UK' },
-        { v: 'Whitebird', g: '32 ECT', p: 4.50, b: 4.50, s: 'box-18x18x18-32c-kraft-20120' },
+        { v: 'Whitebird', g: '32 ECT', p: 3.11, b: 3.11, s: 'box-18x18x18-32c-kraft-20120' },
         { v: 'Packaging Hero', g: '32 ECT', p: 3.10, b: 2.79, s: 'PH-101961' },
         { v: 'Boxery', g: '32 ECT', p: 2.25, b: 2.25, s: 'CXBSM181818' },
         { v: 'Grainger', g: '32 ECT', p: 2.26, b: 2.26, s: '11A777' },

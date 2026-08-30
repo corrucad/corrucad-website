@@ -592,7 +592,7 @@ const rawData = [
         { v: 'Uline', g: '32 ECT', p: 1.51, b: 1.51, s: 'S-19847' },
         { v: 'PackagingPrice', g: '32 ECT', p: 1.51, b: 1.33, s: '201212' },
         { v: 'MSC Direct', g: '32 ECT', p: 6.82, b: 6.82, s: '39544754' },
-        { v: 'Whitebird', g: '32 ECT', p: 2.30, b: 2.30, s: 'box-20x12x12-32c-kraft-20240-rsc' },
+        { v: 'Whitebird', g: '32 ECT', p: 2.05, b: 2.05, s: 'box-20x12x12-32c-kraft-20240-rsc' },
         { v: 'Packaging Hero', g: '32 ECT', p: 1.89, b: 1.43, s: 'PH-102039' },
         { v: 'Boxery', g: '32 ECT', p: 1.49, b: 1.49, s: 'CXBSL201212' },
         { v: 'Grainger', g: '32 ECT', p: 1.30, b: 1.30, s: '493T75' },

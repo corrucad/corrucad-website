@@ -12,7 +12,7 @@ const rawData = [
         { v: 'Arka', g: '32 ECT', p: 0.36, b: 0.36, s: '4x4x4 Blank Shippers' },
         { v: 'MSC Direct', g: '32 ECT', p: 0.84, b: 0.84, s: '31544224' },
         { v: 'RAJA Pack', g: 'Standard', p: 0.70, b: 0.49, s: 'P02UK' },
-        { v: 'Whitebird', g: '32 ECT', p: 0.33, b: 0.33, s: 'box-4x4x4-32c-white-252500' },
+        { v: 'Whitebird', g: '32 ECT', p: 0.33, b: 0.33, s: 'box-4x4x4-32c-kraft-regular-slotted-252500/p' },
         { v: 'Packaging Hero', g: '32 ECT', p: 0.36, b: 0.22, s: 'PH-102963' },
         { v: 'Boxery', g: '32 ECT', p: 0.24, b: 0.24, s: 'CXBCBC04' },
         { v: 'Grainger', g: '32 ECT', p: 0.31, b: 0.31, s: '11K579' },

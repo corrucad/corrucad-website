@@ -162,7 +162,16 @@
                 if (vendor === 'MSC Direct') return `https://www.mscdirect.com/product/details/${sku}`;
                 if (vendor === 'RAJA Pack') return `https://www.rajapack.co.uk/?query=${sku}`;
                 if (vendor === 'Packaging Hero') return `https://www.packaginghero.com/${l}-x-${w}-x-${h}-corrugated-boxes-${sku.toLowerCase()}`;
-                if (vendor === 'Whitebird') return `https://www.whitebird.ca/corrugate/corrugated-boxes/all-corrugated-boxes`;
+                if (vendor === 'Whitebird') {
+                    if (sku && sku !== 'n/a' && sku.trim() !== '') {
+                    return `https://www.whitebird.ca/${sku}/p`;
+                    }
+                // Safe category fallbacks based on length
+                if (l >= 4 && l <= 8) return 'https://www.whitebird.ca/corrugate/corrugated-boxes/all-corrugated-boxes/4-to-8-inches';
+                if (l >= 9 && l <= 14) return 'https://www.whitebird.ca/corrugate/corrugated-boxes/all-corrugated-boxes/9-to-14-inches';
+                // Ultimate safe fallback
+                return 'https://www.whitebird.ca/corrugate/corrugated-boxes/all-corrugated-boxes';
+            }
                 
                 if (vendor === 'PackagingPrice') {
                     if (/^\d+$/.test(sku)) {

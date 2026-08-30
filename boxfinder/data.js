@@ -402,7 +402,7 @@ const rawData = [
         { v: 'PackagingPrice', g: '32 ECT', p: 1.09, b: 0.96, s: '16128' },
         { v: 'Arka', g: '32 ECT', p: 1.48, b: 1.48, s: '16x12x8 Box' },
         { v: 'MSC Direct', g: '32 ECT', p: 3.77, b: 3.77, s: '89819338' },
-        { v: 'Whitebird', g: '32 ECT', p: 1.65, b: 1.65, s: 'box-16x12x8-32c-kraft-25250' },
+        { v: 'Whitebird', g: '32 ECT', p: n/a, b: n/a, s: 'corrugate/corrugated-boxes/all-corrugated-boxes/14-to-17-inches' },
         { v: 'Packaging Hero', g: '32 ECT', p: 1.39, b: 1.24, s: 'PH-101691' },
         { v: 'Boxery', g: '32 ECT', p: 1.06, b: 1.06, s: 'CXBSM36' },
         { v: 'Grainger', g: '32 ECT', p: 0.93, b: 0.93, s: '11R389' },

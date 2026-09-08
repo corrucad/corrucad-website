@@ -8,7 +8,7 @@ const rawData = [
     { l: 4, w: 4, h: 4, offers: [
         { v: 'Uline', g: '200#', p: 0.34, b: 0.34, s: 'S-4040' },
         { v: 'Uline', g: '32 ECT', p: 0.25, b: 0.25, s: 'S-22101' },
-        { v: 'Uline.ca', g: '200#', p: 0.44, b: 0.44, s: 'S-4040' },
+        { v: 'Uline.ca', g: '200#', p: 0.47, b: 0.47, s: 'S-4040' },
         { v: 'Uline.ca', g: '32 ECT', p: 0.34, b: 0.34, s: 'S-22101' },
         { v: 'PackagingPrice', g: '32 ECT', p: 0.24, b: 0.21, s: '444' },
         { v: 'Arka', g: '32 ECT', p: 0.36, b: 0.36, s: '4x4x4 Blank Shippers' },
@@ -24,7 +24,7 @@ const rawData = [
     { l: 5, w: 5, h: 5, offers: [
         { v: 'Uline', g: '200#', p: 0.43, b: 0.43, s: 'S-4050' },
         { v: 'Uline', g: '32 ECT', p: 0.36, b: 0.36, s: 'S-22102' },
-        { v: 'Uline.ca', g: '200#', p: 0.56, b: 0.56, s: 'S-4050' },
+        { v: 'Uline.ca', g: '200#', p: 0.59, b: 0.59, s: 'S-4050' },
         { v: 'Uline.ca', g: '32 ECT', p: 0.49, b: 0.49, s: 'S-22102' },
         { v: 'PackagingPrice', g: '32 ECT', p: 0.34, b: 0.30, s: '555' },
         { v: 'Arka', g: '32 ECT', p: 0.47, b: 0.47, s: '5x5x5 Box' },
@@ -40,7 +40,7 @@ const rawData = [
     { l: 6, w: 4, h: 4, offers: [
         { v: 'Uline', g: '200#', p: 0.39, b: 0.39, s: 'S-4060' },
         { v: 'Uline', g: '32 ECT', p: 0.35, b: 0.35, s: 'S-22103' },
-        { v: 'Uline.ca', g: '200#', p: 0.51, b: 0.51, s: 'S-4060' },
+        { v: 'Uline.ca', g: '200#', p: 0.53, b: 0.53, s: 'S-4060' },
         { v: 'Uline.ca', g: '32 ECT', p: 0.48, b: 0.48, s: 'S-22103' },
         { v: 'PackagingPrice', g: '32 ECT', p: 0.33, b: 0.29, s: '644' },
         { v: 'Arka', g: '32 ECT', p: 0.39, b: 0.39, s: '6x4x4 Box' },
@@ -56,7 +56,7 @@ const rawData = [
     { l: 6, w: 6, h: 4, offers: [
         { v: 'Uline', g: '200#', p: 0.46, b: 0.46, s: 'S-4061' },
         { v: 'Uline', g: '32 ECT', p: 0.37, b: 0.37, s: 'S-22104' },
-        { v: 'Uline.ca', g: '200#', p: 0.59, b: 0.59, s: 'S-4061' },
+        { v: 'Uline.ca', g: '200#', p: 0.63, b: 0.63, s: 'S-4061' },
         { v: 'Uline.ca', g: '32 ECT', p: 0.51, b: 0.51, s: 'S-22104' },
         { v: 'PackagingPrice', g: '32 ECT', p: 0.35, b: 0.31, s: '664' },
         { v: 'Arka', g: '32 ECT', p: 0.41, b: 0.41, s: '6x6x4 Blank Shippers' },
@@ -72,7 +72,7 @@ const rawData = [
     { l: 6, w: 6, h: 6, offers: [
         { v: 'Uline', g: '200#', p: 0.48, b: 0.48, s: 'S-4062' },
         { v: 'Uline', g: '32 ECT', p: 0.41, b: 0.41, s: 'S-21014' },
-        { v: 'Uline.ca', g: '200#', p: 0.61, b: 0.61, s: 'S-4062' },
+        { v: 'Uline.ca', g: '200#', p: 0.66, b: 0.66, s: 'S-4062' },
         { v: 'Uline.ca', g: '32 ECT', p: 0.56, b: 0.56, s: 'S-21014' },
         { v: 'PackagingPrice', g: '32 ECT', p: 0.39, b: 0.34, s: '666' },
         { v: 'Arka', g: '32 ECT', p: 0.46, b: 0.46, s: '6x6x6 Blank Shippers' },
@@ -88,7 +88,7 @@ const rawData = [
     { l: 8, w: 6, h: 4, offers: [
         { v: 'Uline', g: '200#', p: 0.49, b: 0.49, s: 'S-4080' },
         { v: 'Uline', g: '32 ECT', p: 0.43, b: 0.43, s: 'S-19040' },
-        { v: 'Uline.ca', g: '200#', p: 0.64, b: 0.64, s: 'S-4080' },
+        { v: 'Uline.ca', g: '200#', p: 0.67, b: 0.67, s: 'S-4080' },
         { v: 'Uline.ca', g: '32 ECT', p: 0.59, b: 0.59, s: 'S-19040' },
         { v: 'PackagingPrice', g: '32 ECT', p: 0.38, b: 0.34, s: '864' },
         { v: 'Arka', g: '32 ECT', p: 0.49, b: 0.49, s: '8x6x4 Blank Shippers' },
@@ -104,7 +104,7 @@ const rawData = [
     { l: 8, w: 8, h: 4, offers: [
         { v: 'Uline', g: '200#', p: 0.69, b: 0.69, s: 'S-4082' },
         { v: 'Uline', g: '32 ECT', p: 0.58, b: 0.58, s: 'S-19043' },
-        { v: 'Uline.ca', g: '200#', p: 0.90, b: 0.90, s: 'S-4082' },
+        { v: 'Uline.ca', g: '200#', p: 0.95, b: 0.95, s: 'S-4082' },
         { v: 'Uline.ca', g: '32 ECT', p: 0.79, b: 0.79, s: 'S-19043' },
         { v: 'PackagingPrice', g: '32 ECT', p: 0.52, b: 0.46, s: '884' },
         { v: 'Arka', g: '32 ECT', p: 0.65, b: 0.65, s: '8x8x4 Blank Shippers' },
@@ -120,7 +120,7 @@ const rawData = [
     { l: 8, w: 8, h: 8, offers: [
         { v: 'Uline', g: '200#', p: 0.70, b: 0.70, s: 'S-4084' },
         { v: 'Uline', g: '32 ECT', p: 0.59, b: 0.59, s: 'S-18336' },
-        { v: 'Uline.ca', g: '200#', p: 0.91, b: 0.91, s: 'S-4084' },
+        { v: 'Uline.ca', g: '200#', p: 0.96, b: 0.96, s: 'S-4084' },
         { v: 'Uline.ca', g: '32 ECT', p: 0.81, b: 0.81, s: 'S-18336' },
         { v: 'PackagingPrice', g: '32 ECT', p: 0.56, b: 0.49, s: '888' },
         { v: 'Arka', g: '32 ECT', p: 0.76, b: 0.76, s: '8x8x8 Box' },
@@ -136,7 +136,7 @@ const rawData = [
     { l: 9, w: 9, h: 9, offers: [
         { v: 'Uline', g: '200#', p: 0.87, b: 0.87, s: 'S-4094' },
         { v: 'Uline', g: '32 ECT', p: 0.70, b: 0.70, s: 'S-19059' },
-        { v: 'Uline.ca', g: '200#', p: 1.13, b: 1.13, s: 'S-4094' },
+        { v: 'Uline.ca', g: '200#', p: 1.19, b: 1.19, s: 'S-4094' },
         { v: 'Uline.ca', g: '32 ECT', p: 0.96, b: 0.96, s: 'S-19059' },
         { v: 'PackagingPrice', g: '32 ECT', p: 0.66, b: 0.58, s: '999' },
         { v: 'Arka', g: '32 ECT', p: 0.79, b: 0.79, s: '9x9x9 Blank Shippers' },
@@ -152,7 +152,7 @@ const rawData = [
     { l: 10, w: 8, h: 6, offers: [
         { v: 'Uline', g: '200#', p: 0.74, b: 0.74, s: 'S-4103' },
         { v: 'Uline', g: '32 ECT', p: 0.64, b: 0.64, s: 'S-18337' },
-        { v: 'Uline.ca', g: '200#', p: 0.96, b: 0.96, s: 'S-4103' },
+        { v: 'Uline.ca', g: '200#', p: 1.01, b: 1.01, s: 'S-4103' },
         { v: 'Uline.ca', g: '32 ECT', p: 0.88, b: 0.88, s: 'S-18337' },
         { v: 'PackagingPrice', g: '32 ECT', p: 0.60, b: 0.53, s: '1086' },
         { v: 'Arka', g: '32 ECT', p: 0.79, b: 0.79, s: '10x8x6 Standard Shipping Box' },
@@ -168,7 +168,7 @@ const rawData = [
     { l: 10, w: 10, h: 10, offers: [
         { v: 'Uline', g: '200#', p: 0.89, b: 0.89, s: 'S-4105' },
         { v: 'Uline', g: '32 ECT', p: 0.71, b: 0.71, s: 'S-18338' },
-        { v: 'Uline.ca', g: '200#', p: 1.16, b: 1.16, s: 'S-4105' },
+        { v: 'Uline.ca', g: '200#', p: 1.22, b: 1.22, s: 'S-4105' },
         { v: 'Uline.ca', g: '32 ECT', p: 0.97, b: 0.97, s: 'S-18338' },
         { v: 'PackagingPrice', g: '32 ECT', p: 0.67, b: 0.59, s: '101010' },
         { v: 'Arka', g: '32 ECT', p: 0.80, b: 0.80, s: '10x10x10 Blank Shippers' },
@@ -186,7 +186,7 @@ const rawData = [
     { l: 12, w: 6, h: 6, offers: [
         { v: 'Uline', g: '200#', p: 0.69, b: 0.69, s: 'S-4128' },
         { v: 'Uline', g: '32 ECT', p: 0.58, b: 0.58, s: 'S-19063' },
-        { v: 'Uline.ca', g: '200#', p: 0.90, b: 0.90, s: 'S-4128' },
+        { v: 'Uline.ca', g: '200#', p: 0.95, b: 0.95, s: 'S-4128' },
         { v: 'Uline.ca', g: '32 ECT', p: 0.79, b: 0.79, s: 'S-19063' },
         { v: 'PackagingPrice', g: '32 ECT', p: 0.55, b: 0.48, s: '1266' },
         { v: 'Arka', g: '32 ECT', p: 0.75, b: 0.75, s: '12x6x6 Box' },
@@ -202,7 +202,7 @@ const rawData = [
     { l: 12, w: 9, h: 4, offers: [
         { v: 'Uline', g: '200#', p: 0.89, b: 0.89, s: 'S-4521' },
         { v: 'Uline', g: '32 ECT', p: 0.71, b: 0.71, s: 'S-19066' },
-        { v: 'Uline.ca', g: '200#', p: 1.16, b: 1.16, s: 'S-4521' },
+        { v: 'Uline.ca', g: '200#', p: 1.22, b: 1.22, s: 'S-4521' },
         { v: 'Uline.ca', g: '32 ECT', p: 0.97, b: 0.97, s: 'S-19066' },
         { v: 'PackagingPrice', g: '32 ECT', p: 0.67, b: 0.59, s: '1294' },
         { v: 'Arka', g: '32 ECT', p: 0.80, b: 0.80, s: '12x9x4 Blank Shippers' },
@@ -218,7 +218,7 @@ const rawData = [
     { l: 12, w: 9, h: 6, offers: [
         { v: 'Uline', g: '200#', p: 0.98, b: 0.98, s: 'S-4406' },
         { v: 'Uline', g: '32 ECT', p: 0.80, b: 0.80, s: 'S-18339' },
-        { v: 'Uline.ca', g: '200#', p: 1.26, b: 1.26, s: 'S-4406' },
+        { v: 'Uline.ca', g: '200#', p: 1.34, b: 1.34, s: 'S-4406' },
         { v: 'Uline.ca', g: '32 ECT', p: 1.10, b: 1.10, s: 'S-18339' },
         { v: 'PackagingPrice', g: '32 ECT', p: 0.71, b: 0.63, s: '1296' },
         { v: 'Arka', g: '32 ECT', p: 1.06, b: 1.06, s: '12x9x6 Standard Shipping Boxes' },
@@ -234,7 +234,7 @@ const rawData = [
     { l: 12, w: 10, h: 6, offers: [
         { v: 'Uline', g: '200#', p: 1.00, b: 1.00, s: 'S-4130' },
         { v: 'Uline', g: '32 ECT', p: 0.86, b: 0.86, s: 'S-18340' },
-        { v: 'Uline.ca', g: '200#', p: 1.29, b: 1.29, s: 'S-4130' },
+        { v: 'Uline.ca', g: '200#', p: 1.37, b: 1.37, s: 'S-4130' },
         { v: 'Uline.ca', g: '32 ECT', p: 1.18, b: 1.18, s: 'S-18340' },
         { v: 'PackagingPrice', g: '32 ECT', p: 0.78, b: 0.69, s: '12106' },
         { v: 'Arka', g: '32 ECT', p: 0.96, b: 0.96, s: '12x10x6 Blank Shippers' },
@@ -252,7 +252,7 @@ const rawData = [
     { l: 12, w: 10, h: 8, offers: [
         { v: 'Uline', g: '200#', p: 1.02, b: 1.02, s: 'S-4120' },
         { v: 'Uline', g: '32 ECT', p: 0.88, b: 0.88, s: 'S-18341' },
-        { v: 'Uline.ca', g: '200#', p: 1.32, b: 1.32, s: 'S-4120' },
+        { v: 'Uline.ca', g: '200#', p: 1.40, b: 1.40, s: 'S-4120' },
         { v: 'Uline.ca', g: '32 ECT', p: 1.21, b: 1.21, s: 'S-18341' },
         { v: 'PackagingPrice', g: '32 ECT', p: 0.83, b: 0.73, s: '12108' },
         { v: 'Arka', g: '32 ECT', p: 0.99, b: 0.99, s: '12x10x8 Blank Shippers' },
@@ -270,7 +270,7 @@ const rawData = [
     { l: 12, w: 12, h: 4, offers: [
         { v: 'Uline', g: '200#', p: 1.00, b: 1.00, s: 'S-4215' },
         { v: 'Uline', g: '32 ECT', p: 0.86, b: 0.86, s: 'S-19068' },
-        { v: 'Uline.ca', g: '200#', p: 1.29, b: 1.29, s: 'S-4215' },
+        { v: 'Uline.ca', g: '200#', p: 1.37, b: 1.37, s: 'S-4215' },
         { v: 'Uline.ca', g: '32 ECT', p: 1.18, b: 1.18, s: 'S-19068' },
         { v: 'PackagingPrice', g: '32 ECT', p: 0.81, b: 0.71, s: '12124' },
         { v: 'Arka', g: '32 ECT', p: 0.96, b: 0.96, s: '12x12x4 Blank Shippers' },
@@ -286,7 +286,7 @@ const rawData = [
     { l: 12, w: 12, h: 6, offers: [
         { v: 'Uline', g: '200#', p: 1.05, b: 1.05, s: 'S-4122' },
         { v: 'Uline', g: '32 ECT', p: 0.88, b: 0.88, s: 'S-18342' },
-        { v: 'Uline.ca', g: '200#', p: 1.37, b: 1.37, s: 'S-4122' },
+        { v: 'Uline.ca', g: '200#', p: 1.44, b: 1.44, s: 'S-4122' },
         { v: 'Uline.ca', g: '32 ECT', p: 1.21, b: 1.21, s: 'S-18342' },
         { v: 'PackagingPrice', g: '32 ECT', p: 0.83, b: 0.73, s: '12126' },
         { v: 'Arka', g: '32 ECT', p: 0.99, b: 0.99, s: '12x12x6 Blank Shippers' },
@@ -304,7 +304,7 @@ const rawData = [
     { l: 12, w: 12, h: 8, offers: [
         { v: 'Uline', g: '200#', p: 1.12, b: 1.12, s: 'S-4124' },
         { v: 'Uline', g: '32 ECT', p: 0.98, b: 0.98, s: 'S-18343' },
-        { v: 'Uline.ca', g: '200#', p: 1.46, b: 1.46, s: 'S-4124' },
+        { v: 'Uline.ca', g: '200#', p: 1.53, b: 1.53, s: 'S-4124' },
         { v: 'Uline.ca', g: '32 ECT', p: 1.34, b: 1.34, s: 'S-18343' },
         { v: 'PackagingPrice', g: '32 ECT', p: 0.92, b: 0.81, s: '12128' },
         { v: 'Arka', g: '32 ECT', p: 1.21, b: 1.21, s: '12x12x8 Box' },
@@ -322,7 +322,7 @@ const rawData = [
     { l: 12, w: 12, h: 10, offers: [
         { v: 'Uline', g: '200#', p: 1.26, b: 1.26, s: 'S-4126' },
         { v: 'Uline', g: '32 ECT', p: 1.06, b: 1.06, s: 'S-19069' },
-        { v: 'Uline.ca', g: '200#', p: 1.64, b: 1.64, s: 'S-4126' },
+        { v: 'Uline.ca', g: '200#', p: 1.73, b: 1.73, s: 'S-4126' },
         { v: 'Uline.ca', g: '32 ECT', p: 1.45, b: 1.45, s: 'S-19069' },
         { v: 'PackagingPrice', g: '32 ECT', p: 1.00, b: 0.88, s: '121210' },
         { v: 'Arka', g: '32 ECT', p: 1.36, b: 1.36, s: '12x12x10 Box' },
@@ -340,7 +340,7 @@ const rawData = [
     { l: 12, w: 12, h: 12, offers: [
         { v: 'Uline', g: '200#', p: 1.16, b: 1.16, s: 'S-4125' },
         { v: 'Uline', g: '32 ECT', p: 1.00, b: 1.00, s: 'S-18344' },
-        { v: 'Uline.ca', g: '200#', p: 1.50, b: 1.50, s: 'S-4125' },
+        { v: 'Uline.ca', g: '200#', p: 1.59, b: 1.59, s: 'S-4125' },
         { v: 'Uline.ca', g: '32 ECT', p: 1.37, b: 1.37, s: 'S-18344' },
         { v: 'PackagingPrice', g: '32 ECT', p: 0.94, b: 0.83, s: '121212' },
         { v: 'Arka', g: '32 ECT', p: 1.11, b: 1.11, s: '12x12x12 Blank Shippers' },
@@ -358,7 +358,7 @@ const rawData = [
     { l: 14, w: 10, h: 6, offers: [
         { v: 'Uline', g: '200#', p: 1.02, b: 1.02, s: 'S-4233' },
         { v: 'Uline', g: '32 ECT', p: 0.87, b: 0.87, s: 'S-18345' },
-        { v: 'Uline.ca', g: '200#', p: 1.32, b: 1.32, s: 'S-4233' },
+        { v: 'Uline.ca', g: '200#', p: 1.40, b: 1.40, s: 'S-4233' },
         { v: 'Uline.ca', g: '32 ECT', p: 1.19, b: 1.19, s: 'S-18345' },
         { v: 'PackagingPrice', g: '32 ECT', p: 0.82, b: 0.72, s: '14106' },
         { v: 'Arka', g: '32 ECT', p: 0.97, b: 0.97, s: '14x10x6 Box' },
@@ -376,7 +376,7 @@ const rawData = [
     { l: 14, w: 10, h: 10, offers: [
         { v: 'Uline', g: '200#', p: 1.12, b: 1.12, s: 'S-4144' },
         { v: 'Uline', g: '32 ECT', p: 0.98, b: 0.98, s: 'S-18346' },
-        { v: 'Uline.ca', g: '200#', p: 1.46, b: 1.46, s: 'S-4144' },
+        { v: 'Uline.ca', g: '200#', p: 1.53, b: 1.53, s: 'S-4144' },
         { v: 'Uline.ca', g: '32 ECT', p: 1.90, b: 1.90, s: 'S-18346' },
         { v: 'PackagingPrice', g: '32 ECT', p: 0.92, b: 0.81, s: '141010' },
         { v: 'Arka', g: '32 ECT', p: 1.21, b: 1.21, s: '14x10x10 Boxes' },
@@ -394,7 +394,7 @@ const rawData = [
     { l: 14, w: 14, h: 14, offers: [
         { v: 'Uline', g: '200#', p: 1.82, b: 1.82, s: 'S-4142' },
         { v: 'Uline', g: '32 ECT', p: 1.56, b: 1.56, s: 'S-18347' },
-        { v: 'Uline.ca', g: '200#', p: 2.37, b: 2.37, s: 'S-4142' },
+        { v: 'Uline.ca', g: '200#', p: 2.49, b: 2.49, s: 'S-4142' },
         { v: 'Uline.ca', g: '32 ECT', p: 2.14, b: 2.14, s: 'S-18347' },
         { v: 'PackagingPrice', g: '32 ECT', p: 1.47, b: 1.29, s: '141414' },
         { v: 'Arka', g: '32 ECT', p: 1.75, b: 1.75, s: '14x14x14 Blank Shippers' },
@@ -412,7 +412,7 @@ const rawData = [
     { l: 15, w: 15, h: 15, offers: [
         { v: 'Uline', g: '200#', p: 2.09, b: 2.09, s: 'S-4318' },
         { v: 'Uline', g: '32 ECT', p: 1.74, b: 1.74, s: 'S-19073' },
-        { v: 'Uline.ca', g: '200#', p: 2.71, b: 2.71, s: 'S-4318' },
+        { v: 'Uline.ca', g: '200#', p: 2.86, b: 2.86, s: 'S-4318' },
         { v: 'Uline.ca', g: '32 ECT', p: 2.38, b: 2.38, s: 'S-19073' },
         { v: 'PackagingPrice', g: '32 ECT', p: 1.64, b: 1.44, s: '151515' },
         { v: 'Arka', g: '32 ECT', p: 2.27, b: 2.27, s: '15x15x15 Box' },
@@ -430,7 +430,7 @@ const rawData = [
     { l: 16, w: 12, h: 8, offers: [
         { v: 'Uline', g: '200#', p: 1.37, b: 1.37, s: 'S-4235' },
         { v: 'Uline', g: '32 ECT', p: 1.16, b: 1.16, s: 'S-18348' },
-        { v: 'Uline.ca', g: '200#', p: 1.77, b: 1.77, s: 'S-4235' },
+        { v: 'Uline.ca', g: '200#', p: 1.88, b: 1.88, s: 'S-4235' },
         { v: 'Uline.ca', g: '32 ECT', p: 1.59, b: 1.59, s: 'S-18348' },
         { v: 'PackagingPrice', g: '32 ECT', p: 1.09, b: 0.96, s: '16128' },
         { v: 'Arka', g: '32 ECT', p: 1.48, b: 1.48, s: '16x12x8 Box' },
@@ -448,7 +448,7 @@ const rawData = [
     { l: 16, w: 12, h: 10, offers: [
         { v: 'Uline', g: '200#', p: 1.51, b: 1.51, s: 'S-4160' },
         { v: 'Uline', g: '32 ECT', p: 1.26, b: 1.26, s: 'S-19074' },
-        { v: 'Uline.ca', g: '200#', p: 1.95, b: 1.95, s: 'S-4160' },
+        { v: 'Uline.ca', g: '200#', p: 2.07, b: 2.07, s: 'S-4160' },
         { v: 'Uline.ca', g: '32 ECT', p: 1.73, b: 1.73, s: 'S-19074' },
         { v: 'PackagingPrice', g: '32 ECT', p: 1.19, b: 1.05, s: '161210' },
         { v: 'Arka', g: '32 ECT', p: 1.41, b: 1.41, s: '16x12x10 Blank Shippers' },
@@ -466,7 +466,7 @@ const rawData = [
     { l: 16, w: 12, h: 12, offers: [
         { v: 'Uline', g: '200#', p: 1.60, b: 1.60, s: 'S-4163' },
         { v: 'Uline', g: '32 ECT', p: 1.34, b: 1.34, s: 'S-18349' },
-        { v: 'Uline.ca', g: '200#', p: 2.07, b: 2.07, s: 'S-4163' },
+        { v: 'Uline.ca', g: '200#', p: 2.19, b: 2.19, s: 'S-4163' },
         { v: 'Uline.ca', g: '32 ECT', p: 1.84, b: 1.84, s: 'S-18349' },
         { v: 'PackagingPrice', g: '32 ECT', p: 1.26, b: 1.11, s: '161212' },
         { v: 'Arka', g: '32 ECT', p: 1.73, b: 1.73, s: '16x12x12 Boxes' },
@@ -484,7 +484,7 @@ const rawData = [
     { l: 16, w: 16, h: 8, offers: [
         { v: 'Uline', g: '200#', p: 1.80, b: 1.80, s: 'S-4393' },
         { v: 'Uline', g: '32 ECT', p: 1.51, b: 1.51, s: 'S-18350' },
-        { v: 'Uline.ca', g: '200#', p: 2.33, b: 2.33, s: 'S-4393' },
+        { v: 'Uline.ca', g: '200#', p: 2.47, b: 2.47, s: 'S-4393' },
         { v: 'Uline.ca', g: '32 ECT', p: 2.07, b: 2.07, s: 'S-18350' },
         { v: 'PackagingPrice', g: '32 ECT', p: 1.42, b: 1.25, s: '16168' },
         { v: 'Arka', g: '32 ECT', p: 1.94, b: 1.94, s: '16x16x8 Box' },
@@ -502,7 +502,7 @@ const rawData = [
     { l: 16, w: 16, h: 16, offers: [
         { v: 'Uline', g: '200#', p: 2.29, b: 2.29, s: 'S-4166' },
         { v: 'Uline', g: '32 ECT', p: 1.95, b: 1.95, s: 'S-18351' },
-        { v: 'Uline.ca', g: '200#', p: 2.97, b: 2.97, s: 'S-4166' },
+        { v: 'Uline.ca', g: '200#', p: 3.14, b: 3.14, s: 'S-4166' },
         { v: 'Uline.ca', g: '32 ECT', p: 2.67, b: 2.67, s: 'S-18351' },
         { v: 'PackagingPrice', g: '32 ECT', p: 1.84, b: 1.62, s: '161616' },
         { v: 'Arka', g: '32 ECT', p: 2.19, b: 2.19, s: '16x16x16 Blank Shippers' },
@@ -520,7 +520,7 @@ const rawData = [
     { l: 18, w: 12, h: 6, offers: [
         { v: 'Uline', g: '200#', p: 1.54, b: 1.54, s: 'S-4187' },
         { v: 'Uline', g: '32 ECT', p: 1.30, b: 1.30, s: 'S-18352' },
-        { v: 'Uline.ca', g: '200#', p: 1.99, b: 1.99, s: 'S-4187' },
+        { v: 'Uline.ca', g: '200#', p: 2.11, b: 2.11, s: 'S-4187' },
         { v: 'Uline.ca', g: '32 ECT', p: 1.78, b: 1.78, s: 'S-18352' },
         { v: 'PackagingPrice', g: '32 ECT', p: 1.15, b: 1.01, s: '18126' },
         { v: 'MSC Direct', g: '32 ECT', p: 2.68, b: 2.68, s: '31011877' },
@@ -537,7 +537,7 @@ const rawData = [
     { l: 18, w: 12, h: 8, offers: [
         { v: 'Uline', g: '200#', p: 1.58, b: 1.58, s: 'S-4188' },
         { v: 'Uline', g: '32 ECT', p: 1.33, b: 1.33, s: 'S-19076' },
-        { v: 'Uline.ca', g: '200#', p: 2.05, b: 2.05, s: 'S-4188' },
+        { v: 'Uline.ca', g: '200#', p: 2.16, b: 2.16, s: 'S-4188' },
         { v: 'Uline.ca', g: '32 ECT', p: 1.82, b: 1.82, s: 'S-19076' },
         { v: 'PackagingPrice', g: '32 ECT', p: 1.25, b: 1.10, s: '18128' },
         { v: 'MSC Direct', g: '32 ECT', p: 2.86, b: 2.86, s: '39545389' },
@@ -554,7 +554,7 @@ const rawData = [
     { l: 18, w: 12, h: 10, offers: [
         { v: 'Uline', g: '200#', p: 1.62, b: 1.62, s: 'S-4189' },
         { v: 'Uline', g: '32 ECT', p: 1.37, b: 1.37, s: 'S-19842' },
-        { v: 'Uline.ca', g: '200#', p: 2.10, b: 2.10, s: 'S-4189' },
+        { v: 'Uline.ca', g: '200#', p: 2.22, b: 2.22, s: 'S-4189' },
         { v: 'Uline.ca', g: '32 ECT', p: 1.88, b: 1.88, s: 'S-19842' },
         { v: 'PackagingPrice', g: '32 ECT', p: 1.29, b: 1.13, s: '181210' },
         { v: 'Arka', g: '32 ECT', p: 1.54, b: 1.54, s: '18x12x10 Blank Shippers' },
@@ -572,7 +572,7 @@ const rawData = [
     { l: 18, w: 12, h: 12, offers: [
         { v: 'Uline', g: '200#', p: 1.66, b: 1.66, s: 'S-4181' },
         { v: 'Uline', g: '32 ECT', p: 1.39, b: 1.39, s: 'S-18353' },
-        { v: 'Uline.ca', g: '200#', p: 2.16, b: 2.16, s: 'S-4181' },
+        { v: 'Uline.ca', g: '200#', p: 2.27, b: 2.27, s: 'S-4181' },
         { v: 'Uline.ca', g: '32 ECT', p: 1.90, b: 1.90, s: 'S-18353' },
         { v: 'PackagingPrice', g: '32 ECT', p: 1.31, b: 1.15, s: '181212' },
         { v: 'Arka', g: '32 ECT', p: 1.81, b: 1.81, s: '18x12x12 Standard Shipping Boxes' },
@@ -590,7 +590,7 @@ const rawData = [
     { l: 18, w: 14, h: 12, offers: [
         { v: 'Uline', g: '200#', p: 2.00, b: 2.00, s: 'S-4183' },
         { v: 'Uline', g: '32 ECT', p: 1.64, b: 1.64, s: 'S-18354' },
-        { v: 'Uline.ca', g: '200#', p: 2.59, b: 2.59, s: 'S-4183' },
+        { v: 'Uline.ca', g: '200#', p: 2.74, b: 2.74, s: 'S-4183' },
         { v: 'Uline.ca', g: '32 ECT', p: 2.25, b: 2.25, s: 'S-18354' },
         { v: 'PackagingPrice', g: '32 ECT', p: 1.55, b: 1.36, s: '181412' },
         { v: 'Arka', g: '32 ECT', p: 1.84, b: 1.84, s: '18x14x12 Blank Shippers' },
@@ -608,7 +608,7 @@ const rawData = [
     { l: 18, w: 18, h: 12, offers: [
         { v: 'Uline', g: '200#', p: 2.48, b: 2.48, s: 'S-4399' },
         { v: 'Uline', g: '32 ECT', p: 2.08, b: 2.08, s: 'S-18355' },
-        { v: 'Uline.ca', g: '200#', p: 3.22, b: 3.22, s: 'S-4399' },
+        { v: 'Uline.ca', g: '200#', p: 3.40, b: 3.40, s: 'S-4399' },
         { v: 'Uline.ca', g: '32 ECT', p: 2.85, b: 2.85, s: 'S-18355' },
         { v: 'PackagingPrice', g: '32 ECT', p: 1.96, b: 1.72, s: '181812' },
         { v: 'MSC Direct', g: '32 ECT', p: 4.97, b: 4.97, s: '39556394' },
@@ -625,7 +625,7 @@ const rawData = [
     { l: 18, w: 18, h: 18, offers: [
         { v: 'Uline', g: '200#', p: 2.86, b: 2.86, s: 'S-4185' },
         { v: 'Uline', g: '32 ECT', p: 2.40, b: 2.40, s: 'S-18356' },
-        { v: 'Uline.ca', g: '200#', p: 3.71, b: 3.71, s: 'S-4185' },
+        { v: 'Uline.ca', g: '200#', p: 3.92, b: 3.92, s: 'S-4185' },
         { v: 'Uline.ca', g: '32 ECT', p: 3.29, b: 3.29, s: 'S-18356' },
         { v: 'PackagingPrice', g: '32 ECT', p: 2.26, b: 1.99, s: '181818' },
         { v: 'MSC Direct', g: '32 ECT', p: 8.08, b: 8.08, s: '89819577' },
@@ -642,7 +642,7 @@ const rawData = [
     { l: 20, w: 12, h: 12, offers: [
         { v: 'Uline', g: '200#', p: 1.90, b: 1.90, s: 'S-4204' },
         { v: 'Uline', g: '32 ECT', p: 1.60, b: 1.60, s: 'S-19847' },
-        { v: 'Uline.ca', g: '200#', p: 2.46, b: 2.46, s: 'S-4204' },
+        { v: 'Uline.ca', g: '200#', p: 2.60, b: 2.60, s: 'S-4204' },
         { v: 'Uline.ca', g: '32 ECT', p: 2.19, b: 2.19, s: 'S-19847' },
         { v: 'PackagingPrice', g: '32 ECT', p: 1.51, b: 1.33, s: '201212' },
         { v: 'MSC Direct', g: '32 ECT', p: 6.82, b: 6.82, s: '39544754' },
@@ -659,7 +659,7 @@ const rawData = [
     { l: 20, w: 14, h: 6, offers: [
         { v: 'Uline', g: '200#', p: 1.75, b: 1.75, s: 'S-4542' },
         { v: 'Uline', g: '32 ECT', p: 1.47, b: 1.47, s: 'S-21040' },
-        { v: 'Uline.ca', g: '200#', p: 2.27, b: 2.27, s: 'S-4542' },
+        { v: 'Uline.ca', g: '200#', p: 2.40, b: 2.40, s: 'S-4542' },
         { v: 'Uline.ca', g: '32 ECT', p: 2.01, b: 2.01, s: 'S-21040' },
         { v: 'PackagingPrice', g: '32 ECT', p: 1.39, b: 1.22, s: '20146' },
         { v: 'MSC Direct', g: '32 ECT', p: 3.04, b: 3.04, s: '39544713' },
@@ -675,7 +675,7 @@ const rawData = [
     { l: 20, w: 14, h: 12, offers: [
         { v: 'Uline', g: '200#', p: 2.18, b: 2.18, s: 'S-4206' },
         { v: 'Uline', g: '32 ECT', p: 1.82, b: 1.82, s: 'S-20471' },
-        { v: 'Uline.ca', g: '200#', p: 2.83, b: 2.83, s: 'S-4206' },
+        { v: 'Uline.ca', g: '200#', p: 2.99, b: 2.99, s: 'S-4206' },
         { v: 'Uline.ca', g: '32 ECT', p: 2.49, b: 2.49, s: 'S-20471' },
         { v: 'PackagingPrice', g: '32 ECT', p: 1.72, b: 1.51, s: '201412' },
         { v: 'MSC Direct', g: '32 ECT', p: 4.80, b: 4.80, s: '39544671' },
@@ -692,7 +692,7 @@ const rawData = [
     { l: 20, w: 16, h: 14, offers: [
         { v: 'Uline', g: '200#', p: 2.65, b: 2.65, s: 'S-4200' },
         { v: 'Uline', g: '32 ECT', p: 2.20, b: 2.20, s: 'S-18357' },
-        { v: 'Uline.ca', g: '200#', p: 3.44, b: 3.44, s: 'S-4200' },
+        { v: 'Uline.ca', g: '200#', p: 3.63, b: 3.63, s: 'S-4200' },
         { v: 'Uline.ca', g: '32 ECT', p: 3.01, b: 3.01, s: 'S-18357' },
         { v: 'PackagingPrice', g: '32 ECT', p: 2.08, b: 1.83, s: '201614' },
         { v: 'MSC Direct', g: '32 ECT', p: 4.91, b: 4.91, s: '39544580' },
@@ -709,7 +709,7 @@ const rawData = [
     { l: 20, w: 20, h: 12, offers: [
         { v: 'Uline', g: '200#', p: 2.89, b: 2.89, s: 'S-4210' },
         { v: 'Uline', g: '32 ECT', p: 2.47, b: 2.47, s: 'S-18358' },
-        { v: 'Uline.ca', g: '200#', p: 3.75, b: 3.75, s: 'S-4210' },
+        { v: 'Uline.ca', g: '200#', p: 3.96, b: 3.96, s: 'S-4210' },
         { v: 'Uline.ca', g: '32 ECT', p: 3.38, b: 3.38, s: 'S-18358' },
         { v: 'PackagingPrice', g: '32 ECT', p: 2.33, b: 2.05, s: '202012' },
         { v: 'MSC Direct', g: '32 ECT', p: 6.82, b: 6.82, s: '39556865' },
@@ -726,7 +726,7 @@ const rawData = [
     { l: 20, w: 20, h: 20, offers: [
         { v: 'Uline', g: '200#', p: 3.71, b: 3.71, s: 'S-4201' },
         { v: 'Uline', g: '32 ECT', p: 3.11, b: 3.11, s: 'S-18359' },
-        { v: 'Uline.ca', g: '200#', p: 4.81, b: 4.81, s: 'S-4201' },
+        { v: 'Uline.ca', g: '200#', p: 5.08, b: 5.08, s: 'S-4201' },
         { v: 'Uline.ca', g: '32 ECT', p: 4.26, b: 4.26, s: 'S-18359' },
         { v: 'PackagingPrice', g: '32 ECT', p: 2.92, b: 2.57, s: '202020' },
         { v: 'MSC Direct', g: '32 ECT', p: 6.62, b: 6.62, s: '31453202' },
@@ -743,7 +743,7 @@ const rawData = [
     { l: 24, w: 12, h: 12, offers: [
         { v: 'Uline', g: '200#', p: 2.07, b: 2.07, s: 'S-4243' },
         { v: 'Uline', g: '32 ECT', p: 1.70, b: 1.70, s: 'S-18360' },
-        { v: 'Uline.ca', g: '200#', p: 2.68, b: 2.68, s: 'S-4243' },
+        { v: 'Uline.ca', g: '200#', p: 2.84, b: 2.84, s: 'S-4243' },
         { v: 'Uline.ca', g: '32 ECT', p: 2.33, b: 2.33, s: 'S-18360' },
         { v: 'PackagingPrice', g: '32 ECT', p: 1.60, b: 1.41, s: '241212' },
         { v: 'MSC Direct', g: '32 ECT', p: 5.26, b: 5.26, s: '39543731' },
@@ -760,7 +760,7 @@ const rawData = [
     { l: 24, w: 16, h: 16, offers: [
         { v: 'Uline', g: '200#', p: 3.10, b: 3.10, s: 'S-4218' },
         { v: 'Uline', g: '32 ECT', p: 2.57, b: 2.57, s: 'S-21031' },
-        { v: 'Uline.ca', g: '200#', p: 4.01, b: 4.01, s: 'S-4218' },
+        { v: 'Uline.ca', g: '200#', p: 4.25, b: 4.25, s: 'S-4218' },
         { v: 'Uline.ca', g: '32 ECT', p: 3.52, b: 3.52, s: 'S-21031' },
         { v: 'PackagingPrice', g: '32 ECT', p: 2.42, b: 2.13, s: '241616' },
         { v: 'MSC Direct', g: '32 ECT', p: 6.20, b: 6.20, s: '39557491' },
@@ -775,7 +775,7 @@ const rawData = [
     { l: 24, w: 18, h: 12, offers: [
         { v: 'Uline', g: '200#', p: 3.03, b: 3.03, s: 'S-4219' },
         { v: 'Uline', g: '32 ECT', p: 2.54, b: 2.54, s: 'S-19818' },
-        { v: 'Uline.ca', g: '200#', p: 3.94, b: 3.94, s: 'S-4219' },
+        { v: 'Uline.ca', g: '200#', p: 4.15, b: 4.15, s: 'S-4219' },
         { v: 'Uline.ca', g: '32 ECT', p: 3.48, b: 3.48, s: 'S-19818' },
         { v: 'PackagingPrice', g: '32 ECT', p: 2.40, b: 2.11, s: '241812' },
         { v: 'MSC Direct', g: '32 ECT', p: 6.10, b: 6.10, s: '39557533' },
@@ -792,7 +792,7 @@ const rawData = [
     { l: 24, w: 18, h: 18, offers: [
         { v: 'Uline', g: '200#', p: 3.81, b: 3.81, s: 'S-4340' },
         { v: 'Uline', g: '32 ECT', p: 3.19, b: 3.19, s: 'S-19077' },
-        { v: 'Uline.ca', g: '200#', p: 4.94, b: 4.94, s: 'S-4340' },
+        { v: 'Uline.ca', g: '200#', p: 5.22, b: 5.22, s: 'S-4340' },
         { v: 'Uline.ca', g: '32 ECT', p: 4.37, b: 4.37, s: 'S-19077' },
         { v: 'PackagingPrice', g: '32 ECT', p: 3.00, b: 2.64, s: '241818' },
         { v: 'MSC Direct', g: '32 ECT', p: 8.37, b: 8.37, s: '39543467' },
@@ -809,7 +809,7 @@ const rawData = [
     { l: 24, w: 24, h: 12, offers: [
         { v: 'Uline', g: '200#', p: 3.87, b: 3.87, s: 'S-4320' },
         { v: 'Uline', g: '32 ECT', p: 3.22, b: 3.22, s: 'S-22210' },
-        { v: 'Uline.ca', g: '200#', p: 5.02, b: 5.02, s: 'S-4320' },
+        { v: 'Uline.ca', g: '200#', p: 5.30, b: 5.30, s: 'S-4320' },
         { v: 'Uline.ca', g: '32 ECT', p: 4.41, b: 4.41, s: 'S-22210' },
         { v: 'PackagingPrice', g: '32 ECT', p: 3.03, b: 2.67, s: '242412' },
         { v: 'MSC Direct', g: '32 ECT', p: 9.08, b: 9.08, s: '39557699' },
@@ -826,7 +826,7 @@ const rawData = [
     { l: 24, w: 24, h: 24, offers: [
         { v: 'Uline', g: '200#', p: 5.45, b: 5.45, s: 'S-4247' },
         { v: 'Uline', g: '32 ECT', p: 4.54, b: 4.54, s: 'S-19078' },
-        { v: 'Uline.ca', g: '200#', p: 7.06, b: 7.06, s: 'S-4247' },
+        { v: 'Uline.ca', g: '200#', p: 7.47, b: 7.47, s: 'S-4247' },
         { v: 'Uline.ca', g: '32 ECT', p: 6.22, b: 6.22, s: 'S-19078' },
         { v: 'PackagingPrice', g: '32 ECT', p: 4.27, b: 3.76, s: '242424' },
         { v: 'MSC Direct', g: '32 ECT', p: 14.72, b: 14.72, s: '89819593' },
@@ -842,7 +842,7 @@ const rawData = [
     ]},
     { l: 36, w: 36, h: 36, offers: [
         { v: 'Uline', g: '200#', p: 11.83, b: 11.83, s: 'S-4193' },
-        { v: 'Uline.ca', g: '200#', p: 15.35, b: 15.35, s: 'S-4193' },
+        { v: 'Uline.ca', g: '200#', p: 16.21, b: 16.21, s: 'S-4193' },
         { v: 'PackagingPrice', g: '32 ECT', p: 11.16, b: 9.82, s: '363636' },
         { v: 'MSC Direct', g: '32 ECT', p: 31.69, b: 31.69, s: '39558887' },
         { v: 'Whitebird', g: '32 ECT', p: 16.90, b: 16.90, s: 'box-36x36x36-32c-kraft-5120' },

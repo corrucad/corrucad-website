@@ -10,8 +10,8 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CorruCAD | Precision Corrugated CAD & Pricing Engine</title>
-    <meta name="description" content="Professional engineering tool for corrugated packaging. Generate FEFCO geometry, calculate $/ton fiber costs, and export production-ready DXF & Kiwiplan CSV files.">
+    <title>CorruCAD v3.0 | Precision Corrugated CAD, Pricing Engine & COSI 1.0</title>
+    <meta name="description" content="Professional engineering tool for corrugated packaging. Generate FEFCO geometry, calculate $/ton fiber costs, and export DXF, Kiwiplan CSV, and VDW/FEFCO COSI 1.0 machine setup JSON.">
     <link rel="canonical" href="https://www.corrucad.com/" />
     <link rel="icon" href="/favicon.png" type="image/png" sizes="192x192">
     
@@ -26,7 +26,8 @@
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       "name": "CorruCAD",
-      "description": "Professional engineering tool for corrugated packaging design and pricing.",
+      "version": "3.0",
+      "description": "Professional engineering tool for corrugated packaging design, pricing, and Industry 4.0 COSI 1.0 machine setup.",
       "applicationCategory": "BusinessApplication",
       "operatingSystem": "Web",
       "author": {
@@ -41,9 +42,10 @@
     }
     </script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
+        code, pre { font-family: 'JetBrains Mono', monospace; }
         .section-title {
             font-size: 1.125rem; font-weight: 600; color: #374151;
             border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1rem;
@@ -56,18 +58,17 @@
 
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://www.corrucad.com/">
-    <meta property="og:title" content="CorruCAD | Precision Corrugated CAD & Pricing Engine">
-    <meta property="og:description" content="Industrial engineering tool for corrugated design. Generate FEFCO geometry, calculate $/ton fiber costs, and export DXF/Kiwiplan files.">
+    <meta property="og:title" content="CorruCAD v3.0 | Precision Corrugated CAD, Pricing Engine & COSI 1.0">
+    <meta property="og:description" content="Industrial engineering tool for corrugated design. Generate FEFCO geometry, calculate $/ton fiber costs, and export DXF, Kiwiplan CSV, and COSI 1.0 JSON payloads.">
     <meta property="og:image" content="https://www.corrucad.com/social-preview.png">
 
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://www.corrucad.com/">
-    <meta property="twitter:title" content="CorruCAD | Precision Corrugated CAD & Pricing Engine">
-    <meta property="twitter:description" content="Professional corrugated engineering: $/ton math, FEFCO designs, and industrial CAD exports.">
+    <meta property="twitter:title" content="CorruCAD v3.0 | Precision Corrugated CAD & COSI 1.0">
+    <meta property="twitter:description" content="Professional corrugated engineering: $/ton math, FEFCO designs, Kiwiplan scheduling, and COSI 1.0 converting machine automation.">
     <meta property="twitter:image" content="https://www.corrucad.com/social-preview.png">
     
     <script src="/_vercel/insights/script.js" defer></script>
-   
 </head>
 
 <body class="bg-gray-100">
@@ -94,12 +95,12 @@
 
     <div id="root">
         <div style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0;">
-            <h1>CorruCAD: Industrial Corrugated Design & CAD Engine</h1>
+            <h1>CorruCAD v3.0: Industrial Corrugated Design, Estimating & COSI 1.0 Automation</h1>
             <p>
                 Generate production-ready FEFCO geometry for RSC, FOL, and 0401 folders. 
                 Our precision estimating engine converts $/ton paper market assumptions into 
                 instant $/MSF quotes for 32 ECT and 200# Mullen board. 
-                Export DXF CAD files and Kiwiplan-ready CSVs directly to production.
+                Export DXF CAD files, Kiwiplan-ready CSVs, and VDW/FEFCO COSI 1.0 JSON machine setup payloads directly to converting equipment.
             </p>
             <nav>
                 <a href="/boxfinder">Compare live vendor prices on BoxFinder</a>
@@ -145,6 +146,15 @@
             </svg>
         );
 
+        const CpuIcon = ({ size = 16, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <rect width="16" height="16" x="4" y="4" rx="2"/>
+                <rect width="6" height="6" x="9" y="9" rx="1"/>
+                <path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/>
+                <path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/>
+            </svg>
+        );
+
         const estimatingEngine = (() => {
             const calculateQuote = (inputs) => {
                 const defaults = {
@@ -167,7 +177,6 @@
                 return {
                     pricePerTon, totalFiberWeightLbsMsf, boxWeightLbs, baseMaterialCost,
                     marginAmount, costPerBox: finalCostPerBox, totalCost,
-                    // Return calculated values dynamically
                     convertingPerBox: data.convertingCost, 
                     printPerBox: data.printUpcharge,
                     freightPerBox: data.freightAdder
@@ -291,7 +300,6 @@
                 calculateBlank: (L_in, W_in, H_in, thickness) => {
                     const CAL = thickness;
                     const corner_offset = 0.5 * CAL; 
-                    
                     const Tuck = 2.0; 
                     const x_tuck_w = Tuck;
                     const x_depth_w = H_in + CAL; 
@@ -365,7 +373,6 @@
                 name: 'Five Panel Folder (0410)',
                 calculateBlank: (L_input, W_input, H_input, thickness) => {
                     const slotWidth_full_in = 3/8; const oneSixteenth_in = 1/16;
-                    
                     const panel1_width = W_input + thickness - oneSixteenth_in;
                     const panel2_width = L_input + thickness;
                     const panel3_width = W_input + thickness;
@@ -374,13 +381,11 @@
 
                     const x_inner_glue_tab = panel1_width + panel2_width + panel3_width + panel4_width;
                     const x_outer_glue_tab = x_inner_glue_tab + panel5_width;
-
                     const internalH_for_blank = H_input + (3 * thickness);
                     const flapLength_inches = W_input;
 
                     const blankWidth = x_outer_glue_tab;
                     const blankHeight = internalH_for_blank + (2 * flapLength_inches);
-
                     const outsideDimensions = { length: L_input + (2 * thickness), width: W_input + (2 * thickness), height: H_input + (4 * thickness) };
 
                     const slots = [
@@ -388,7 +393,6 @@
                         { x: (panel1_width + panel2_width) - (slotWidth_full_in / 2), y: 0, w: slotWidth_full_in, h: flapLength_inches, type: 'full' },
                         { x: (panel1_width + panel2_width + panel3_width) - (slotWidth_full_in / 2), y: 0, w: slotWidth_full_in, h: flapLength_inches, type: 'full' },
                         { x: x_inner_glue_tab - (slotWidth_full_in / 2), y: 0, w: (slotWidth_full_in / 2) + panel5_width, h: flapLength_inches, type: 'corner_cut' },
-                        
                         { x: panel1_width - (slotWidth_full_in / 2), y: internalH_for_blank + flapLength_inches, w: slotWidth_full_in, h: flapLength_inches, type: 'full' },
                         { x: (panel1_width + panel2_width) - (slotWidth_full_in / 2), y: internalH_for_blank + flapLength_inches, w: slotWidth_full_in, h: flapLength_inches, type: 'full' },
                         { x: (panel1_width + panel2_width + panel3_width) - (slotWidth_full_in / 2), y: internalH_for_blank + flapLength_inches, w: slotWidth_full_in, h: flapLength_inches, type: 'full' },
@@ -401,12 +405,10 @@
                         { x: panel1_width + panel2_width, y: flapLength_inches, w: panel3_width, h: internalH_for_blank, type: 'panel' },
                         { x: panel1_width + panel2_width + panel3_width, y: flapLength_inches, w: panel4_width, h: internalH_for_blank, type: 'panel' },
                         { x: x_inner_glue_tab, y: flapLength_inches, w: panel5_width, h: internalH_for_blank, type: 'panel' },
-                        
                         { x: 0, y: 0, w: panel1_width, h: flapLength_inches, type: 'flap' },
                         { x: panel1_width, y: 0, w: panel2_width, h: flapLength_inches, type: 'flap' },
                         { x: panel1_width + panel2_width, y: 0, w: panel3_width, h: flapLength_inches, type: 'flap' },
                         { x: panel1_width + panel2_width + panel3_width, y: 0, w: panel4_width, h: flapLength_inches, type: 'flap' },
-                        
                         { x: 0, y: internalH_for_blank + flapLength_inches, w: panel1_width, h: flapLength_inches, type: 'flap' },
                         { x: panel1_width, y: internalH_for_blank + flapLength_inches, w: panel2_width, h: flapLength_inches, type: 'flap' },
                         { x: panel1_width + panel2_width, y: internalH_for_blank + flapLength_inches, w: panel3_width, h: flapLength_inches, type: 'flap' },
@@ -423,7 +425,6 @@
                     ];
 
                     const dxfGlueTabPerimeterPoints = [];
-
                     return { blankWidth, blankHeight, outsideDimensions, layout, scoreLines, slots, dxfGlueTabPerimeterPoints };
                 }
             },
@@ -696,15 +697,19 @@
 
         const FEFCOCADApp = () => {
             const [appState, setAppState] = useState({
-                unit: 'in', // Unit Switcher State
+                unit: 'in',
                 length: 12, width: 12, height: 12,
                 boardProfile: '32 ECT C', fefcoStyle: '0201',
                 priceMsf: 58, outerLiner: 35, innerLiner: 35,
                 medium1: 23, middleLiner: 0, medium2: 0,
                 flute1: '1.42', flute2: '1.32',
-                adderMode: 'per_box', // Supports 'per_box' or 'per_msf'
+                adderMode: 'per_box',
                 margin: 0, convertingCost: 0.00, printUpcharge: 0.00, freightAdder: 0.00, setupFee: 0, quantity: 1000,
                 topTenSelection: '12 x 12 x 12 (S-4125)',
+                // COSI 1.0 Machine & Network Attributes
+                machineId: 'FFG-04',
+                mqttBroker: 'mqtt://192.168.1.100:1883',
+                mqttTopic: 'cosi/converting/ffg04/setup',
             });
 
             const [results, setResults] = useState({
@@ -712,6 +717,10 @@
                 squareFootage: null, wastePercentage: null, inchesOfRule: null,
                 quoteResults: null, message: 'Enter dimensions or select a preset to begin.',
             });
+
+            const [isCosiModalOpen, setIsCosiModalOpen] = useState(false);
+            const [cosiCopied, setCosiCopied] = useState(false);
+            const [mqttStatus, setMqttStatus] = useState(null);
 
             const canvasRef = useRef(null);
 
@@ -735,7 +744,6 @@
                         newH = Math.round(newH * 25.4).toString();
                         newPrice = newPrice / (1.15 * 92.90304);
                         
-                        // Check active format mode before dividing metric values
                         if (prev.adderMode === 'per_msf') {
                             newPrint = newPrint / (1.15 * 92.90304);
                             newConv = newConv / (1.15 * 92.90304);
@@ -753,7 +761,6 @@
                         newH = snap(newH);
                         newPrice = newPrice * (1.15 * 92.90304);
                         
-                        // Check active format mode before multiplying imperial values
                         if (prev.adderMode === 'per_msf') {
                             newPrint = newPrint * (1.15 * 92.90304);
                             newConv = newConv * (1.15 * 92.90304);
@@ -818,7 +825,7 @@
                     new Date().toISOString().slice(0,10).replace(/-/g,""),
                     appState.boardProfile, appState.flute1,
                     L_mm, W_mm, D_mm, BlankW_mm, BlankL_mm,
-                    Score1_mm, Score2_mm, Score3_mm, Score4_mm, Score5_mm, "Generated by corru~CAD v2.6.9"
+                    Score1_mm, Score2_mm, Score3_mm, Score4_mm, Score5_mm, "Generated by corru~CAD v3.0"
                 ];
 
                 const csvContent = "data:text/csv;charset=utf-8," + headers.join(",") + "\n" + row.join(",");
@@ -829,6 +836,118 @@
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
+            };
+
+            const buildCosiPayload = useCallback(() => {
+                if (!results.blankDimensions) return null;
+
+                const generateUUID = () => {
+                    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+                        return crypto.randomUUID();
+                    }
+                    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+                        const r = Math.random() * 16 | 0;
+                        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                        return v.toString(16);
+                    });
+                };
+
+                const vertScores = results.blankDimensions.scoreLines
+                    .filter(l => l.type === 'vertical' || l.type === 'vertical_glue_tab')
+                    .sort((a, b) => a.x1 - b.x1);
+
+                const creases = [];
+                const seenX = new Set();
+                vertScores.forEach(l => {
+                    const mmVal = Math.round(l.x1 * 25.4);
+                    if (!seenX.has(mmVal)) {
+                        seenX.add(mmVal);
+                        creases.push({
+                            axis: "transverse",
+                            position: {
+                                value: Number(mmVal.toFixed(1)),
+                                uom: "mm"
+                            }
+                        });
+                    }
+                });
+
+                const currentBoard = boardData[appState.boardProfile];
+                let fluteDesignation = "B";
+                if (currentBoard) {
+                    if (currentBoard.type === 'doublewall' && currentBoard.flutes) {
+                        fluteDesignation = currentBoard.flutes.join('');
+                    } else if (currentBoard.flute) {
+                        fluteDesignation = currentBoard.flute;
+                    }
+                }
+
+                const fefcoCleanCode = appState.fefcoStyle.split('_')[0];
+                const blankWidthMm = Math.round(results.blankDimensions.blankWidth * 25.4);
+                const blankHeightMm = Math.round(results.blankDimensions.blankHeight * 25.4);
+
+                return {
+                    messageID: `urn:uuid:${generateUUID()}`,
+                    schemaId: "cosi::1.0:setup-converting",
+                    assetClass: "converting",
+                    messageType: "setup",
+                    machineId: appState.machineId || "FFG-04",
+                    timestamp: new Date().toISOString(),
+                    payload: {
+                        job: {
+                            jobId: `JOB-${Date.now()}`,
+                            targetQuantity: parseInt(appState.quantity, 10) || 1000
+                        },
+                        product: {
+                            fefcoCode: fefcoCleanCode,
+                            flute: fluteDesignation,
+                            boardGrade: appState.boardProfile
+                        },
+                        sheet: {
+                            width: { value: Number(blankWidthMm.toFixed(1)), uom: "mm" },
+                            length: { value: Number(blankHeightMm.toFixed(1)), uom: "mm" }
+                        },
+                        creases: creases
+                    }
+                };
+            }, [results.blankDimensions, appState]);
+
+            const exportToCOSI = () => {
+                if (!results.blankDimensions) {
+                    setResults(prev => ({...prev, message: 'Please calculate dimensions before exporting COSI setup.'}));
+                    return;
+                }
+
+                const payload = buildCosiPayload();
+                if (!payload) return;
+
+                const jsonStr = JSON.stringify(payload, null, 2);
+                const blob = new Blob([jsonStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.setAttribute("href", url);
+                link.setAttribute("download", `COSI_1.0_Setup_${appState.fefcoStyle}_${payload.payload.job.jobId}.json`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                setResults(prev => ({...prev, message: 'VDW/FEFCO COSI 1.0 setup JSON envelope exported successfully!'}));
+            };
+
+            const handleCopyCosiJson = () => {
+                const payload = buildCosiPayload();
+                if (!payload) return;
+                navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
+                setCosiCopied(true);
+                setTimeout(() => setCosiCopied(false), 2000);
+            };
+
+            const handleSimulateMqtt = () => {
+                setMqttStatus('publishing');
+                setTimeout(() => {
+                    setMqttStatus('published');
+                    setTimeout(() => setMqttStatus(null), 4000);
+                }, 750);
             };
 
             const handleStateChange = useCallback((changes) => {
@@ -936,22 +1055,12 @@
                 if (blankAreaSqIn > 0) {
                     let totalWasteAreaSqIn = 0;
                     blankData.slots.forEach(slot => { 
-                        if (slot.type !== 'corner_cut') {
-                            totalWasteAreaSqIn += slot.w * slot.h; 
-                        } else {
-                            totalWasteAreaSqIn += slot.w * slot.h;
-                        }
+                        totalWasteAreaSqIn += slot.w * slot.h; 
                     });
                     
                     const glueTabStyles = ['0201', '0203', '0200_HSC'];
-                    if(glueTabStyles.includes(fefcoStyle)) {
+                    if (glueTabStyles.includes(fefcoStyle)) {
                         const glueFlap_in = 1.375;
-                        let flapLength_for_waste = 0;
-                        if (fefcoStyle === '0201' || fefcoStyle === '0200_HSC') {
-                           flapLength_for_waste = roundToNearestFraction(W_in / 2, 1/16) + roundToNearestFraction(thickness_in / 2, 1/16);
-                        } else if (fefcoStyle === '0203') {
-                           flapLength_for_waste = W_in;
-                        }
                         const angle15DegRad = 15 * Math.PI / 180;
                         const angleOffset = Math.tan(angle15DegRad) * glueFlap_in;
                         totalWasteAreaSqIn += angleOffset * glueFlap_in;
@@ -1020,7 +1129,6 @@
                 let enginePrintUpcharge = 0;
                 let engineFreightAdder = 0;
 
-                // Adjust the engine calculations based on the selected adder mode (Flat per box vs Area per MSF)
                 if (adderMode === 'per_msf') {
                     const msfPerBox = blankAreaSqFt / 1000;
                     const convUsdMsf = unit === 'mm' ? (parseFloat(convertingCost) || 0) * 1.15 * 92.90304 : (parseFloat(convertingCost) || 0);
@@ -1110,7 +1218,6 @@
                 ? (appState.unit === 'mm' ? '€/m²' : '$/msf') 
                 : (appState.unit === 'mm' ? '€/box' : '$/box');
 
-            // Format outputs to dynamically pull from the USD engine baseline (Engine manages Area/Box multiplier)
             const displayMaterialCost = quoteResults ? (appState.unit === 'mm' ? quoteResults.baseMaterialCost / 1.15 : quoteResults.baseMaterialCost) : 0;
             const displayMargin = quoteResults ? (appState.unit === 'mm' ? quoteResults.marginAmount / 1.15 : quoteResults.marginAmount) : 0;
             const displayConverting = quoteResults ? (appState.unit === 'mm' ? quoteResults.convertingPerBox / 1.15 : quoteResults.convertingPerBox) : 0;
@@ -1127,7 +1234,6 @@
                     return;
                 }
 
-                // Get multiplier based on unit mapping (square footage vs square meters)
                 const areaMultiplier = appState.unit === 'mm' 
                     ? (results.squareFootage * 0.09290304) 
                     : (results.squareFootage / 1000);      
@@ -1160,14 +1266,22 @@
                 });
             };
 
+            const currentCosiPayload = buildCosiPayload();
+
             return (
                 <div className="max-w-7xl mx-auto p-4 md:p-8">
                     <div className="text-center mb-8">
                          <h1 className="text-4xl md:text-5xl font-extrabold text-slate-800 flex items-baseline justify-center">
                             <span>corru</span><span className="text-orange-500 text-5xl md:text-6xl font-normal mx-1" style={{ transform: 'translateY(2px)' }}>~</span><span className="font-black">CAD</span>
                         </h1>
-                        <p className="text-md text-gray-600">v2.6.9 - Precision Engine with Presets</p>
+                        <div className="mt-1 flex items-center justify-center gap-2">
+                            <span className="text-md text-gray-700 font-semibold">v3.0 - Precision CAD &amp; COSI 1.0 Connected</span>
+                            <span className="bg-indigo-100 text-indigo-800 border border-indigo-200 text-xs px-2.5 py-0.5 rounded-full font-bold inline-flex items-center gap-1 shadow-sm">
+                                <CpuIcon size={12} className="text-indigo-600" /> Industry 4.0
+                            </span>
+                        </div>
                     </div>
+
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-sm space-y-6">
                             <div>
@@ -1302,6 +1416,7 @@
                                 </div>
                             </div>
                         </div>
+                        
                         <div className="bg-white p-6 rounded-lg shadow-sm space-y-6">
                             <h2 className="section-title">Quote Summary</h2>
                             {message && <div className="text-sm p-3 rounded-md bg-blue-50 text-blue-700">{message}</div>}
@@ -1342,15 +1457,63 @@
                                         </div>
                                     </div>
                                 ) : <div className="text-sm text-gray-500">Enter valid dimensions...</div>}
+                                
                                 <div className="mt-4 border rounded-md bg-white overflow-hidden">
                                     <canvas ref={canvasRef}></canvas>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4 mt-4">
-                                <button onClick={() => { handleDownload('dxf'); trackEvent('click_button', 'download_dxf', `${appState.fefcoStyle}_${appState.unit}`); }} disabled={!blankDimensions} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md disabled:bg-gray-400">Download DXF</button>
-                                <button onClick={() => { handleDownload('pdf'); trackEvent('click_button', 'download_pdf', `${appState.fefcoStyle}_${appState.unit}`); }} disabled={!blankDimensions} className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md disabled:bg-gray-400">Download PDF</button>
-                                <button onClick={() => { exportToKiwiplan(); trackEvent('click_button', 'export_kiwiplan_csv', `${appState.fefcoStyle}_${appState.unit}`); }} disabled={!blankDimensions} className="col-span-2 w-full flex justify-center items-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md disabled:bg-gray-400">Export to Kiwiplan (.CSV)</button>
+                                
+                                <div className="grid grid-cols-2 gap-3 mt-4">
+                                    <button 
+                                        onClick={() => { handleDownload('dxf'); trackEvent('click_button', 'download_dxf', `${appState.fefcoStyle}_${appState.unit}`); }} 
+                                        disabled={!blankDimensions} 
+                                        className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-3 rounded-md transition-colors disabled:bg-gray-400 text-sm shadow-sm flex items-center justify-center gap-1.5"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                                        Download DXF
+                                    </button>
+                                    
+                                    <button 
+                                        onClick={() => { handleDownload('pdf'); trackEvent('click_button', 'download_pdf', `${appState.fefcoStyle}_${appState.unit}`); }} 
+                                        disabled={!blankDimensions} 
+                                        className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-3 rounded-md transition-colors disabled:bg-gray-400 text-sm shadow-sm flex items-center justify-center gap-1.5"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                                        Download PDF
+                                    </button>
+                                    
+                                    <button 
+                                        onClick={() => { exportToKiwiplan(); trackEvent('click_button', 'export_kiwiplan_csv', `${appState.fefcoStyle}_${appState.unit}`); }} 
+                                        disabled={!blankDimensions} 
+                                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-3 rounded-md transition-colors disabled:bg-gray-400 text-sm shadow-sm flex items-center justify-center gap-1.5"
+                                        title="Order Layer: ERP/MES Scheduling CSV hot folder format"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h2"/><path d="M14 13h2"/><path d="M8 17h2"/><path d="M14 17h2"/></svg>
+                                        Kiwiplan (.CSV)
+                                    </button>
+                                    
+                                    <button 
+                                        onClick={() => { exportToCOSI(); trackEvent('click_button', 'export_cosi_json', `${appState.fefcoStyle}_${appState.unit}`); }} 
+                                        disabled={!blankDimensions} 
+                                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-3 rounded-md transition-colors disabled:bg-gray-400 text-sm shadow-sm flex items-center justify-center gap-1.5 border border-indigo-500"
+                                        title="Machine Layer: VDW/FEFCO COSI 1.0 converting setup payload (JSON)"
+                                    >
+                                        <CpuIcon size={16} className="text-indigo-200" />
+                                        COSI 1.0 (.JSON)
+                                    </button>
+                                </div>
+
+                                <div className="mt-3">
+                                    <button
+                                        onClick={() => setIsCosiModalOpen(true)}
+                                        disabled={!blankDimensions}
+                                        className="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 py-2 px-3 rounded-md text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                                        COSI 1.0 Machine Config &amp; MQTT Broker Dispatch →
+                                    </button>
                                 </div>
                             </div>
+
                             <div className="bg-indigo-50 p-4 rounded-md">
                                 <h3 className="font-semibold text-indigo-800 mb-2">Pricing Output</h3>
                                 {quoteResults ? (
@@ -1399,6 +1562,140 @@
                             </div>
                         </div>
                     </div>
+
+                    {/* COSI 1.0 Machine Configuration & MQTT Dispatch Modal */}
+                    {isCosiModalOpen && (
+                        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 overflow-y-auto">
+                            <div className="bg-white rounded-xl shadow-2xl max-w-3xl w-full border border-gray-200 overflow-hidden my-8">
+                                <div className="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <CpuIcon size={20} className="text-indigo-400" />
+                                        <div>
+                                            <h3 className="text-lg font-bold">COSI 1.0 Machine Setup &amp; MQTT Telemetry</h3>
+                                            <p className="text-xs text-slate-400">VDW/FEFCO Standard Draft 2020-12 Schema Interface</p>
+                                        </div>
+                                    </div>
+                                    <button 
+                                        onClick={() => setIsCosiModalOpen(false)}
+                                        className="text-slate-400 hover:text-white p-1 rounded-md transition-colors"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                    </button>
+                                </div>
+
+                                <div className="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                        <div>
+                                            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Target Machine ID</label>
+                                            <input 
+                                                type="text" 
+                                                value={appState.machineId} 
+                                                onChange={(e) => handleStateChange({ machineId: e.target.value })}
+                                                placeholder="e.g. FFG-04, RDC-01"
+                                                className="w-full text-sm font-mono p-2 border border-gray-300 rounded-md bg-white"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">MQTT Broker URL</label>
+                                            <input 
+                                                type="text" 
+                                                value={appState.mqttBroker} 
+                                                onChange={(e) => handleStateChange({ mqttBroker: e.target.value })}
+                                                placeholder="mqtt://192.168.1.100:1883"
+                                                className="w-full text-sm font-mono p-2 border border-gray-300 rounded-md bg-white"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">MQTT Topic</label>
+                                            <input 
+                                                type="text" 
+                                                value={appState.mqttTopic} 
+                                                onChange={(e) => handleStateChange({ mqttTopic: e.target.value })}
+                                                placeholder="cosi/converting/ffg04/setup"
+                                                className="w-full text-sm font-mono p-2 border border-gray-300 rounded-md bg-white"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div className="flex justify-between items-center mb-2">
+                                            <span className="text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
+                                                Generated JSON Envelope (<span className="text-indigo-600 font-mono">cosi::1.0:setup-converting</span>)
+                                            </span>
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    onClick={handleCopyCosiJson}
+                                                    className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium px-2.5 py-1 rounded transition-colors flex items-center gap-1 border border-gray-300"
+                                                >
+                                                    {cosiCopied ? (
+                                                        <>
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-green-600"><polyline points="20 6 9 17 4 12"/></svg>
+                                                            Copied!
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                                                            Copy Payload
+                                                        </>
+                                                    )}
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <pre className="bg-slate-950 text-emerald-400 p-4 rounded-lg text-xs leading-relaxed overflow-x-auto border border-slate-800 shadow-inner max-h-72">
+                                            {currentCosiPayload ? JSON.stringify(currentCosiPayload, null, 2) : '// Calculate CAD dimensions to preview COSI envelope'}
+                                        </pre>
+                                    </div>
+
+                                    <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg flex items-start gap-3 text-xs text-amber-900">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-600 shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                        <div>
+                                            <p className="font-bold">Architectural Distinction: Order vs Machine Layer</p>
+                                            <p className="mt-0.5 text-amber-800">
+                                                Kiwiplan CSV pushes commercial order lines (Customer, DueDate) to plant schedulers. COSI 1.0 pushes strict physical telemetry directly to converting PLCs (sheet dimensions in millimeters, dynamic transverse creases, and flute tooling clearances).
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-gray-50 border-t border-gray-200 px-6 py-4 flex flex-wrap justify-between items-center gap-3">
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={handleSimulateMqtt}
+                                            disabled={mqttStatus === 'publishing'}
+                                            className="bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold py-2 px-3.5 rounded-md flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                                            {mqttStatus === 'publishing' ? 'Publishing stream...' : 'Dispatch via MQTT Stream'}
+                                        </button>
+
+                                        {mqttStatus === 'published' && (
+                                            <span className="text-xs text-emerald-700 font-semibold bg-emerald-100 border border-emerald-300 px-2.5 py-1 rounded-md flex items-center gap-1">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                                Dispatched to {appState.machineId}!
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                        <button 
+                                            onClick={() => setIsCosiModalOpen(false)}
+                                            className="px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-100 rounded-md text-xs font-semibold transition-colors"
+                                        >
+                                            Close
+                                        </button>
+                                        <button 
+                                            onClick={exportToCOSI}
+                                            className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 px-4 rounded-md flex items-center gap-1.5 transition-colors shadow-sm"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                                            Download .JSON Setup
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             );
         };

@@ -1058,7 +1058,9 @@
                         },
                         article: {
                             articleRef: appState.topTenSelection !== 'custom' ? appState.topTenSelection : `ART-${appState.length}x${appState.width}x${appState.height}`,
-                            boxType: fefcoCleanCode,
+                            boxType: fefcoCleanCode
+                        },
+                        rawMaterial: {
                             boardGrade: appState.boardProfile,
                             flute: fluteDesignation
                         },
@@ -1836,7 +1838,7 @@
                                             <div className="flex items-center gap-1.5 text-emerald-800"><span className="text-emerald-600 font-bold">✓</span> <strong>Message ID:</strong> Lowercase hyphenated UUID v5 (no prefix)</div>
                                             <div className="flex items-center gap-1.5 text-emerald-800"><span className="text-emerald-600 font-bold">✓</span> <strong>Asset Class:</strong> <code>setup-converting</code> with <code>messageType: cos</code></div>
                                             <div className="flex items-center gap-1.5 text-emerald-800"><span className="text-emerald-600 font-bold">✓</span> <strong>Schema ID:</strong> <code>cosi:setup-converting-payload:1.0</code></div>
-                                            <div className="flex items-center gap-1.5 text-emerald-800"><span className="text-emerald-600 font-bold">✓</span> <strong>Data Model:</strong> Standard <code>jobSettings</code>, <code>article</code>, <code>machineSettings</code></div>
+                                            <div className="flex items-center gap-1.5 text-emerald-800"><span className="text-emerald-600 font-bold">✓</span> <strong>Data Model:</strong> Standard <code>jobSettings</code>, <code>article</code>, <code>rawMaterial</code>, <code>machineSettings</code></div>
                                             <div className="flex items-center gap-1.5 text-emerald-800"><span className="text-emerald-600 font-bold">✓</span> <strong>Extensibility:</strong> CAD creases placed in <code>customProps</code></div>
                                         </div>
                                     </div>

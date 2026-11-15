@@ -100,8 +100,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 0.33,
-                "b": 0.33,
+                "p": 0.34,
+                "b": 0.34,
                 "s": "box-4x4x4-32c-kraft-regular-slotted-252500"
             }
         ]
@@ -205,8 +205,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 0.47,
-                "b": 0.47,
+                "p": 0.49,
+                "b": 0.49,
                 "s": "box-5x5x5-32c-kraft-251500"
             }
         ]
@@ -429,8 +429,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 0.48,
-                "b": 0.48,
+                "p": 0.51,
+                "b": 0.51,
                 "s": "box-6x6x4-32c-kraft-252000"
             }
         ]
@@ -541,8 +541,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 0.53,
-                "b": 0.53,
+                "p": 0.56,
+                "b": 0.56,
                 "s": "box-6x6x6-32c-kraft-251500"
             }
         ]
@@ -653,8 +653,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 0.56,
-                "b": 0.56,
+                "p": 0.59,
+                "b": 0.59,
                 "s": "box-8x6x4-23c-kraft-251500"
             }
         ]
@@ -765,8 +765,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 0.75,
-                "b": 0.75,
+                "p": 0.79,
+                "b": 0.79,
                 "s": "box-8x8x4-32c-kraft-25750"
             }
         ]
@@ -877,8 +877,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 0.77,
-                "b": 0.77,
+                "p": 0.81,
+                "b": 0.81,
                 "s": "box-8x8x8-32c-kraft-25750"
             }
         ]
@@ -982,8 +982,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 0.91,
-                "b": 0.91,
+                "p": 0.96,
+                "b": 0.96,
                 "s": "box-9x9x9-32c-kraft-25500"
             }
         ]
@@ -1094,8 +1094,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 0.81,
-                "b": 0.81,
+                "p": 0.88,
+                "b": 0.88,
                 "s": "box-10x8x6-32c-kraft-25750"
             }
         ]
@@ -1220,8 +1220,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 0.92,
-                "b": 0.92,
+                "p": 0.97,
+                "b": 0.97,
                 "s": "box-10x10x10-32c-kraft-25500"
             }
         ]
@@ -1325,8 +1325,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 0.76,
-                "b": 0.76,
+                "p": 0.79,
+                "b": 0.79,
                 "s": "box-12x6x6-32c-kraft-25750"
             }
         ]
@@ -1437,8 +1437,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 0.91,
-                "b": 0.91,
+                "p": 0.97,
+                "b": 0.97,
                 "s": "box-12x9x4-32c-kraft-25750"
             }
         ]
@@ -1549,8 +1549,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 1.02,
-                "b": 1.02,
+                "p": 1.1,
+                "b": 1.1,
                 "s": "box-12x9x6-32c-kraft-25750"
             }
         ]
@@ -1668,8 +1668,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 1.1,
-                "b": 1.1,
+                "p": 1.18,
+                "b": 1.18,
                 "s": "box-12x10x6-32c-kraft-25500"
             }
         ]
@@ -1794,8 +1794,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 1.22,
-                "b": 1.22,
+                "p": 1.21,
+                "b": 1.21,
                 "s": "box-12x10x8-32c-kraft-25500"
             }
         ]
@@ -1899,8 +1899,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 1.1,
-                "b": 1.1,
+                "p": 1.18,
+                "b": 1.18,
                 "s": "box-12x12x4-32c-kraft-25500"
             }
         ]
@@ -2025,8 +2025,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 1.15,
-                "b": 1.15,
+                "p": 1.21,
+                "b": 1.21,
                 "s": "box-12x12x6-32c-kraft-25500"
             }
         ]
@@ -2263,8 +2263,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 1.38,
-                "b": 1.38,
+                "p": 1.45,
+                "b": 1.45,
                 "s": "box-12x12x10-rsc-32c-kraft"
             }
         ]
@@ -2389,8 +2389,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 1.29,
-                "b": 1.29,
+                "p": 1.37,
+                "b": 1.37,
                 "s": "box-12x12x12-32c-kraft-25250"
             }
         ]
@@ -2515,8 +2515,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 1.13,
-                "b": 1.13,
+                "p": 1.19,
+                "b": 1.19,
                 "s": "box-14x10x6-32c-kraft-25500"
             }
         ]
@@ -2641,8 +2641,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 1.25,
-                "b": 1.25,
+                "p": 1.34,
+                "b": 1.34,
                 "s": "box-14x10x10-32c-kraft-rsc-25500"
             }
         ]
@@ -2767,8 +2767,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 2.02,
-                "b": 2.02,
+                "p": 2.14,
+                "b": 2.14,
                 "s": "box-14x14x14-32c-kraft-25250"
             }
         ]
@@ -2886,8 +2886,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 2.25,
-                "b": 2.25,
+                "p": 2.38,
+                "b": 2.38,
                 "s": "box-15x15x15-32c-kraft-25250-rsc"
             }
         ]
@@ -3117,8 +3117,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 1.64,
-                "b": 1.64,
+                "p": 1.73,
+                "b": 1.73,
                 "s": "box-16x12x10-32c-kraft-25250"
             }
         ]
@@ -3243,8 +3243,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 1.73,
-                "b": 1.73,
+                "p": 1.84,
+                "b": 1.84,
                 "s": "box-16x12x12-32c-kraft-25250"
             }
         ]
@@ -3362,8 +3362,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 1.95,
-                "b": 1.95,
+                "p": 2.07,
+                "b": 2.07,
                 "s": "box-16x16x8-32c-kraft-25250"
             }
         ]
@@ -3488,8 +3488,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 2.53,
-                "b": 2.53,
+                "p": 2.67,
+                "b": 2.67,
                 "s": "box-16x16x16-32c-kraft-25125"
             }
         ]
@@ -3607,8 +3607,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 1.68,
-                "b": 1.68,
+                "p": 1.78,
+                "b": 1.78,
                 "s": "box-18x12x6-32c-kraft-25250"
             }
         ]
@@ -3719,8 +3719,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 1.72,
-                "b": 1.72,
+                "p": 1.82,
+                "b": 1.82,
                 "s": "box-18x12x8-32c-kraft-25500"
             }
         ]
@@ -3838,8 +3838,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 1.77,
-                "b": 1.77,
+                "p": 1.88,
+                "b": 1.88,
                 "s": "box-18x12x10-32c-kraft-25250"
             }
         ]
@@ -3964,8 +3964,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 1.8,
-                "b": 1.8,
+                "p": 1.9,
+                "b": 1.9,
                 "s": "box-18x12x12-32c-kraft-25250"
             }
         ]
@@ -4083,8 +4083,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 2.14,
-                "b": 2.14,
+                "p": 2.25,
+                "b": 2.25,
                 "s": "box-18x14x12-32c-kraft-25250"
             }
         ]
@@ -4195,8 +4195,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 5.16,
-                "b": 4.03,
+                "p": 5.45,
+                "b": 4.6,
                 "s": "box-18x18x12-8-6-32c-kraft-multi-d-25120"
             }
         ]
@@ -4314,8 +4314,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 3.11,
-                "b": 3.11,
+                "p": 3.29,
+                "b": 3.29,
                 "s": "box-18x18x18-32c-kraft-20120"
             }
         ]
@@ -4426,8 +4426,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 2.05,
-                "b": 2.05,
+                "p": 2.19,
+                "b": 2.19,
                 "s": "box-20x12x12-32c-kraft-20240-rsc"
             }
         ]
@@ -4531,8 +4531,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 1.91,
-                "b": 1.91,
+                "p": 2.01,
+                "b": 2.01,
                 "s": "box-20x14x6-32c-kraft-25250"
             }
         ]
@@ -4643,8 +4643,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 2.55,
-                "b": 2.55,
+                "p": 2.49,
+                "b": 2.49,
                 "s": "box-20x14x12-32c-kraft-rsc-25250"
             }
         ]
@@ -4762,8 +4762,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 2.87,
-                "b": 2.87,
+                "p": 3.01,
+                "b": 3.01,
                 "s": "box-20x16x14-32c-kraft-20240"
             }
         ]
@@ -4874,8 +4874,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 3.21,
-                "b": 3.21,
+                "p": 3.38,
+                "b": 3.38,
                 "s": "box-20x20x12-32c-20120"
             }
         ]
@@ -4993,8 +4993,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 4.0,
-                "b": 4.0,
+                "p": 4.26,
+                "b": 4.26,
                 "s": "box-20x20x20-32c-kraft-20120"
             }
         ]
@@ -5112,8 +5112,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 2.2,
-                "b": 2.2,
+                "p": 4.41,
+                "b": 4.41,
                 "s": "box-24x24x12-32c-kraft-20120"
             }
         ]
@@ -5206,13 +5206,6 @@ const rawData = [
                 "p": 3.52,
                 "b": 3.52,
                 "s": "S-21031"
-            },
-            {
-                "v": "Whitebird",
-                "g": "32 ECT",
-                "p": 4.01,
-                "b": 4.01,
-                "s": "box-24x16x16-32c-kraft-20120"
             }
         ]
     },
@@ -5448,8 +5441,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 4.12,
-                "b": 4.12,
+                "p": 4.65,
+                "b": 4.65,
                 "s": "box-24x18x18-32c-kraft-20120"
             }
         ]
@@ -5560,8 +5553,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 4.18,
-                "b": 4.18,
+                "p": 4.41,
+                "b": 4.41,
                 "s": "box-24x24x12-32c-kraft-20120"
             }
         ]
@@ -5672,8 +5665,8 @@ const rawData = [
             {
                 "v": "Whitebird",
                 "g": "32 ECT",
-                "p": 5.87,
-                "b": 5.87,
+                "p": 6.22,
+                "b": 6.22,
                 "s": "box-24x24x24-32c-kraft-15120"
             }
         ]
@@ -5766,13 +5759,6 @@ const rawData = [
                 "p": 16.21,
                 "b": 16.21,
                 "s": "S-4193"
-            },
-            {
-                "v": "Whitebird",
-                "g": "32 ECT",
-                "p": 16.9,
-                "b": 16.9,
-                "s": "box-36x36x36-32c-kraft-5120"
             }
         ]
     }
